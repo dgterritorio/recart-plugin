@@ -1,0 +1,18 @@
+{
+    "dominio": "Limites",
+    "subdominio": "LIMITES ADMINISTRATIVOS, FISCAIS E JURÍDICOS",
+    "familia": "MARCOS ADIMINISTRATIVOS",
+    "objeto": "TEXTO ASSOCIADO AO MARCO DE CONC/FREG *",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

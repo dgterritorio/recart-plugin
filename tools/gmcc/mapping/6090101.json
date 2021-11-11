@@ -1,0 +1,18 @@
+{
+    "dominio": "Construções",
+    "subdominio": "INSTALAÇÕES DESTINADAS AO ABASTECIMENTO",
+    "familia": "ÁGUA",
+    "objeto": "ESTAÇÃO DE TRATAMENTO ÁGUAS",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

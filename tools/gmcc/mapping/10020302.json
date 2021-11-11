@@ -1,0 +1,18 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "TRÁFEGO FERROVIÁRIO",
+    "familia": "MARCAÇÕES",
+    "objeto": "MARCO HECTOMÉTRICO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

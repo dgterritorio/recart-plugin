@@ -1,0 +1,109 @@
+{
+	"objecto": {
+		"Tema": "INFRAESTRUTURAS E SERVIÇOS DE INTERESSE PÚBLICO",
+		"Característica geográfica": "Conduta de água",
+		"Objeto INSPIRE": "",
+		"objeto": "CondutaDeAgua",
+		"Definição": "Conduta utilizada para transportar água de um local para outro.",
+		"Dim.": "2D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi inserida ou alterada.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi substituída.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (linha)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "valorCondutaAgua",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Tipo de conduta utilizada para transportar água."
+		}, {
+			"Atributo": "valorPosicaoVertical",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "A posição vertical relativa da entidade (fenómeno no mundo real)."
+		}, {
+			"Atributo": "diametro",
+			"Multip.": "1",
+			"Tipo": "Real",
+			"D1": "",
+			"D2": "",
+			"Definição": "Diâmetro ou largura da conduta. [unidade: metro]"
+		}],
+		"listas de códigos": [{
+			"nome": "valorCondutaAgua",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Aqueduto",
+				"Valores INSPIRE": "Crossing: aqueduct",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Construção de pedra ou destinada ao transporte de água, incluindo aqueduto sobre arcadas ou pilares."
+			}, {
+				"Valores": "2",
+				"Descrição": "Conduta",
+				"Valores INSPIRE": "WaterPipe",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Tubo condutor de água."
+			}, {
+				"Valores": "3",
+				"Descrição": "Valeta",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Fosso estreito artificial que se destina a coletar e a conduzir as águas superficiais para fora da via rodoviária."
+			}]
+		}, {
+			"nome": "valorPosicaoVertical",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Suspenso ou elevado",
+				"Valores INSPIRE": "suspendedOrElevated",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "A entidade geográfica está acima do solo."
+			}, {
+				"Valores": "0",
+				"Descrição": "Ao nível do solo",
+				"Valores INSPIRE": "onGroundSurface ",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "A entidade geográfica está assente diretamente no solo."
+			}, {
+				"Valores": "-1",
+				"Descrição": "No subsolo",
+				"Valores INSPIRE": "underground",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "A entidade geográfica está assente abaixo do solo."
+			}]
+		}]
+	}
+}

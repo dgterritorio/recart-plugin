@@ -1,0 +1,37 @@
+{
+    "dominio": "Estruturas de Abastecimento e Transporte",
+    "subdominio": "ESTRUTURAS DE ABASTECIMENTO",
+    "familia": "ENERGIA ELÉCTRICA",
+    "objeto": "CABO DE  TRANSPORTE AÉREO  DE BAIXA TENSÃO",
+    "map": [
+        {
+            "table": "cabo_electrico",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_designacao_tensao",
+                    "op": "set",
+                    "value": {
+                      "ndd1": "4"
+                    }
+                },
+                {
+                    "src": "",
+                    "dst": "valor_posicao_vertical",
+                    "op": "set",
+                    "value": "1"
+                }
+            ]
+        }
+    ]
+}

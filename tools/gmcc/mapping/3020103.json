@@ -1,0 +1,29 @@
+{
+    "dominio": "Altimetria",
+    "subdominio": "ACIDENTES TOPOGRÁFICOS (ORIGEM NATURAL)",
+    "familia": " ROCHAS E AREIAS",
+    "objeto": "AREIAS    ?????????????????????????",
+    "map": [
+        {
+            "table": "margem",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_margem",
+                    "op": "set",
+                    "value": "6"
+                }
+            ]
+        }
+    ]
+}

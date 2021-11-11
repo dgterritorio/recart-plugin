@@ -1,0 +1,18 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "",
+    "familia": "OUTROS   ????????????????????????????",
+    "objeto": "PASSEIO FLUVIAL/MARÍTIMO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

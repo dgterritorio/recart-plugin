@@ -1,0 +1,34 @@
+{
+    "dominio": "Toponímia",
+    "subdominio": "HIDROGRAFIA",
+    "familia": "TOPONIMIA COSTEIRA",
+    "objeto": "ÍNSUA",
+    "map": [
+        {
+            "table": "designacao_local",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_local_nomeado",
+                    "op": "set",
+                    "value": "6.8"
+                },
+                {
+                    "src": "Text",
+                    "dst": "nome",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

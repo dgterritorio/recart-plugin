@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainDialog</class>
+ <widget class="QDialog" name="MainDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1280</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Direção-Geral do Território - Recart</string>
+  </property>
+  <property name="locale">
+   <locale language="Portuguese" country="Portugal"/>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="1">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QGridLayout" name="gridLayout_6">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
+         <string>Input</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Ligação</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="3">
+          <widget class="QComboBox" name="connCombo"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Schema</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QPushButton" name="loadLayersBtn">
+           <property name="text">
+            <string>Carregar</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" colspan="2">
+          <widget class="QComboBox" name="schemaName"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="title">
+         <string>Operações</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Directório Output</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="3">
+          <widget class="QgsFileWidget" name="mQgsFileWidget">
+           <property name="storageMode">
+            <enum>QgsFileWidget::GetDirectory</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Formato Output</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <widget class="QPushButton" name="exportBtn">
+           <property name="text">
+            <string>Exportar</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="aliasCheckBox">
+           <property name="text">
+            <string>Exportar alias</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" colspan="2">
+          <widget class="QComboBox" name="exportFormat"/>
+         </item>
+         <item row="1" column="3">
+          <widget class="QComboBox" name="exportEncoding"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="title">
+         <string>Log</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QPlainTextEdit" name="plainTextEdit"/>
+         </item>
+         <item>
+          <widget class="QProgressBar" name="progressBar">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>0</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Layers</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="1" column="0">
+       <widget class="QTreeView" name="treeView"/>
+      </item>
+      <item row="0" column="0" alignment="Qt::AlignRight">
+       <widget class="QCheckBox" name="selectACheckBox">
+        <property name="text">
+         <string>Selecionar todos</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsFileWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsfilewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>connCombo</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>MainDialog</receiver>
+   <slot>changeConn(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1033</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>loadLayersBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainDialog</receiver>
+   <slot>doLoadLayers()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1184</x>
+     <y>84</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>exportBtn</sender>
+   <signal>clicked()</signal>
+   <receiver>MainDialog</receiver>
+   <slot>doExportLayers()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1185</x>
+     <y>190</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>selectACheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>MainDialog</receiver>
+   <slot>selectAll(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>555</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>exportFormat</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>MainDialog</receiver>
+   <slot>onChangeFormat(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>957</x>
+     <y>190</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

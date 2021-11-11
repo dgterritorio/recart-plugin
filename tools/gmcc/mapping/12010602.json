@@ -1,0 +1,29 @@
+{
+    "dominio": "Hidrografia",
+    "subdominio": "NASCENTES E CURSOS DE ÁGUA",
+    "familia": "RIBEIRAS /LINHAS DE ÁGUA",
+    "objeto": "RIBEIRA/RIBEIRO",
+    "map": [
+        {
+            "table": "curso_de_agua_area",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "delimitacao_conhecida",
+                    "op": "set",
+                    "value": "false"
+                }
+            ]
+        }
+    ]
+}

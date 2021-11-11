@@ -1,0 +1,18 @@
+{
+    "dominio": "Limites",
+    "subdominio": "",
+    "familia": "LIMITES DO INE",
+    "objeto": "LIMITE DE SUB-SECÇÃO ESTATÍSTICA",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

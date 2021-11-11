@@ -1,0 +1,99 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "additionalProperties": true,
+    "required": [
+        "map"
+    ],
+    "properties": {
+        "map": {
+            "$id": "#/properties/map",
+            "type": "array",
+            "title": "The Map Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/map/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "description": "An explanation about the purpose of this instance.",
+                "default": {},
+                "additionalProperties": true,
+                "required": [
+                    "table",
+                    "fields"
+                ],
+                "properties": {
+                    "table": {
+                        "$id": "#/properties/map/items/properties/table",
+                        "type": "string",
+                        "title": "The Table Schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "linha_de_quebra"
+                        ]
+                    },
+                    "fields": {
+                        "$id": "#/properties/map/items/properties/fields",
+                        "type": "array",
+                        "title": "The Fields Schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": [],
+                        "additionalItems": true,
+                        "items": {
+                            "$id": "#/properties/map/items/properties/fields/items",
+                            "type": "object",
+                            "title": "The Items Schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": {},
+                            "additionalProperties": true,
+                            "required": [
+                                "src",
+                                "dst",
+                                "op"
+                            ],
+                            "properties": {
+                                "src": {
+                                    "$id": "#/properties/map/items/properties/fields/items/properties/src",
+                                    "type": "string",
+                                    "title": "The Src Schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "1_geom"
+                                    ]
+                                },
+                                "dst": {
+                                    "$id": "#/properties/map/items/properties/fields/items/properties/dst",
+                                    "type": "string",
+                                    "title": "The Dst Schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "geometria"
+                                    ]
+                                },
+                                "op": {
+                                    "$id": "#/properties/map/items/properties/fields/items/properties/op",
+                                    "type": "string",
+                                    "title": "The Op Schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "eq"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

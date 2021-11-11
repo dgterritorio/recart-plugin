@@ -1,0 +1,29 @@
+{
+    "dominio": "Estruturas de Abastecimento e Transporte",
+    "subdominio": "ESTRUTURAS DE ABASTECIMENTO",
+    "familia": "ENERGIA SOLAR",
+    "objeto": "ÁREA CONTENDO PAINEIS SOLARES",
+    "map": [
+        {
+            "table": "elem_assoc_eletricidade",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_associado_electricidade",
+                    "op": "set",
+                    "value": "1.2"
+                }
+            ]
+        }
+    ]
+}

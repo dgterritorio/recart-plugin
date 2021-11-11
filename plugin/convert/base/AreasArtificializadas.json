@@ -1,0 +1,141 @@
+{
+	"objecto": {
+		"Tema": "OCUPAÇÃO DO SOLO",
+		"Característica geográfica": "Área artificializada",
+		"Objeto INSPIRE": "LandCoverUnit",
+		"objeto": "AreasArtificializadas",
+		"Definição": "Área artificializada de ocupação do solo.",
+		"Dim.": "2D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi inserida ou alterada.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi substituída.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (polígono)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "inst_producao_id",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "inst_gestao_ambiental_id",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "equip_util_coletiva_id",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "valorAreasArtificializadas",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Tipo de área artificializada."
+		}, {
+			"Atributo": "nome",
+			"Multip.": "[0..1]",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Nome da área."
+		}],
+		"listas de códigos": [{
+			"nome": "valorAreasArtificializadas",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Equipamentos de saúde",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Área associada aos equipamentos de saúde."
+			}, {
+				"Valores": "2",
+				"Descrição": "Equipamentos de educação",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Área associada aos equipamentos de educação."
+			}, {
+				"Valores": "3",
+				"Descrição": "Equipamentos industriais",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Área associada à atividade industrial."
+			}, {
+				"Valores": "4",
+				"Descrição": "Equipamentos comerciais ou de carácter geral",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Área associada à atividade comercial e de carácter geral (inclui os empreendimentos turísticos, as grandes superfícies comerciais e outros equipamentos similares)."
+			}, {
+				"Valores": "5",
+				"Descrição": "Área de deposição de resíduos",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Área de deposição e tratamento de resíduos urbanos ou industriais."
+			}, {
+				"Valores": "6",
+				"Descrição": "Área em construção",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Área em construção (inclui escavações, estaleiros de obra, etc.) e áreas abandonadas inseridas num contexto urbano."
+			}, {
+				"Valores": "7",
+				"Descrição": "Instalação desportiva e de lazer",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Área ocupada por instalações desportivas (estádios de futebol e infraestruturas anexas, estádios de hóquei, piscinas e campos de ténis, pistas de ciclismo, hipódromos, pistas de atletismo, campos de tiro, etc.) e por outros equipamentos de lazer (parques e jardins, áreas verdes, campos de golfe, etc.)."
+			}, {
+				"Valores": "8",
+				"Descrição": "Parque de campismo",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Área ocupada por estruturas de apoio ao campismo ou ao caravanismo."
+			}, {
+				"Valores": "9",
+				"Descrição": "Área de inumação",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Terreno ou local, geralmente murado, destinado à sepultura dos defuntos (exemplo: cemitérios)."
+			}]
+		}]
+	}
+}

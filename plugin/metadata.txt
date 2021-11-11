@@ -1,0 +1,21 @@
+[general]
+name=RecartDGT
+qgisMinimumVersion=3.14
+description=Convert, import, export cartography datasets based on CartTop specification (valid for Portugal mainland)
+version=1.2.3
+author=Geomaster
+email=geral@geomaster.pt
+
+about=Creates QGIS projects from CartTop datasets stored on Postgresql; export CartTop datasets to GPKG, SHP and GeoJSON; validates CartTop rules; convert old DGN/DWG MNT datasets to CartTop (GDAL > 3.1 is required). CartTop is the official specification for cartographic data in Portugal.
+
+tracker=
+repository=
+
+tags=dgt,geomaster
+
+homepage=https://geomaster.pt
+category=Plugins
+icon=icon.png
+
+experimental=True
+deprecated=False

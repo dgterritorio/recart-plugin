@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/plugins/recartDGT" >
+        <file>icon.png</file>
+    </qresource>
+    <qresource prefix="/plugins/recartDGT" >
+        <file>validate.svg</file>
+    </qresource>
+    <qresource prefix="/plugins/recartDGT" >
+        <file>convert.svg</file>
+    </qresource>
+    <qresource prefix="/plugins/recartDGT" >
+        <file>export.svg</file>
+    </qresource>
+</RCC>

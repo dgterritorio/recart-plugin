@@ -1,0 +1,32 @@
+{
+    "dominio": "Áreas Agrícolas e Florestais",
+    "subdominio": "ÁREAS FLORESTAIS",
+    "familia": "FOLHA PERSISTENTE",
+    "objeto": "FLORESTA NATURAL DA MADEIRA",
+    "map": [
+        {
+            "table": "area_agricola_florestal_mato",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_areas_agricolas_florestais_matos",
+                    "op": "set",
+                    "value": {
+                                "ndd1": "4.1",
+                                "ndd2": "4.1.7"
+                            }
+                }
+            ]
+        }
+    ]
+}

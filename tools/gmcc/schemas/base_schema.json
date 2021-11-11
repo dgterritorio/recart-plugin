@@ -1,0 +1,180 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "additionalProperties": true,
+    "required": [
+        "objecto"
+    ],
+    "properties": {
+        "objecto": {
+            "$id": "#/properties/objecto",
+            "type": "object",
+            "title": "The Objecto Schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "additionalProperties": true,
+            "required": [
+                "objeto",
+                "Atributos"
+            ],
+            "properties": {
+                "objeto": {
+                    "$id": "#/properties/objecto/properties/objeto",
+                    "type": "string",
+                    "title": "The Objeto Schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "AdmPublica"
+                    ]
+                },
+                "Atributos": {
+                    "$id": "#/properties/objecto/properties/Atributos",
+                    "type": "array",
+                    "title": "The Atributos Schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [
+                        [
+                            {
+                                "Multip.": "1",
+                                "Atributo": "identificador",
+                                "Tipo": "UUID",
+                                "D1": "x",
+                                "D2": "x",
+                                "Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc()."
+                            },
+                            {
+                                "Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi inserida ou alterada.",
+                                "Multip.": "1",
+                                "Atributo": "inicioObjeto",
+                                "Tipo": "DataTempo",
+                                "D1": "x",
+                                "D2": "x"
+                            },
+                            {
+                                "Multip.": "[0..1]",
+                                "Atributo": "fimObjeto",
+                                "Tipo": "DataTempo",
+                                "D1": "",
+                                "D2": "",
+                                "Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi substituída."
+                            }
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/objecto/properties/Atributos/items",
+                        "type": "object",
+                        "title": "The Items Schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "Tipo": "UUID",
+                                "D1": "x",
+                                "D2": "x",
+                                "Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+                                "Multip.": "1",
+                                "Atributo": "identificador"
+                            },
+                            {
+                                "Multip.": "1",
+                                "Atributo": "inicioObjeto",
+                                "Tipo": "DataTempo",
+                                "D1": "x",
+                                "D2": "x",
+                                "Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi inserida ou alterada."
+                            },
+                            {
+                                "Multip.": "[0..1]",
+                                "Atributo": "fimObjeto",
+                                "Tipo": "DataTempo",
+                                "D1": "",
+                                "D2": "",
+                                "Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi substituída."
+                            },
+                            {
+                                "Multip.": "[1]",
+                                "Atributo": "valorTipoAdmPublica",
+                                "Tipo": "Lista de códigos",
+                                "D1": "x",
+                                "D2": "x",
+                                "Definição": "Caracterização do serviço da Administração Pública."
+                            },
+                            {
+                                "Tipo": "Texto",
+                                "D1": "x",
+                                "D2": "x",
+                                "Definição": "Topónimo utilizado para identificar o objeto no mundo real.",
+                                "Multip.": "1",
+                                "Atributo": "nome"
+                            },
+                            {
+                                "Definição": "Identificação do serviço ou a pessoa de contacto.",
+                                "Multip.": "1",
+                                "Atributo": "pontoDeContacto",
+                                "Tipo": "Texto",
+                                "D1": "",
+                                "D2": ""
+                            }
+                        ],
+                        "additionalProperties": true,
+                        "required": [
+                            "Atributo",
+                            "Tipo",
+                            "D1",
+                            "D2"
+                        ],
+                        "properties": {
+                            "Atributo": {
+                                "$id": "#/properties/objecto/properties/Atributos/items/properties/Atributo",
+                                "type": "string",
+                                "title": "The Atributo Schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "identificador"
+                                ]
+                            },
+                            "Tipo": {
+                                "$id": "#/properties/objecto/properties/Atributos/items/properties/Tipo",
+                                "type": "string",
+                                "title": "The Tipo Schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "UUID"
+                                ]
+                            },
+                            "D1": {
+                                "$id": "#/properties/objecto/properties/Atributos/items/properties/D1",
+                                "type": "string",
+                                "title": "The D1 Schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "x"
+                                ]
+                            },
+                            "D2": {
+                                "$id": "#/properties/objecto/properties/Atributos/items/properties/D2",
+                                "type": "string",
+                                "title": "The D2 Schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "x"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

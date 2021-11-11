@@ -1,0 +1,18 @@
+{
+    "dominio": "Áreas com outras utilizações",
+    "subdominio": "",
+    "familia": "",
+    "objeto": "ÁREAS ALTERADAS/EM ALTERAÇÃO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

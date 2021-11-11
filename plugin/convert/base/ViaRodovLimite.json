@@ -1,0 +1,71 @@
+{
+	"objecto": {
+		"Tema": "TRANSPORTES (Transporte rodoviário)",
+		"Característica geográfica": "Via rodoviária - Limite",
+		"Objeto INSPIRE": "",
+		"objeto": "ViaRodovLimite",
+		"Definição": "Linha que materializa os limites da via rodoviária.",
+		"Dim.": "3D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi inserida ou alterada.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi substituída.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (linha)",
+			"D1": "x",
+			"D2": "X",
+			"Definição": ""
+		}, {
+			"Atributo": "valorTipoLimite",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Identifica o tipo de limite."
+		}],
+		"listas de códigos": [{
+			"nome": "valorTipoLimite",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Limite exterior sem berma",
+				"Valores INSPIRE": "carriageway",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Linha que materializa o limite da via rodoviária pelo limite exterior da zona utilizada pelo tráfego (sem berma direita), ou seja, pelo limite geométrico exterior da faixa de rodagem (constituída unicamente pela largura das vias de trânsito), caso exista sinalização horizontal (guia). Caso esta sinalização não exista, também não existirá berma direita e como tal o limite da via rodoviária coincide com o limite exterior da área pavimentada ou não pavimentada."
+			}, {
+				"Valores": "2",
+				"Descrição": "Separador",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Linha que delimita a área destinada a separar o tráfego do mesmo sentido ou de sentidos opostos, incluindo, caso existam, as bermas esquerdas. Aplica-se em: rotunda, separador central (distância entre os bordos interiores das faixas unidirecionais) ou lateral, ilhéu direcional ou dispositivo semelhante."
+			}, {
+				"Valores": "3",
+				"Descrição": "Limite exterior com berma pavimentada",
+				"Valores INSPIRE": "pavedSurface",
+				"D1": "",
+				"D2": "",
+				"Definição": "Linha que materializa o limite da via rodoviária pelo limite exterior da berma direita pavimentada, caso exista sinalização horizontal (guia). Caso esta sinalização não exista também não existirá berma direita e como tal o limite da via rodoviária não é representável."
+			}]
+		}]
+	}
+}

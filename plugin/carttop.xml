@@ -1,0 +1,126 @@
+<!DOCTYPE qgis_style>
+<qgis_style version="2">
+  <symbols>
+    <symbol name="agua_lentica" clip_to_extent="1" tags="CartTop,hidrografia" alpha="1" force_rhr="0" type="fill">
+      <data_defined_properties>
+        <Option type="Map">
+          <Option name="name" type="QString" value=""/>
+          <Option name="properties"/>
+          <Option name="type" type="QString" value="collection"/>
+        </Option>
+      </data_defined_properties>
+      <layer pass="0" locked="0" class="SimpleFill" enabled="1">
+        <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+        <prop k="color" v="120,222,203,255"/>
+        <prop k="joinstyle" v="bevel"/>
+        <prop k="offset" v="0,0"/>
+        <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+        <prop k="offset_unit" v="MM"/>
+        <prop k="outline_color" v="0,0,204,255"/>
+        <prop k="outline_style" v="solid"/>
+        <prop k="outline_width" v="0.12"/>
+        <prop k="outline_width_unit" v="MapUnit"/>
+        <prop k="style" v="solid"/>
+        <data_defined_properties>
+          <Option type="Map">
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties"/>
+            <Option name="type" type="QString" value="collection"/>
+          </Option>
+        </data_defined_properties>
+      </layer>
+    </symbol>
+    <symbol name="area_de_trabalho" clip_to_extent="1" tags="CartTop" alpha="1" force_rhr="0" type="fill">
+      <data_defined_properties>
+        <Option type="Map">
+          <Option name="name" type="QString" value=""/>
+          <Option name="properties"/>
+          <Option name="type" type="QString" value="collection"/>
+        </Option>
+      </data_defined_properties>
+      <layer pass="0" locked="0" class="SimpleFill" enabled="1">
+        <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+        <prop k="color" v="225,117,0,255"/>
+        <prop k="joinstyle" v="bevel"/>
+        <prop k="offset" v="0,0"/>
+        <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+        <prop k="offset_unit" v="MM"/>
+        <prop k="outline_color" v="225,117,0,255"/>
+        <prop k="outline_style" v="solid"/>
+        <prop k="outline_width" v="0.52"/>
+        <prop k="outline_width_unit" v="MM"/>
+        <prop k="style" v="no"/>
+        <data_defined_properties>
+          <Option type="Map">
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties"/>
+            <Option name="type" type="QString" value="collection"/>
+          </Option>
+        </data_defined_properties>
+      </layer>
+    </symbol>
+    <symbol name="concelho" clip_to_extent="1" tags="CartTop,Unidades Administrativas" alpha="0.8" force_rhr="0" type="fill">
+      <data_defined_properties>
+        <Option type="Map">
+          <Option name="name" type="QString" value=""/>
+          <Option name="properties"/>
+          <Option name="type" type="QString" value="collection"/>
+        </Option>
+      </data_defined_properties>
+      <layer pass="0" locked="0" class="SimpleFill" enabled="1">
+        <prop k="border_width_map_unit_scale" v="3x:10000,1000,0,0,0,0"/>
+        <prop k="color" v="213,180,60,255"/>
+        <prop k="joinstyle" v="round"/>
+        <prop k="offset" v="0,0"/>
+        <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+        <prop k="offset_unit" v="MM"/>
+        <prop k="outline_color" v="35,35,35,255"/>
+        <prop k="outline_style" v="dash dot"/>
+        <prop k="outline_width" v="1.5"/>
+        <prop k="outline_width_unit" v="MapUnit"/>
+        <prop k="style" v="no"/>
+        <data_defined_properties>
+          <Option type="Map">
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties"/>
+            <Option name="type" type="QString" value="collection"/>
+          </Option>
+        </data_defined_properties>
+      </layer>
+    </symbol>
+    <symbol name="freguesia" clip_to_extent="1" tags="CartTop,Unidades Administrativas" alpha="0.8" force_rhr="0" type="fill">
+      <data_defined_properties>
+        <Option type="Map">
+          <Option name="name" type="QString" value=""/>
+          <Option name="properties"/>
+          <Option name="type" type="QString" value="collection"/>
+        </Option>
+      </data_defined_properties>
+      <layer pass="0" locked="0" class="SimpleFill" enabled="1">
+        <prop k="border_width_map_unit_scale" v="3x:10000,1000,0,0,0,0"/>
+        <prop k="color" v="255,255,255,255"/>
+        <prop k="joinstyle" v="bevel"/>
+        <prop k="offset" v="0,0"/>
+        <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+        <prop k="offset_unit" v="MM"/>
+        <prop k="outline_color" v="35,35,35,255"/>
+        <prop k="outline_style" v="dot"/>
+        <prop k="outline_width" v="1"/>
+        <prop k="outline_width_unit" v="MapUnit"/>
+        <prop k="style" v="no"/>
+        <data_defined_properties>
+          <Option type="Map">
+            <Option name="name" type="QString" value=""/>
+            <Option name="properties"/>
+            <Option name="type" type="QString" value="collection"/>
+          </Option>
+        </data_defined_properties>
+      </layer>
+    </symbol>
+  </symbols>
+  <colorramps/>
+  <textformats/>
+  <labelsettings/>
+  <legendpatchshapes/>
+  <symbols3d/>
+</qgis_style>
