@@ -35,7 +35,7 @@ O plugin tem funcionalidades distintas e, por isso, tem desde logo três opçõe
 
 #### Visualização de informação CartTop
 
-https://github.com/jgrocha/recart-plugin/raw/rg_4_2/images/carttop2qgis.webm
+https://github.com/jgrocha/recart-plugin/raw/main/images/carttop2qgis.webm
 
 #### Validação da informação em CatTop
 
