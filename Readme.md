@@ -35,19 +35,20 @@ O plugin tem funcionalidades distintas e, por isso, tem desde logo três opçõe
 
 #### Visualização de informação CartTop
 
-https://github.com/jgrocha/recart-plugin/raw/main/images/carttop2qgis.webm
+[![Visualização de informação CartTop no QGIS](images/carttop2qgis.png)](https://vimeo.com/manage/videos/645190059)
 
-#### Validação da informação em CatTop
+#### Validação da informação em CartTop
 
-https://github.com/jgrocha/recart-plugin/raw/main/images/carttop-validation.webm
+[![Validação da informação em CartTop](images/carttop-validation.png)](https://vimeo.com/manage/videos/645192295)
 
 #### Cartografia antiga (multicodificada) para CartTop
 
-https://github.com/jgrocha/recart-plugin/raw/main/images/mnt2carttop.webm
+[![Cartografia multicodificada para CartTop](images/mnt2carttop.png)](https://vimeo.com/manage/videos/645190199)
 
-#### CartTop para Shapfile ou Geopackage
+#### CartTop para Shapefile ou Geopackage
 
-https://github.com/jgrocha/recart-plugin/raw/main/images/carttop2gpkg.webm
+[![CartTop para Shapefile ou Geopackage](images/carttop2gpkg.png)](https://vimeo.com/manage/videos/645189407)
+
 ### Limitações
 
 Por desenho, a conversão de DGN/DWG deve ser feita para um esquema novo, sem dados. O plugin não tem a capacidade de acrescentar dados a uma conversão anterior. Por essa razão, deve-se escolher um esquema novo para o destino da conversão de MNT para CartTop.
@@ -70,7 +71,7 @@ Na conversão de cartografia, podem surgir códigos nos DGN/DWG desconhecidos.
 
 Os códigos desconhecidos podem ser tratados de duas formas:
 1. A forma mais complexa consiste em acrescentar novos mapeamentos para esses códigos desconhecidos, há semelhança dos muitos mapeamentos existentes. Para tal, é preciso editar o `plugin/convert/mapping.py`.
-2. A forma amis simples consiste em mapear os códigos desconhecidos em códigos conhecidos. Isso faz-se criando um ficheiro de __alias p/ códigos__, que depois é indicado na correspondente opção no plugin.
+2. A forma mais simples consiste em mapear os códigos desconhecidos em códigos conhecidos. Isso faz-se criando um ficheiro de __alias p/ códigos__, que depois é indicado na correspondente opção no plugin.
 
 ##### Alias p/ Códigos
 
