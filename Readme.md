@@ -35,31 +35,26 @@ O plugin tem funcionalidades distintas e, por isso, tem desde logo três opçõe
 
 #### Visualização de informação CartTop
 
-![](images/carttop2qgis.webm)
+https://github.com/jgrocha/recart-plugin/raw/rg_4_2/images/carttop2qgis.webm
 
 #### Validação da informação em CatTop
 
-![](images/carttop-validation.webm)
+https://github.com/jgrocha/recart-plugin/raw/main/images/carttop-validation.webm
 
 #### Cartografia antiga (multicodificada) para CartTop
 
-![](images/mnt2carttop.webm)
-
-<video src='images/mnt2carttop.webm' width=180>
+https://github.com/jgrocha/recart-plugin/raw/main/images/mnt2carttop.webm
 
 #### CartTop para Shapfile ou Geopackage
 
-![](images/carttop2gpkg.mov)
-
-<video src='images/carttop2gpkg.mov' width=180>
-
+https://github.com/jgrocha/recart-plugin/raw/main/images/carttop2gpkg.webm
 ### Limitações
 
 Por desenho, a conversão de DGN/DWG deve ser feita para um esquema novo, sem dados. O plugin não tem a capacidade de acrescentar dados a uma conversão anterior. Por essa razão, deve-se escolher um esquema novo para o destino da conversão de MNT para CartTop.
 
 ### Opções avançadas
 
-Segue uma breve descrição das opções de conversão de MNt para CartTop.
+Segue uma breve descrição das opções de conversão de MNT para CartTop.
 #### Forçar dimensões da geometria
 
 O CartTop estabelece as geometrias que têm que ser 2D ou 3D. 
