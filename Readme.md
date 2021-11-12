@@ -45,9 +45,13 @@ O plugin tem funcionalidades distintas e, por isso, tem desde logo três opçõe
 
 ![](images/mnt2carttop.webm)
 
+<video src='images/mnt2carttop.webm' width=180>
+
 #### CartTop para Shapfile ou Geopackage
 
 ![](images/carttop2gpkg.mov)
+
+<video src='images/carttop2gpkg.mov' width=180>
 
 ### Limitações
 
