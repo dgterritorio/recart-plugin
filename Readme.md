@@ -1,4 +1,4 @@
-## A aplicações informática recartDGT
+## A aplicação informática recartDGT
 
 A aplicação recartDGT oferece algumas funcionalidades para se tirar o melhor partido do novo modelo CartTop. O modelo CartTop resulta das [especificações técnicas](https://www.dgterritorio.pt/sites/default/files/ficheiros-cartografia/NormasEspecificacoesTecnicasCartTop.pdf) de cartografia topográfica publicadas pela Direção Geral do Território.
 
@@ -14,9 +14,9 @@ O plugin recartDGT é uma aplicação informática, que funciona a partir do QGI
 
 #### Descarregar o plugin recartDGT
 
-O plugin recartDGT está disponível em [recartDGT.zip](https://gitlab.com/geomaster/dgt-recart/-/blob/master/plugin/recartDGT.zip). 
+O plugin recartDGT está disponível em [recartDGT.zip](https://github.com/dgterritorio/recart-plugin/raw/main/plugin/recartDGT.zip). 
 
-No [repositório do recart](https://gitlab.com/geomaster/dgt-recart) está disponível o código fonte. Pode-se e deve-se usar o repositório para reportar questões.
+No [repositório do recart](https://github.com/dgterritorio/recart-plugin) está disponível o código fonte. Pode-se e deve-se usar o repositório para reportar questões.
 
 #### Instalar o plugin
 
@@ -35,27 +35,26 @@ O plugin tem funcionalidades distintas e, por isso, tem desde logo três opçõe
 
 #### Visualização de informação CartTop
 
-![](images/carttop2qgis.webm)
+https://github.com/jgrocha/recart-plugin/raw/main/images/carttop2qgis.webm
 
 #### Validação da informação em CatTop
 
-![](images/carttop-validation.webm)
+https://github.com/jgrocha/recart-plugin/raw/main/images/carttop-validation.webm
 
 #### Cartografia antiga (multicodificada) para CartTop
 
-![](images/mnt2carttop.webm)
+https://github.com/jgrocha/recart-plugin/raw/main/images/mnt2carttop.webm
 
 #### CartTop para Shapfile ou Geopackage
 
-![](images/carttop2gpkg.webm)
-
+https://github.com/jgrocha/recart-plugin/raw/main/images/carttop2gpkg.webm
 ### Limitações
 
 Por desenho, a conversão de DGN/DWG deve ser feita para um esquema novo, sem dados. O plugin não tem a capacidade de acrescentar dados a uma conversão anterior. Por essa razão, deve-se escolher um esquema novo para o destino da conversão de MNT para CartTop.
 
 ### Opções avançadas
 
-Segue uma breve descrição das opções de conversão de MNt para CartTop.
+Segue uma breve descrição das opções de conversão de MNT para CartTop.
 #### Forçar dimensões da geometria
 
 O CartTop estabelece as geometrias que têm que ser 2D ou 3D. 

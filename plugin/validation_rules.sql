@@ -122,75 +122,147 @@ select pc.*
 from {schema}.ponto_cotado as pc, bad
 where pc.identificador = bad.identificador $$);
 
--- hidrografia
-delete from validation.rules where code = 'rg_4_2';
+-- "Transportes" NoTransRodov <-> SegViaRodov
+-- "Transportes" NoTransFerrov <-> SegViaFerrea
+-- "Hidrografia" os nós hifdrográficos têm que coincidir com eixos de água
+-- "Construções" só tem a entidade 3D SinalGeodesico, sem ter que ser coincidente com nada.
+delete from validation.rules where code = 'rg_4_2_i';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('rg_4_2', 'Consistência tridimensional (Parte 2 - Restantes)',
+values ('rg_4_2_i', 'Consistência tridimensional (Hidrografia)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_hidrografico',
 $$with nos as (
 	SELECT identificador, geometria from {schema}.no_hidrografico nh
 ),
-tin as (select n.identificador, t.id, t.geometria, n.geometria as amostra
-from validation.tin t, nos as n
-where st_contains(t.geometria, n.geometria)
-),
-triaux as (select identificador, amostra, (ST_DumpPoints(geometria)).* as dp
-from tin
-), 
-detalhe as (select path[2], identificador, amostra, st_z(amostra), geom, st_z(geom) as z, st_distance(amostra, geom) as distancia
-from triaux where path[2] < 4),
-resumo as (select identificador, amostra, coalesce(st_z(amostra),0) as z_declarado, SUM(z/distancia)/SUM(1/distancia) as z_calculado,
-coalesce(st_z(amostra),0)-SUM(z/distancia)/SUM(1/distancia) as diferenca
-from detalhe
-group by identificador, amostra),
-total as (select count(n.*) from {schema}.no_hidrografico n, validation.tin t where st_contains(t.geometria, n.geometria)),
-good as (select count(*) from resumo where abs(diferenca) <= 2),
-bad as (select count(*) from resumo where abs(diferenca) > 2)
+total as (select count(*) from {schema}.no_hidrografico),
+good as (SELECT count(distinct(a.identificador))
+   from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
+     where st_3dintersects(a.geometria, b.geometria)),
+bad as (select count(nh.*) 
+from {schema}.no_hidrografico nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
+     where st_3dintersects(a.geometria, b.geometria)    
+))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$with nos as (
 	SELECT identificador, geometria from {schema}.no_hidrografico nh
 ),
-tin as (select n.identificador, t.id, t.geometria, n.geometria as amostra
-from validation.tin t, nos as n
-where st_contains(t.geometria, n.geometria)
+total as (select count(*) from {schema}.no_hidrografico),
+good as (SELECT count(distinct(a.identificador))
+   from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
+     where st_3dintersects(a.geometria, b.geometria)),
+bad as (select count(nh.*) 
+from {schema}.no_hidrografico nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
+     where st_3dintersects(a.geometria, b.geometria)    
+))
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$select nh.* 
+from {schema}.no_hidrografico nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
+     where st_3dintersects(a.geometria, b.geometria)    
+) $$);
+--
+delete from validation.rules where code = 'rg_4_2_ii';
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+values ('rg_4_2_ii', 'Consistência tridimensional (Transportes)',
+$$Todos os objetos tridimensionais (3D) são consistentes entre si.
+Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
+$$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_trans_rodov',
+$$with nos as (
+	SELECT identificador, geometria from {schema}.no_trans_rodov nh
 ),
-triaux as (select identificador, amostra, (ST_DumpPoints(geometria)).* as dp
-from tin
-), 
-detalhe as (select path[2], identificador, amostra, st_z(amostra), geom, st_z(geom) as z, st_distance(amostra, geom) as distancia
-from triaux where path[2] < 4),
-resumo as (select identificador, amostra, coalesce(st_z(amostra),0) as z_declarado, SUM(z/distancia)/SUM(1/distancia) as z_calculado,
-coalesce(st_z(amostra),0)-SUM(z/distancia)/SUM(1/distancia) as diferenca
-from detalhe
-group by identificador, amostra),
-total as (select count(n.*) from {schema}.no_hidrografico n, validation.tin t where st_contains(t.geometria, n.geometria)),
-good as (select count(*) from resumo where abs(diferenca) <= 2),
-bad as (select count(*) from resumo where abs(diferenca) > 2)
+total as (select count(*) from {schema}.no_trans_rodov),
+good as (SELECT count(distinct(a.identificador))
+   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
+     where st_3dintersects(a.geometria, b.geometria)),
+bad as (select count(nh.*) 
+from {schema}.no_trans_rodov nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
+     where st_3dintersects(a.geometria, b.geometria)    
+))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$with nos as (
-	SELECT identificador, geometria from {schema}.no_hidrografico nh
+	SELECT identificador, geometria from {schema}.no_trans_rodov nh
 ),
-tin as (select n.identificador, t.id, t.geometria, n.geometria as amostra
-from validation.tin t, nos as n
-where st_contains(t.geometria, n.geometria)
+total as (select count(*) from {schema}.no_trans_rodov),
+good as (SELECT count(distinct(a.identificador))
+   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
+     where st_3dintersects(a.geometria, b.geometria)),
+bad as (select count(nh.*) 
+from {schema}.no_trans_rodov nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
+     where st_3dintersects(a.geometria, b.geometria)    
+))
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$select nh.* 
+from {schema}.no_trans_rodov nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
+     where st_3dintersects(a.geometria, b.geometria)    
+) $$);
+--
+delete from validation.rules where code = 'rg_4_2_iii';
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+values ('rg_4_2_iii', 'Consistência tridimensional (Transportes)',
+$$Todos os objetos tridimensionais (3D) são consistentes entre si.
+Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
+$$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_trans_ferrov',
+$$with nos as (
+	SELECT identificador, geometria from {schema}.no_trans_ferrov nh
 ),
-triaux as (select identificador, amostra, (ST_DumpPoints(geometria)).* as dp
-from tin
-), 
-detalhe as (select path[2], identificador, amostra, st_z(amostra), geom, st_z(geom) as z, st_distance(amostra, geom) as distancia
-from triaux where path[2] < 4),
-resumo as (select identificador, amostra, coalesce(st_z(amostra),0) as z_declarado, SUM(z/distancia)/SUM(1/distancia) as z_calculado,
-coalesce(st_z(amostra),0)-SUM(z/distancia)/SUM(1/distancia) as diferenca
-from detalhe
-group by identificador, amostra)
-select n.*
-from {schema}.no_hidrografico n, resumo
-where n.identificador = resumo.identificador
-and abs(diferenca) > 2 $$);
+total as (select count(*) from {schema}.no_trans_ferrov),
+good as (SELECT count(distinct(a.identificador))
+   from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
+     where st_3dintersects(a.geometria, b.geometria)),
+bad as (select count(nh.*) 
+from {schema}.no_trans_ferrov nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
+     where st_3dintersects(a.geometria, b.geometria)    
+))
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$with nos as (
+	SELECT identificador, geometria from {schema}.no_trans_ferrov nh
+),
+total as (select count(*) from {schema}.no_trans_ferrov),
+good as (SELECT count(distinct(a.identificador))
+   from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
+     where st_3dintersects(a.geometria, b.geometria)),
+bad as (select count(nh.*) 
+from {schema}.no_trans_ferrov nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
+     where st_3dintersects(a.geometria, b.geometria)    
+))
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$select nh.* 
+from {schema}.no_trans_ferrov nh
+where nh.identificador not in (
+SELECT a.identificador
+   from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
+     where st_3dintersects(a.geometria, b.geometria)    
+) $$);
 
 
 delete from validation.rules where code = 'rg_5';
