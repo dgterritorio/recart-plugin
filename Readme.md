@@ -1,4 +1,4 @@
-## A aplicações informática recartDGT
+## A aplicação informática recartDGT
 
 A aplicação recartDGT oferece algumas funcionalidades para se tirar o melhor partido do novo modelo CartTop. O modelo CartTop resulta das [especificações técnicas](https://www.dgterritorio.pt/sites/default/files/ficheiros-cartografia/NormasEspecificacoesTecnicasCartTop.pdf) de cartografia topográfica publicadas pela Direção Geral do Território.
 
@@ -14,9 +14,9 @@ O plugin recartDGT é uma aplicação informática, que funciona a partir do QGI
 
 #### Descarregar o plugin recartDGT
 
-O plugin recartDGT está disponível em [recartDGT.zip](https://gitlab.com/geomaster/dgt-recart/-/blob/master/plugin/recartDGT.zip). 
+O plugin recartDGT está disponível em [recartDGT.zip](https://github.com/dgterritorio/recart-plugin/raw/main/plugin/recartDGT.zip). 
 
-No [repositório do recart](https://gitlab.com/geomaster/dgt-recart) está disponível o código fonte. Pode-se e deve-se usar o repositório para reportar questões.
+No [repositório do recart](https://github.com/dgterritorio/recart-plugin) está disponível o código fonte. Pode-se e deve-se usar o repositório para reportar questões.
 
 #### Instalar o plugin
 
@@ -47,7 +47,7 @@ O plugin tem funcionalidades distintas e, por isso, tem desde logo três opçõe
 
 #### CartTop para Shapfile ou Geopackage
 
-![](images/carttop2gpkg.webm)
+![](images/carttop2gpkg.mov)
 
 ### Limitações
 
