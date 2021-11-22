@@ -530,7 +530,7 @@ begin
 		execute format('select count(t.*) from {schema}.%1$I t
 			where (not (select ST_intersects(t.geometria, f.geometria) from 
 					(select geom_col as geometria from validation.no_hidro) as f)
-				or t.identificador not in (select distinct ta.identificador from {schema}.%1$I ta, no_hidrografico nh 
+				or t.identificador not in (select distinct ta.identificador from {schema}.%1$I ta, {schema}.no_hidrografico nh 
 					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no) INTO bad_aux;
 	
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
@@ -546,7 +546,7 @@ begin
 			execute format('insert into %1$s select t.* from {schema}.%2$I t
 				where (not (select ST_intersects(t.geometria, f.geometria) from 
 						(select geom_col as geometria from validation.no_hidro) as f)
-					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, no_hidrografico nh 
+					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, {schema}.no_hidrografico nh 
 						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no);
 		end if;
 	end loop;

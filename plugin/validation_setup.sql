@@ -717,4 +717,5 @@ SELECT ST_Collect(f.geometria) AS geom_col FROM (
 				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
 ) as f);
 
+DROP INDEX IF EXISTS tin_geom_idx;
 create index tin_geom_idx ON validation.tin using gist(geometria);
