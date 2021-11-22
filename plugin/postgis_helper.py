@@ -52,7 +52,8 @@ class PostgisUtils:
             conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
             cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-            cnt = open(path, "r", encoding='utf-8').read()
+            with open(path, "r", encoding='utf-8') as f:
+                cnt = f.read()
             if len(cnt) > 1:
                 cur.execute(cnt)
                 # conn.commit()
@@ -129,7 +130,6 @@ class PostgisUtils:
         res = None
         try:
             cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
             if len(sql) > 1:
                 cur.execute(sql)
                 if writer is not None:
@@ -149,8 +149,8 @@ class PostgisUtils:
     def run_file_with_conn(self, conn, path):
         try:
             cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-            cnt = open(path, "r", encoding='utf-8').read()
+            with open(path, "r", encoding='utf-8') as f:
+                cnt = f.read()
             if len(cnt) > 1:
                 cur.execute(cnt)
                 # conn.commit()

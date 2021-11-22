@@ -12,8 +12,9 @@
 #
 # Save all layer styles to the database
 # pg_dump -h localhost -U geobox -t layer_styles --no-owner --no-privileges --attribute-inserts -d 5035_carttop2_santa_marta_penaguiao_20211210 > layer_styles.new.sql
-# sed -i "s/VALUES ([0-9]\+, '[^']\+', '[^']\+', /VALUES ( '{schema}', /g" layer_styles.new.sql
-# sed -i "s/layer_styles (id, f_table_catalog, /layer_styles (/g" layer_styles.new.sql
+
+# sed -i "s/VALUES ([0-9]\+, '[^']\+', '[^']\+', /VALUES ( current_database(), '{schema}', /g" layer_styles.new.sql
+# sed -i "s/layer_styles (id,/layer_styles (/g" layer_styles.new.sql
 # sed -i "s/owner, ui, update_time, //g" layer_styles.new.sql
 # sed -i "s/'[a-z]\+', NULL, '202[^']\+', //g" layer_styles.new.sql
 # sed -E -i "s/CREATE (TABLE|SEQUENCE)/CREATE \1 IF NOT EXISTS/g" layer_styles.new.sql

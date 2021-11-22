@@ -335,7 +335,7 @@ class ConvertProcess(QThread):
             self.running = False
         except Exception as e:
             if not self.cancel:
-                self.write("[Erro]")
+                self.write("[Erro -3]")
                 self.write(("\tException: {}".format(e)))
 
     def runSql(self, path):
