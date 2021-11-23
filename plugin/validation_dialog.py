@@ -126,7 +126,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     "update validation.rules set run = false where code ilike 're3_2' or code ilike 'rg_4' or code ilike 'rg_4_1' or code ilike 'rg_4_2';")
                 self.updateTable()
             except Exception as e:
-                self.writeText("[Erro]")
+                self.writeText("[Erro 1]")
                 self.writeText(("\tException: {}".format(e)))
 
     def validateAllChange(self, state):
@@ -137,7 +137,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.updateTable()
                 self.checkBox.setChecked(True)
             except Exception as e:
-                self.writeText("[Erro]")
+                self.writeText("[Erro 2]")
                 self.writeText(("\tException: {}".format(e)))        
         if state is False and self.ruleSetup:
             try:
@@ -146,7 +146,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.updateTable()
                 self.checkBox.setChecked(False)
             except Exception as e:
-                self.writeText("[Erro]")
+                self.writeText("[Erro 3]")
                 self.writeText(("\tException: {}".format(e)))
 
     def setRuleState(self, state):
@@ -160,7 +160,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             if (rcode == 're3_2' or rcode == 'rg_4' or rcode == 'rg_4_1' or rcode == 'rg_4_2') and state is True:
                 self.checkBox.setChecked(True)
         except Exception as e:
-            self.writeText("[Erro]")
+            self.writeText("[Erro 4]")
             self.writeText(("\tException: {}".format(e)))
 
     def updateTable(self):
@@ -190,7 +190,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             if self.updateProcess is not None:
                 self.updateProcess.setUpdated(False)
         except Exception as e:
-            self.writeText("[Erro]")
+            self.writeText("[Erro 5]")
             self.writeText(("\tException: {}".format(e)))
 
     def testValidationRules(self):
@@ -261,7 +261,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     self.testValidationRules()
                 except ValueError as error:
                     self.plainTextEdit.appendPlainText(
-                        "[Erro]: {0}\n".format(error))
+                        "[Erro 6]: {0}\n".format(error))
 
     def testValidProcessing(self):
         res = True
@@ -475,7 +475,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 subprocess.call(('xdg-open', filepath))
 
         except Exception as e:
-            self.writeText("[Erro]")
+            self.writeText("[Erro 7]")
             self.writeText(("\tException: {}".format(e)))
 
     def changeSchema(self):
@@ -486,13 +486,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.bp = os.path.dirname(os.path.realpath(__file__))
         self.schema = str(self.schemaName.currentText())
         try:
-            cnt = open(self.bp + '/validation_rules.sql', "r", encoding='utf-8').read()
+            with open(self.bp + '/validation_rules.sql', 'r', encoding='utf-8') as f:
+                cnt = f.read()
             cnt = cnt.format(schema=self.schema)
             self.pgutils.run_query(cnt)
             # self.pgutils.run_file(bp + '/validation_rules.sql')
             self.testValidationRules()
         except Exception as e:
-            self.writeText("[Erro]")
+            self.writeText("[Erro 6]")
             self.writeText(("\tException: {}".format(e)))
 
     def finishedValidate(self):
@@ -626,7 +627,7 @@ class UpdateProcess(QThread):
                     self.updated = True
                     self.signal.emit()
         except Exception as e:
-            self.write("[Erro]")
+            self.write("[Erro 8]")
             self.write(("\tException: {}".format(e)))
 
 
@@ -648,41 +649,45 @@ class AddLayersProcess(QThread):
         }
         return tk[text]
 
+    def write(self, text):
+        self.signal.emit(text)
+        
     def run(self):
         try:
             tables = self.pgutils.run_query(
                 'SELECT table_name FROM information_schema.tables WHERE table_schema = \'errors\'')
 
-            for tb in tables:
-                ts = re.search(r'([a-z_]+)_rg|([a-z_]+)_re', tb[0])
-                slayer = None
-                if ts.group(1) is not None:
-                    slayer = ts.group(1)
-                elif ts.group(2) is not None:
-                    slayer = ts.group(2)
-                else:
-                    print('-----')
-                    print(tb[0])
-
-                if slayer is not None:
-                    if len(displayList[slayer]["geom"]) > 0:
-                        for gt in displayList[slayer]["geom"]:
-                            ln = tb[0] if len(
-                                displayList[slayer]["geom"]) == 1 else tb[0] + " (" + self.trnl(gt) + ")"
-                            con = self.conn
-                            con = con + " srid=3763 type=" + gt
-                            con = con + " table='errors'.'" + \
-                                tb[0] + "' (geometria) sql="
-                            self.addLayer.emit(
-                                displayList[slayer]["name"], con, ln, slayer, displayList[slayer]["index"])
+            if ( tables ):
+                for tb in tables:
+                    ts = re.search(r'([a-z_]+)_rg|([a-z_]+)_re', tb[0])
+                    slayer = None
+                    if ts.group(1) is not None:
+                        slayer = ts.group(1)
+                    elif ts.group(2) is not None:
+                        slayer = ts.group(2)
                     else:
-                        con = self.conn
-                        con = con + " table='errors'.'" + tb[0] + "'"
-                        self.addLayer.emit(
-                            displayList[slayer]["name"], con, tb[0], slayer, displayList[slayer]["index"])
+                        print('-----')
+                        print(tb[0])
+
+                    if slayer is not None:
+                        if len(displayList[slayer]["geom"]) > 0:
+                            for gt in displayList[slayer]["geom"]:
+                                ln = tb[0] if len(
+                                    displayList[slayer]["geom"]) == 1 else tb[0] + " (" + self.trnl(gt) + ")"
+                                con = self.conn
+                                con = con + " srid=3763 type=" + gt
+                                con = con + " table='errors'.'" + \
+                                    tb[0] + "' (geometria) sql="
+                                self.addLayer.emit(
+                                    displayList[slayer]["name"], con, ln, slayer, displayList[slayer]["index"])
+                        else:
+                            con = self.conn
+                            con = con + " table='errors'.'" + tb[0] + "'"
+                            self.addLayer.emit(
+                                displayList[slayer]["name"], con, tb[0], slayer, displayList[slayer]["index"])
 
         except Exception as e:
-            self.write("[Erro]")
+            self.write("[Erro 9]")
             self.write(("\tException: {}".format(e)))
 
 
@@ -722,8 +727,8 @@ class CreateProcess(QThread):
         try:
             file = None
             if self.valid3d is True:
-                file = open(self.bp + '/validation_setup.sql', "r", encoding='utf-8')
-                cnt = file.read()
+                with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
+                    cnt = f.read()
                 cnt = cnt.format(schema=self.schema)
 
                 self.actconn = self.pgutils.get_connection()
@@ -740,7 +745,7 @@ class CreateProcess(QThread):
                 file.close()
         except Exception as e:
             if not self.cancel:
-                self.write("[Erro]")
+                self.write("[Erro 10]")
                 self.write(("\tException: {}".format(e)))
 
 
@@ -788,7 +793,9 @@ class ValidateProcess(QThread):
                         coalesce(((regexp_match(code, '[0-9]+_[0-9]+_([0-9])_*'))[1])::integer, 0) asc;")
 
             i = 1
-            l = len(rules)
+            l = 0
+            if ( rules ):
+                l = len(rules)
             if l > 0:
                 self.actconn = self.pgutils.get_connection()
 
@@ -824,10 +831,10 @@ class ValidateProcess(QThread):
             # SELECT f_table_name, f_geometry_column, "type" FROM geometry_columns WHERE f_table_schema = 'errors';
             tables = self.pgutils.run_query(
                 'SELECT table_name FROM information_schema.tables WHERE table_schema = \'errors\'')
-
-            if len(tables) > 0:
-                self.write(
-                    "\n\t[Aviso] Detetados erros na validação. A adicionar camadas com erros...")
+            if ( tables ):
+                if len(tables) > 0:
+                    self.write(
+                        "\n\t[Aviso] Detetados erros na validação. A adicionar camadas com erros...")
             else:
                 self.write(
                     "\t[Sucesso] Base de dados validada. Não foram detetados erros.")
@@ -835,5 +842,5 @@ class ValidateProcess(QThread):
             self.pgutils.run_query('update validation.rules set run = false;')
         except Exception as e:
             if not self.cancel:
-                self.write("[Erro]")
+                self.write("[Erro 11]")
                 self.write(("\tException: {}".format(e)))

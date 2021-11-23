@@ -297,7 +297,8 @@ class MainDialog(QDialog, FORM_CLASS):
                     # print ('- layer: ' + child.name())
 
             taGroupNode = root.findGroup( 'Tabelas Auxiliares' )
-            taGroupNode.setExpanded(False)
+            if ( taGroupNode ):
+                taGroupNode.setExpanded(False)
 
             self.writeText('Tarefas terminadas')
 
@@ -326,7 +327,7 @@ class LoadLayersProcess(QThread):
 
             self.write('[Sucesso] Camadas carregadas')
         except Exception as e:
-            self.write("[Erro]")
+            self.write("[Erro -1]")
             self.write(("\tException: {}".format(e)))
 
 
@@ -371,7 +372,7 @@ class ExportLayersProcess(QThread):
 
             self.write('Processo exportação terminado')
         except Exception as e:
-            self.write("[Erro]")
+            self.write("[Erro -2]")
             self.write(("\tException: {}".format(str(e))))
 
     def get_group_layers(self, group):
@@ -392,9 +393,22 @@ class ExportLayersProcess(QThread):
         # qstyles.importXml('carttop.xml')
         # after = qstyles.symbolNames()
         # mystyles = list(set(after) - set(before))
-
         # for s in mystyles:
         #     qstyles.addFavorite(QgsStyle.StyleEntity.SymbolEntity, s)
+
+        # Injetar layer_styles.sql na BD
+
+        bp = os.path.dirname(os.path.realpath(__file__))
+        try:
+            with open(bp + '/convert/processing/layer_styles.sql', encoding='utf-8') as pp_file:
+                pp_src = pp_file.read()
+                styles = re.sub(r"{schema}", self.schema, pp_src)
+                utils = PostgisUtils(self, self.conn)
+                utils.run_query(styles)
+        except Exception as e:
+            self.write(
+                'Erro a inserir os estilos em base de dados: \'' + str(e) + '\'')
+
 
         layer_was_added_spy = QSignalSpy(QgsProject.instance().layerWasAdded)
         # layers_added_spy = QSignalSpy(QgsProject.instance().layersAdded)

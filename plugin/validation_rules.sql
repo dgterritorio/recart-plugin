@@ -854,7 +854,7 @@ good as (select count(cdae.*)
 		or st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))
 ),
 bad as (select count(cdae.*)
-	from curso_de_agua_eixo cdae, area_trabalho adt
+	from {schema}.curso_de_agua_eixo cdae, {schema}.area_trabalho adt
 	where (ST_StartPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico) or ST_EndPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico))
 		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))
 )
@@ -868,14 +868,14 @@ good as (select count(cdae.*)
 		or st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))
 ),
 bad as (select count(cdae.*)
-	from curso_de_agua_eixo cdae, area_trabalho adt
+	from {schema}.curso_de_agua_eixo cdae, {schema}.area_trabalho adt
 	where (ST_StartPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico) or ST_EndPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico))
 		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select cdae.*
-	from curso_de_agua_eixo cdae, area_trabalho adt
+	from {schema}.curso_de_agua_eixo cdae, {schema}.area_trabalho adt
 	where (ST_StartPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico) or ST_EndPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico))
 		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))$$);
 
@@ -1002,7 +1002,7 @@ observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valo
 “Junção”.$$, 
 $$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
 $$with 
-total as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
+total as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
@@ -1016,7 +1016,7 @@ total as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
 				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
 				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
 ),
-good as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
+good as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
@@ -1033,7 +1033,7 @@ good as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
 				or (select ST_intersects(a.geometria, i.geometria) from 
 					(select geom_col as geometria from validation.interrupcao_fluxo) as i))
 ),
-bad as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
+bad as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
@@ -1053,7 +1053,7 @@ bad as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$with 
-total as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
+total as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
@@ -1067,7 +1067,7 @@ total as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
 				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
 				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
 ),
-good as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
+good as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
@@ -1084,7 +1084,7 @@ good as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
 				or (select ST_intersects(a.geometria, i.geometria) from 
 					(select geom_col as geometria from validation.interrupcao_fluxo) as i))
 ),
-bad as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
+bad as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
@@ -1104,7 +1104,7 @@ bad as (select count(a.*) from curso_de_agua_eixo a, curso_de_agua_eixo b
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select a.*
-	from curso_de_agua_eixo a, curso_de_agua_eixo b
+	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and

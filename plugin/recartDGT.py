@@ -62,14 +62,12 @@ class recartDGT:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        self.version = '1.2.3'
-
         # Create the dialog (after translation) and keep reference
         self.dlg = MainDialog(self.iface)
         self.dlgC = ConvertDialog(self.iface)
         self.dlgV = ValidationDialog(self.iface)
 
-        title = self.dlg.windowTitle() + ' (v' + self.version + ')'
+        title = self.dlg.windowTitle()
         self.dlg.setWindowTitle(title)
         self.dlgC.setWindowTitle(title)
         self.dlgV.setWindowTitle(title)
