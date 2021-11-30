@@ -373,7 +373,7 @@ class PostgisImporter:
 
                 with open(bp + '/' + '/processing/_base_references.sql', encoding='utf-8') as pp_file:
                     pp_src = pp_file.read()
-                    base_sql_file.write(pp_src.format(schema=self.schema))
+                    base_sql_file.write( re.sub(r"{schema}", self.schema, pp_src) )
         except Exception as e:
             print('Erro a guardar ficheiro base: \'' + str(e) + '\'')
 
@@ -451,7 +451,7 @@ class PostgisImporter:
 
                 with open(bp + '/' + '/processing/_cleanup.sql', encoding='utf-8') as pp_file:
                     pp_src = pp_file.read()
-                    feat_sql_file.write(pp_src.format(schema=self.schema))
+                    feat_sql_file.write( re.sub(r"{schema}", self.schema, pp_src) )
         except Exception as e:
             print('Erro a guardar ficheiro de features: \'' + str(e) + '\'')
 

@@ -488,9 +488,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
         try:
             with open(self.bp + '/validation_rules.sql', 'r', encoding='utf-8') as f:
                 cnt = f.read()
-            cnt = cnt.format(schema=self.schema)
+            cnt = re.sub(r"{schema}", self.schema, cnt)
             self.pgutils.run_query(cnt)
-            # self.pgutils.run_file(bp + '/validation_rules.sql')
             self.testValidationRules()
         except Exception as e:
             self.writeText("[Erro 6]")
@@ -729,14 +728,14 @@ class CreateProcess(QThread):
             if self.valid3d is True:
                 with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
                     cnt = f.read()
-                cnt = cnt.format(schema=self.schema)
+                cnt = re.sub(r"{schema}", self.schema, cnt)
 
                 self.actconn = self.pgutils.get_connection()
                 self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
             else:
                 file = open(self.bp + '/validation_setup_no3d.sql', "r", encoding='utf-8')
                 cnt = file.read()
-                cnt = cnt.format(schema=self.schema)
+                cnt = re.sub(r"{schema}", self.schema, cnt)
 
                 self.actconn = self.pgutils.get_connection()
                 self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
@@ -782,7 +781,7 @@ class ValidateProcess(QThread):
     def run(self):
         try:
             self.pgutils.run_query(
-                'update validation.rules set total = 0, good = 0, bad = 0;')
+                'update validation.rules set total = 0, good = 0, bad = 0 where run=true;')
 
             ndt = 'true' if self.ndd1 == 'NdD1' else 'false'
             rules = self.pgutils.run_query(

@@ -716,8 +716,7 @@ polígonos que representam o "Curso de água - área" ou a "Água lêntica"
 (Figura 30).$$,
 $$"Curso de água - eixo".$$, 'curso_de_agua_eixo');
 
-
-delete from validation.rules where code = 're4_8';
+/* delete from validation.rules where code = 're4_8';
 insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report) 
 values ('re4_8', 'Interrupção do curso de água', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
@@ -839,6 +838,100 @@ $$select a.*
 			coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
 		and not (select ST_intersects(a.geometria, i.geometria) from 
 				(select geom_col as geometria from validation.interrupcao_fluxo) as i)$$);
+ */
+
+delete from validation.rules where code = 're4_8_1';
+insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report) 
+values ('re4_8_1', 'Interrupção do curso de água', 
+$$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
+quando:
+ - Existe uma interceção com outro curso de água;
+ - Existe uma alteração do valor de qualquer um dos atributos que
+caracteriza o "Curso de água - eixo";
+- Existe uma variação ("Queda de água" ou "Zona húmida") ou
+regulação de fluxo ("Barreira").$$,
+$$"Curso de água - eixo", "Curso de água - área", "Queda de água", "Zona
+húmida" e "Barreira".$$, 'curso_de_agua_eixo',
+$$with
+total as (select count(distinct a.identificador)
+	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
+	where ST_intersects(a.geometria, b.geometria)),
+good as (select count(distinct a.identificador)
+	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
+	where a.identificador != b.identificador and 
+		ST_intersects(a.geometria, b.geometria) and ST_Touches(a.geometria, b.geometria)
+),
+bad as (select count(distinct a.identificador)
+	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
+	where a.identificador != b.identificador and 
+		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)
+)
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad$$,
+NULL,
+$$select distinct a.*
+	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
+	where a.identificador != b.identificador and 
+		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$);
+
+delete from validation.rules where code = 're4_8_2';
+insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report) 
+values ('re4_8_2', 'Interrupção do curso de água', 
+$$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
+quando:
+ - Existe uma interceção com outro curso de água;
+ - Existe uma alteração do valor de qualquer um dos atributos que
+caracteriza o "Curso de água - eixo";
+- Existe uma variação ("Queda de água" ou "Zona húmida") ou
+regulação de fluxo ("Barreira").$$,
+$$"Curso de água - eixo", "Curso de água - área", "Queda de água", "Zona
+húmida" e "Barreira".$$, 'curso_de_agua_eixo',
+$$with
+total as (with multipontos as (
+	select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
+		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
+		where ST_intersects(a.geometria, ST_Boundary(b.geometria))),
+	pontos as (select (ST_Dump(multipontos.geometria)).geom as geometria
+	from multipontos)
+	select count(distinct pontos.*)
+	from pontos),
+good as (with multipontos as (
+	select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
+		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
+		where ST_intersects(a.geometria, ST_Boundary(b.geometria))),
+	pontos as (select (ST_Dump(multipontos.geometria)).geom as geometria
+	from multipontos)
+	select count(distinct pontos.*)
+	from pontos, {schema}.curso_de_agua_eixo e
+	where pontos.geometria = ST_StartPoint(e.geometria) 
+		or pontos.geometria = ST_EndPoint(e.geometria)),
+bad as (with multipontos as (
+	select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
+		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
+		where ST_intersects(a.geometria, ST_Boundary(b.geometria))),
+	pontos as (select (ST_Dump(multipontos.geometria)).geom as geometria
+	from multipontos)
+	select count(distinct pontos.*)
+	from pontos
+	where not exists (select * 
+		from {schema}.curso_de_agua_eixo e
+		where pontos.geometria = ST_StartPoint(e.geometria) 
+		or pontos.geometria = ST_EndPoint(e.geometria)))
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad$$,
+NULL,
+$$with multipontos as (
+select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
+	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
+	where ST_intersects(a.geometria, ST_Boundary(b.geometria))),
+pontos as (select multipontos.identificador, (ST_Dump(multipontos.geometria)).geom as geometria
+from multipontos)
+select distinct c.*
+from pontos, {schema}.curso_de_agua_eixo c
+where pontos.identificador = c.identificador and not exists (select * 
+	from {schema}.curso_de_agua_eixo e
+	where pontos.geometria = ST_StartPoint(e.geometria) 
+	or pontos.geometria = ST_EndPoint(e.geometria))$$);
 
 -- Regras semelhantes: re4_9_1, re5_2_3, re5_5_3
 delete from validation.rules where code = 're4_9_1';
