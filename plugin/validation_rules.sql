@@ -58,6 +58,49 @@ values ('rg_3', 'Tolerância de conetividade',
 $$A tolerância de conetividade é 0 (zero).$$,
 $$Todas as entidades representadas através de objetos de geometria linha.$$);
 
+-- Relacionada com a regra geral 3 e com a seção 6.3 EIXOS E CONETIVIDADE
+delete from validation.rules where code = 'ra_3_1';
+insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
+values ('ra_3_1', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+$$Os eixos de futuras redes não devem ter comprimento 0.$$,
+$$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
+'curso_de_agua_eixo',
+$$with 
+total as (select count(*) from {schema}.curso_de_agua_eixo),
+good as (select count(*) from {schema}.curso_de_agua_eixo a where st_length(a.geometria) > 0),
+bad as (select count(*) from {schema}.curso_de_agua_eixo a where st_length(a.geometria) = 0)
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$select a.* from {schema}.curso_de_agua_eixo a where st_length(a.geometria) = 0$$);
+
+delete from validation.rules where code = 'ra_3_2';
+insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
+values ('ra_3_2', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+$$Os eixos de futuras redes não devem ter comprimento 0.$$,
+$$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
+'seg_via_rodov',
+$$with 
+total as (select count(*) from {schema}.seg_via_rodov),
+good as (select count(*) from {schema}.seg_via_rodov a where st_length(a.geometria) > 0),
+bad as (select count(*) from {schema}.seg_via_rodov a where st_length(a.geometria) = 0)
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$select a.* from {schema}.seg_via_rodov a where st_length(a.geometria) = 0$$);
+
+delete from validation.rules where code = 'ra_3_3';
+insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
+values ('ra_3_3', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+$$Os eixos de futuras redes não devem ter comprimento 0.$$,
+$$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
+'seg_via_ferrea',
+$$with 
+total as (select count(*) from {schema}.seg_via_ferrea),
+good as (select count(*) from {schema}.seg_via_ferrea a where st_length(a.geometria) > 0),
+bad as (select count(*) from {schema}.seg_via_ferrea a where st_length(a.geometria) = 0)
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$select a.* from {schema}.seg_via_ferrea a where st_length(a.geometria) = 0$$);
+
 -- TODO
 -- Nova redação
 -- delete from validation.rules where code = 'rg_4';
@@ -126,9 +169,9 @@ where pc.identificador = bad.identificador $$);
 -- "Transportes" NoTransFerrov <-> SegViaFerrea
 -- "Hidrografia" os nós hifdrográficos têm que coincidir com eixos de água
 -- "Construções" só tem a entidade 3D SinalGeodesico, sem ter que ser coincidente com nada.
-delete from validation.rules where code = 'rg_4_2_i';
+delete from validation.rules where code = 'rg_4_2_1';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('rg_4_2_i', 'Consistência tridimensional (Hidrografia)',
+values ('rg_4_2_1', 'Consistência tridimensional (Hidrografia)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_hidrografico',
@@ -172,9 +215,9 @@ SELECT a.identificador
      where st_3dintersects(a.geometria, b.geometria)    
 ) $$);
 --
-delete from validation.rules where code = 'rg_4_2_ii';
+delete from validation.rules where code = 'rg_4_2_2';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('rg_4_2_ii', 'Consistência tridimensional (Transportes)',
+values ('rg_4_2_2', 'Consistência tridimensional (Transportes)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_trans_rodov',
@@ -218,9 +261,9 @@ SELECT a.identificador
      where st_3dintersects(a.geometria, b.geometria)    
 ) $$);
 --
-delete from validation.rules where code = 'rg_4_2_iii';
+delete from validation.rules where code = 'rg_4_2_3';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('rg_4_2_iii', 'Consistência tridimensional (Transportes)',
+values ('rg_4_2_3', 'Consistência tridimensional (Transportes)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_trans_ferrov',

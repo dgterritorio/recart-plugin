@@ -658,12 +658,14 @@ class AddLayersProcess(QThread):
 
             if ( tables ):
                 for tb in tables:
-                    ts = re.search(r'([a-z_]+)_rg|([a-z_]+)_re', tb[0])
+                    ts = re.search(r'([a-z_]+)_rg|([a-z_]+)_re|([a-z_]+)_ra', tb[0])
                     slayer = None
                     if ts.group(1) is not None:
                         slayer = ts.group(1)
                     elif ts.group(2) is not None:
                         slayer = ts.group(2)
+                    elif ts.group(3) is not None:
+                        slayer = ts.group(3)                        
                     else:
                         print('-----')
                         print(tb[0])

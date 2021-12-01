@@ -715,6 +715,7 @@ SELECT ST_Collect(f.geometria) AS geom_col FROM (
 	select st_intersection(a.geometria, b.geometria) as geometria
 		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
+		and not st_isempty(st_intersection(a.geometria, b.geometria))
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
 				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
@@ -728,5 +729,5 @@ SELECT ST_Collect(f.geometria) AS geom_col FROM (
 				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
 ) as f);
 
-DROP INDEX IF EXISTS tin_geom_idx;
+drop index IF EXISTS validation.tin_geom_idx;
 create index tin_geom_idx ON validation.tin using gist(geometria);
