@@ -16,7 +16,12 @@ begin
 			if nd1 is true then
 				execute onerule.query INTO total, good, bad;
 			else
-				execute onerule.query_nd2 INTO total, good, bad;
+				-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
+				if onerule.query_nd2 is not null then
+					execute onerule.query_nd2 INTO total, good, bad;
+				else 
+					execute onerule.query INTO total, good, bad;
+				end if;
 			end if;
 			raise notice 'Good? % % %', total, good, bad;
 			EXECUTE format('UPDATE validation.rules SET total = %s, good = %s, bad = %s WHERE CURRENT OF rules', total, good, bad);
@@ -55,7 +60,12 @@ begin
 		if nd1 is true then
 			execute _query INTO total, good, bad;
 		else
-			execute _query_nd2 INTO total, good, bad;
+			-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
+			if _query_nd2 is not null then
+				execute _query_nd2 INTO total, good, bad;
+			else 
+				execute _query INTO total, good, bad;
+			end if;
 		end if;
 		raise notice 'Good? % % %', total, good, bad;
 		execute format('UPDATE validation.rules SET total = %s, good = %s, bad = %s WHERE code = %L', total, good, bad, _code);
@@ -105,7 +115,7 @@ declare
 	res bool;
 begin
 	res = true;
-	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{{}}') into parts;
+	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{}') into parts;
 
 	foreach word in array parts
 	loop
@@ -151,7 +161,7 @@ declare
 	res bool;
 begin
 	res = true;
-	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{{}}') into parts;
+	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{}') into parts;
 
 	foreach word in array parts
 	loop
@@ -567,11 +577,12 @@ CREATE TABLE IF NOT EXISTS validation.no_hidro_juncao AS (
 	) AS f
 );
 
+-- barreira é 2D apenas
 CREATE TABLE IF NOT EXISTS validation.interrupcao_fluxo AS (
 	SELECT ST_Collect(f.geometria) AS geom_col FROM (
 		SELECT geometria FROM {schema}.queda_de_agua union all
-		SELECT geometria FROM {schema}.zona_humida union all
-		SELECT geometria FROM {schema}.barreira
+		SELECT geometria FROM {schema}.zona_humida -- union all
+		-- SELECT geometria FROM {schema}.barreira
 	) AS f
 );
 

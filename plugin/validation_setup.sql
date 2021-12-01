@@ -16,7 +16,12 @@ begin
 			if nd1 is true then
 				execute onerule.query INTO total, good, bad;
 			else
-				execute onerule.query_nd2 INTO total, good, bad;
+				-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
+				if onerule.query_nd2 is not null then
+					execute onerule.query_nd2 INTO total, good, bad;
+				else 
+					execute onerule.query INTO total, good, bad;
+				end if;
 			end if;
 			raise notice 'Good? % % %', total, good, bad;
 			EXECUTE format('UPDATE validation.rules SET total = %s, good = %s, bad = %s WHERE CURRENT OF rules', total, good, bad);
@@ -55,7 +60,12 @@ begin
 		if nd1 is true then
 			execute _query INTO total, good, bad;
 		else
-			execute _query_nd2 INTO total, good, bad;
+			-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
+			if _query_nd2 is not null then
+				execute _query_nd2 INTO total, good, bad;
+			else 
+				execute _query INTO total, good, bad;
+			end if;
 		end if;
 		raise notice 'Good? % % %', total, good, bad;
 		execute format('UPDATE validation.rules SET total = %s, good = %s, bad = %s WHERE code = %L', total, good, bad, _code);
@@ -105,7 +115,7 @@ declare
 	res bool;
 begin
 	res = true;
-	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{{}}') into parts;
+	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{}') into parts;
 
 	foreach word in array parts
 	loop
@@ -151,7 +161,7 @@ declare
 	res bool;
 begin
 	res = true;
-	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{{}}') into parts;
+	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{}') into parts;
 
 	foreach word in array parts
 	loop
@@ -644,15 +654,15 @@ from envelope;
 -- gdal_grid -l validation.curva_de_nivel_ponto_cotado -a_srs EPSG:3763 -a linear -ot Float32 -of GTiff -txe -24000 -22400 -tye 237000 238000 -outsize 400 250 "PG:service=ortos" dem_linear_cdn_pc.tif --config GDAL_NUM_THREADS ALL_CPUS
 
 -- primeiro e último ponto da curva de nível
--- um ponto intercalar a cada 5 metros, para curvas de nível com mais de 5 metros
+-- um ponto intercalar a cada 10 metros, para curvas de nível com mais de 10 metros
 --
 drop table if exists validation.curva_de_nivel_points_interval;
 create table validation.curva_de_nivel_points_interval as
 SELECT concat( identificador::text, '-', path[1]::text) as identificador, geom::geometry(POINTZ, 3763) as geometria
 FROM (
-SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, 5.0/st_length(geometria)))).*
+SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, 10.0/st_length(geometria)))).*
 from {schema}.curva_de_nivel cdn
-where st_length(geometria) > 5
+where st_length(geometria) > 10.0
 ) as pontos
 union SELECT concat( identificador::text, '-0') as identificador, ST_PointN(geometria, 1) as geometria
 from {schema}.curva_de_nivel cdn
@@ -691,11 +701,12 @@ CREATE TABLE IF NOT EXISTS validation.no_hidro_juncao AS (
 	) AS f
 );
 
+-- barreira é 2D apenas
 CREATE TABLE IF NOT EXISTS validation.interrupcao_fluxo AS (
 	SELECT ST_Collect(f.geometria) AS geom_col FROM (
 		SELECT geometria FROM {schema}.queda_de_agua union all
-		SELECT geometria FROM {schema}.zona_humida union all
-		SELECT geometria FROM {schema}.barreira
+		SELECT geometria FROM {schema}.zona_humida -- union all
+		-- SELECT geometria FROM {schema}.barreira
 	) AS f
 );
 
@@ -704,6 +715,7 @@ SELECT ST_Collect(f.geometria) AS geom_col FROM (
 	select st_intersection(a.geometria, b.geometria) as geometria
 		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
+		and not st_isempty(st_intersection(a.geometria, b.geometria))
 		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
 				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
 				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
@@ -717,5 +729,5 @@ SELECT ST_Collect(f.geometria) AS geom_col FROM (
 				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
 ) as f);
 
-DROP INDEX IF EXISTS tin_geom_idx;
+drop index IF EXISTS validation.tin_geom_idx;
 create index tin_geom_idx ON validation.tin using gist(geometria);
