@@ -20,7 +20,7 @@
 """
 from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLineEdit
-
+from qgis.core import QgsApplication, QgsAuthMethodConfig
 
 def listDataSources():
     # dataSources = []
@@ -44,11 +44,21 @@ def getConnString(parent, conName):
             parent, "Error", "Unable to connect: there is no defined database connection \"%s\"." % conName)
         return
 
-    service, host, db, user, passw = map(lambda x: settings.value(
-        x), ["service", "host", "database", "username", "password"])
+    service, host, db, user, passw, authcfg = map(lambda x: settings.value(
+        x), ["service", "host", "database", "username", "password", "authcfg"])
 
     if service:
         return ('service=%s') % (service)
+
+    if authcfg:
+        authMgr = QgsApplication.authManager()
+        newAU = QgsAuthMethodConfig()
+        authMgr.loadAuthenticationConfig(authcfg, newAU, True)
+        cMap = newAU.configMap()
+        if not user and cMap['username']:
+            user = cMap['username']
+        if not passw and cMap['password']:
+            passw = cMap['password']      
 
     port = int(settings.value("port"))
 
