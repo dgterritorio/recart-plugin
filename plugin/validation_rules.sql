@@ -173,7 +173,7 @@ where pc.identificador = bad.identificador $$);
 
 -- "Transportes" NoTransRodov <-> SegViaRodov
 -- "Transportes" NoTransFerrov <-> SegViaFerrea
--- "Hidrografia" os nós hifdrográficos têm que coincidir com eixos de água
+-- "Hidrografia" os nós hidrográficos têm que coincidir com eixos de água
 -- "Construções" só tem a entidade 3D SinalGeodesico, sem ter que ser coincidente com nada.
 delete from validation.rules where code = 'rg_4_2_1';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 

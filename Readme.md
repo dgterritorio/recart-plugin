@@ -10,6 +10,12 @@ O módulo recartDGT é uma aplicação informática, que funciona a partir do QG
 - Conversão da Informação Geográfica (adquirida ao abrigo das normas CartTop) para outros formatos (GPKG, SHP e GeoJSON)
 - Conversão da Informação Geográfica antiga (produzida usando o modelo numérico, multicodificada, em DGN/DWG) para CartTop
 
+#### Requisitos
+
+- O módulo deve ser instalado numa versão do QGIS 3.x (lançado em 2018)
+- A extensão PostGIS deve ser 3.x (lançado em 2019)
+- O servidor PostgreSQL deve estar na versão 11 ou superior (lançado em 2018)
+
 #### Descarregar o plugin recartDGT
 
 O módulo recartDGT está disponível em [recartDGT.zip](https://github.com/dgterritorio/recart-plugin/raw/main/plugin/recartDGT.zip). 
@@ -17,8 +23,6 @@ O módulo recartDGT está disponível em [recartDGT.zip](https://github.com/dgte
 No [repositório do recart](https://github.com/dgterritorio/recart-plugin) está disponível o código fonte. Pode-se e deve-se usar o repositório para reportar questões.
 
 #### Instalar o plugin (interface em Português)
-
-O módulo deve ser instalado numa versão do QGIS 3.x. 
 
 Para instalar o módulo, escolhe-se no menu a opção Módulos → Gerir e instalar módulos...
 1. Escolher "Instalar de um ZIP"
