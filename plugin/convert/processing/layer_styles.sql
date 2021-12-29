@@ -7871,13 +7871,13 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{75e4758a-3744-4c97-b5b2-c0859c0e18ff}">
-   <rule symbol="0" label="Muro de alvenaria ou betão" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = 1" key="{7d88dc6d-d0bf-4bbd-80bd-23f46974ba0b}"/>
-   <rule symbol="1" label="Muro de pedra" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = 2" key="{c6cef376-dd9c-4d38-9178-849c1ffa99f3}"/>
-   <rule symbol="2" label="Sebe" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = 3" key="{bc56d175-d20e-4827-b1bd-7fff9eb0880a}"/>
-   <rule symbol="3" label="Gradeamento ou vedação" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = 4" key="{8f60388e-468a-4251-aa09-1dbdbea68ba6}"/>
-   <rule symbol="4" label="Muralha" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = 5" key="{f755a74f-b60f-4e01-9939-731cb8e92274}"/>
-   <rule symbol="5" label="Portão" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = 6" key="{f9735d8b-9206-4eac-8576-19cbacaf15f7}"/>
-   <rule symbol="6" label="Pista" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = 8" key="{c659b11d-aa76-448e-9670-b952d2b4016a}"/>
+   <rule symbol="0" label="Muro de alvenaria ou betão" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = ''1''" key="{7d88dc6d-d0bf-4bbd-80bd-23f46974ba0b}"/>
+   <rule symbol="1" label="Muro de pedra" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = ''2''" key="{c6cef376-dd9c-4d38-9178-849c1ffa99f3}"/>
+   <rule symbol="2" label="Sebe" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = ''3''" key="{bc56d175-d20e-4827-b1bd-7fff9eb0880a}"/>
+   <rule symbol="3" label="Gradeamento ou vedação" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = ''4''" key="{8f60388e-468a-4251-aa09-1dbdbea68ba6}"/>
+   <rule symbol="4" label="Muralha" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = ''5''" key="{f755a74f-b60f-4e01-9939-731cb8e92274}"/>
+   <rule symbol="5" label="Portão" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = ''6''" key="{f9735d8b-9206-4eac-8576-19cbacaf15f7}"/>
+   <rule symbol="6" label="Pista" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_construcao_linear&quot; = ''8''" key="{c659b11d-aa76-448e-9670-b952d2b4016a}"/>
    <rule symbol="7" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{e18ac45a-4bc5-4571-b64f-1630f76103ae}"/>
   </rules>
   <symbols>
@@ -9524,14 +9524,14 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{b81af2d7-db38-4a2d-8782-a6609d9bf5e8}">
-   <rule symbol="0" label="Molhe" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 1 " key="{d8c2e643-f466-4321-bed3-624b0014441d}"/>
-   <rule symbol="1" label="Pontão" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 2" key="{effe47aa-8cb9-4da1-95d8-3dcd8d7eb684}"/>
-   <rule symbol="2" label="Piscina" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 3" key="{0ec0eab3-7f45-465c-aa67-fab7f43c770a}"/>
-   <rule symbol="3" label="Tanque" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 4" key="{6d178c1c-8450-4962-94c1-402ed88f8706}"/>
-   <rule symbol="4" label="Campo de jogos" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 5" key="{dc9dcc0d-f863-4a64-b49a-8a6fa9670fe7}"/>
-   <rule symbol="5" label="Lago de jardim" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 6" key="{7845e6ff-700f-4ca3-b3df-0b167f6836f4}"/>
-   <rule symbol="6" label="Escadaria" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 7" key="{48902b05-0ddf-43ad-88e9-c2a3a924865f}"/>
-   <rule symbol="7" label="Bancada" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 8" key="{a57e20e7-b961-40fb-9648-7a86a6f2adc5}"/>
+   <rule symbol="0" label="Molhe" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''1'' " key="{d8c2e643-f466-4321-bed3-624b0014441d}"/>
+   <rule symbol="1" label="Pontão" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''2''" key="{effe47aa-8cb9-4da1-95d8-3dcd8d7eb684}"/>
+   <rule symbol="2" label="Piscina" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''3''" key="{0ec0eab3-7f45-465c-aa67-fab7f43c770a}"/>
+   <rule symbol="3" label="Tanque" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''4''" key="{6d178c1c-8450-4962-94c1-402ed88f8706}"/>
+   <rule symbol="4" label="Campo de jogos" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''5''" key="{dc9dcc0d-f863-4a64-b49a-8a6fa9670fe7}"/>
+   <rule symbol="5" label="Lago de jardim" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''6''" key="{7845e6ff-700f-4ca3-b3df-0b167f6836f4}"/>
+   <rule symbol="6" label="Escadaria" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''7''" key="{48902b05-0ddf-43ad-88e9-c2a3a924865f}"/>
+   <rule symbol="7" label="Bancada" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''8''" key="{a57e20e7-b961-40fb-9648-7a86a6f2adc5}"/>
    <rule symbol="8" label="Limite da construção linear" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_construcao&quot;  =  ''10'' " key="{701cfaf5-d113-48ea-92d6-eec0c6814bf8}"/>
    <rule symbol="9" label="Rampa de acesso" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_construcao&quot;  =  ''11'' " key="{ac02e289-bf67-42e4-a7ca-43cb5024df8c}"/>
    <rule symbol="10" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{639e0af2-8be0-4531-a97f-ebde5f42c095}"/>
@@ -10930,8 +10930,8 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{c7a44d2b-40fb-4a65-8c32-1d8874d1343b}">
-   <rule symbol="0" label="Piscina" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 3" key="{a92d4443-f0ad-4e3f-b267-52c5a4df5735}"/>
-   <rule symbol="1" label="Tanque" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 4" key="{a21a3dc7-2624-4d2c-9988-1b437168430b}"/>
+   <rule symbol="0" label="Piscina" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''3''" key="{a92d4443-f0ad-4e3f-b267-52c5a4df5735}"/>
+   <rule symbol="1" label="Tanque" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''4''" key="{a21a3dc7-2624-4d2c-9988-1b437168430b}"/>
    <rule symbol="2" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{e23c9bbd-1207-4c5c-a941-6392f328e049}"/>
   </rules>
   <symbols>
@@ -11483,9 +11483,9 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="1" type="RuleRenderer" referencescale="-1">
   <rules key="{2a637862-aa81-4eda-83f0-70fee0cc8e78}">
    <rule symbol="0" label="Fictício" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;ficticio&quot; =  ''true'' " key="{78f745b0-c2de-4440-b60c-a88c0db5153c}"/>
-   <rule symbol="1" label="Suspenso ou elevado" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_posicao_vertical&quot; = 1" key="{f005e141-a270-4143-ad38-34a435a06fe4}"/>
-   <rule symbol="2" label="Ao nível do solo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_posicao_vertical&quot; = 0" key="{9fd61eed-90f2-4339-a21a-e3fee797c74f}"/>
-   <rule symbol="3" label="No subsolo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_posicao_vertical&quot; = -1" key="{a886962a-9cdc-4077-84ca-26dd3775b8ec}"/>
+   <rule symbol="1" label="Suspenso ou elevado" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_posicao_vertical&quot; = ''1''" key="{f005e141-a270-4143-ad38-34a435a06fe4}"/>
+   <rule symbol="2" label="Ao nível do solo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_posicao_vertical&quot; = ''0''" key="{9fd61eed-90f2-4339-a21a-e3fee797c74f}"/>
+   <rule symbol="3" label="No subsolo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_posicao_vertical&quot; = ''-1''" key="{a886962a-9cdc-4077-84ca-26dd3775b8ec}"/>
   </rules>
   <symbols>
    <symbol clip_to_extent="1" type="line" force_rhr="0" name="0" alpha="0.8">
@@ -12739,9 +12739,9 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{2f31a1d4-51fc-4943-b398-2ad5c1bbd812}">
-   <rule symbol="0" label="Mestra" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_curva&quot;  = 1" key="{9c5ce879-3ae2-4fb2-807c-ff671588f87d}"/>
-   <rule symbol="1" label="Secundária" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_curva&quot;  = 2" key="{194746f9-6ec6-4da5-99f0-acc9f9dcf6d9}"/>
-   <rule symbol="2" label="Auxiliar" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_curva&quot;  = 3" key="{43acdcbe-0c1e-43fc-a088-6e350bb876d7}"/>
+   <rule symbol="0" label="Mestra" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_curva&quot; = ''1''" key="{9c5ce879-3ae2-4fb2-807c-ff671588f87d}"/>
+   <rule symbol="1" label="Secundária" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_curva&quot; = ''2''" key="{194746f9-6ec6-4da5-99f0-acc9f9dcf6d9}"/>
+   <rule symbol="2" label="Auxiliar" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_curva&quot; = ''3''" key="{43acdcbe-0c1e-43fc-a088-6e350bb876d7}"/>
   </rules>
   <symbols>
    <symbol clip_to_extent="1" type="line" force_rhr="0" name="0" alpha="0.8">
@@ -14653,11 +14653,11 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{8733dda6-79b9-45d3-a598-4a03e81ae224}">
-   <rule symbol="0" label="Ruína" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_condicao_const&quot; = 5" key="{0f926516-532d-438d-a5dc-9106bf98a536}"/>
-   <rule symbol="1" label="Azenha" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = 3" key="{f933c56c-c092-4c31-95ff-c6ad87f063dd}"/>
-   <rule symbol="2" label="Barraca" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = 4" key="{7a97be09-35bc-4d8e-a9ac-822d2d490ce7}"/>
-   <rule symbol="3" label="Capela" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = 7" key="{ea78d865-6fdf-43ba-8466-448e533978ac}"/>
-   <rule symbol="4" label="Chaminé" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = 9" key="{82de0afc-d859-4d76-8df2-49e01088a099}"/>
+   <rule symbol="0" label="Ruína" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_condicao_const&quot; = ''5''" key="{0f926516-532d-438d-a5dc-9106bf98a536}"/>
+   <rule symbol="1" label="Azenha" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = ''3''" key="{f933c56c-c092-4c31-95ff-c6ad87f063dd}"/>
+   <rule symbol="2" label="Barraca" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_construcao&quot; = ''4''" key="{7a97be09-35bc-4d8e-a9ac-822d2d490ce7}"/>
+   <rule symbol="3" label="Capela" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = ''7''" key="{ea78d865-6fdf-43ba-8466-448e533978ac}"/>
+   <rule symbol="4" label="Chaminé" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = ''9''" key="{82de0afc-d859-4d76-8df2-49e01088a099}"/>
    <rule symbol="5" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{996a275f-de28-408d-88cb-b85c157cbbce}"/>
   </rules>
   <symbols>
@@ -22923,8 +22923,8 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{38bd8ec6-9e61-4cb3-9e5a-6bc6572c5186}">
-   <rule symbol="0" label="Local de estação" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_infra_trans_ferrov&quot; = 1" key="{49fb1c2a-7ee5-440f-b105-f705fb196fee}"/>
-   <rule symbol="1" label="Local de apeadeiro" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_infra_trans_ferrov&quot; = 2" key="{f88a03c7-4021-4e36-825e-0abff2dba54e}"/>
+   <rule symbol="0" label="Local de estação" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_infra_trans_ferrov&quot; = ''1''" key="{49fb1c2a-7ee5-440f-b105-f705fb196fee}"/>
+   <rule symbol="1" label="Local de apeadeiro" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_infra_trans_ferrov&quot; = ''2''" key="{f88a03c7-4021-4e36-825e-0abff2dba54e}"/>
   </rules>
   <symbols>
    <symbol clip_to_extent="1" type="marker" force_rhr="0" name="0" alpha="0.8">
@@ -24579,14 +24579,14 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{b562d260-6f12-4292-9d7f-b749ad95f014}">
-   <rule symbol="0" label="Escarpado - Topo do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = 1 AND &quot;valor_classifica&quot;  = 6 " key="{7a491fbd-69ae-4fc1-844d-40ff67b5a71d}"/>
-   <rule symbol="1" label="Escarpado - Base do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = 1 AND &quot;valor_classifica&quot;  = 1" key="{99730478-8ac1-4646-ae46-8138e5124b77}"/>
-   <rule symbol="2" label="Talude - Topo do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = 2 AND &quot;valor_classifica&quot;  = 6" key="{fed2176f-632f-4333-9445-fb551470b733}"/>
-   <rule symbol="3" label="Talude - Base do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = 2 AND &quot;valor_classifica&quot;  = 1" key="{2ea45feb-fec5-415c-81a3-71610bf219f5}"/>
-   <rule symbol="4" label="Socalco - Topo do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = 3 AND &quot;valor_classifica&quot;  = 6" key="{248a389e-b928-4bf6-9b99-c02d32feebab}"/>
-   <rule symbol="5" label="Socalco - Base do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = 3 AND &quot;valor_classifica&quot;  = 1" key="{cb167918-b76f-4eac-ab41-ecfba82c698f}"/>
-   <rule symbol="6" label="Combro - Topo do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = 4 AND &quot;valor_classifica&quot;  = 6" key="{c4f9b031-7a4d-4a9d-98a2-3f5059d092cc}"/>
-   <rule symbol="7" label="Combro - Base do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = 4 AND &quot;valor_classifica&quot;  = 1" key="{5b149497-0be3-4f73-a2cd-df6bad8940aa}"/>
+   <rule symbol="0" label="Escarpado - Topo do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = ''1'' AND &quot;valor_classifica&quot; = ''6'' " key="{7a491fbd-69ae-4fc1-844d-40ff67b5a71d}"/>
+   <rule symbol="1" label="Escarpado - Base do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = ''1'' AND &quot;valor_classifica&quot; = ''1''" key="{99730478-8ac1-4646-ae46-8138e5124b77}"/>
+   <rule symbol="2" label="Talude - Topo do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = ''2'' AND &quot;valor_classifica&quot; = ''6''" key="{fed2176f-632f-4333-9445-fb551470b733}"/>
+   <rule symbol="3" label="Talude - Base do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = ''2'' AND &quot;valor_classifica&quot; = ''1''" key="{2ea45feb-fec5-415c-81a3-71610bf219f5}"/>
+   <rule symbol="4" label="Socalco - Topo do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = ''3'' AND &quot;valor_classifica&quot; = ''6''" key="{248a389e-b928-4bf6-9b99-c02d32feebab}"/>
+   <rule symbol="5" label="Socalco - Base do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = ''3'' AND &quot;valor_classifica&quot; = ''1''" key="{cb167918-b76f-4eac-ab41-ecfba82c698f}"/>
+   <rule symbol="6" label="Combro - Topo do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = ''4'' AND &quot;valor_classifica&quot; = ''6''" key="{c4f9b031-7a4d-4a9d-98a2-3f5059d092cc}"/>
+   <rule symbol="7" label="Combro - Base do declive" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_natureza_linha&quot; = ''4'' AND &quot;valor_classifica&quot; = ''1''" key="{5b149497-0be3-4f73-a2cd-df6bad8940aa}"/>
   </rules>
   <symbols>
    <symbol clip_to_extent="1" type="line" force_rhr="0" name="0" alpha="0.8">
@@ -26219,10 +26219,10 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{f4355b3d-0717-4136-aa44-1a75e00ba586}">
-   <rule symbol="0" label="Rocha" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_margem&quot; = 5" key="{65714579-015d-47f5-a160-49cc6ce3eb92}"/>
-   <rule symbol="1" label="Areia" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_margem&quot; = 6" key="{da751f0e-0c7d-410e-b8d7-bc551f1ff136}"/>
-   <rule symbol="2" label="Pedra" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_margem&quot; = 8" key="{eb9b876f-cad9-404f-acc3-e64943a2c30c}"/>
-   <rule symbol="3" label="Não aplicável" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_margem&quot; = 995" key="{f5a18584-47bb-4c60-9e36-25613f0570d0}"/>
+   <rule symbol="0" label="Rocha" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_margem&quot; = ''5''" key="{65714579-015d-47f5-a160-49cc6ce3eb92}"/>
+   <rule symbol="1" label="Areia" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_margem&quot; = ''6''" key="{da751f0e-0c7d-410e-b8d7-bc551f1ff136}"/>
+   <rule symbol="2" label="Pedra" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_margem&quot; = ''8''" key="{eb9b876f-cad9-404f-acc3-e64943a2c30c}"/>
+   <rule symbol="3" label="Não aplicável" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_margem&quot; = ''995''" key="{f5a18584-47bb-4c60-9e36-25613f0570d0}"/>
    <rule symbol="4" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{3edae69a-7f54-4ed7-9128-ade7ee4cdeb8}"/>
   </rules>
   <symbols>
@@ -28111,12 +28111,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{336b55b2-a831-4940-9dfb-655e2b73f27a}">
-   <rule symbol="0" label="Início" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = 1" key="{23619b9e-76b5-4516-9f22-471591165671}"/>
-   <rule symbol="1" label="Fim" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = 2" key="{b693f711-ea87-4b96-8da6-9c88c6a38385}"/>
-   <rule symbol="2" label="Junção" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = 3" key="{80351f07-af26-485f-88cd-910281bfb7e7}"/>
-   <rule symbol="3" label="Pseudo-nó" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = 4" key="{5d59758e-b3a6-4930-8806-c2a7dc59ba6c}"/>
-   <rule symbol="4" label="Variação de fluxo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = 5" key="{78adbb76-f65e-493e-b474-829fbe817911}"/>
-   <rule symbol="5" label="Regulação de fluxo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = 6" key="{eef8394b-6a48-46c6-8e3a-81be914fbb67}"/>
+   <rule symbol="0" label="Início" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = ''1''" key="{23619b9e-76b5-4516-9f22-471591165671}"/>
+   <rule symbol="1" label="Fim" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = ''2''" key="{b693f711-ea87-4b96-8da6-9c88c6a38385}"/>
+   <rule symbol="2" label="Junção" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = ''3''" key="{80351f07-af26-485f-88cd-910281bfb7e7}"/>
+   <rule symbol="3" label="Pseudo-nó" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = ''4''" key="{5d59758e-b3a6-4930-8806-c2a7dc59ba6c}"/>
+   <rule symbol="4" label="Variação de fluxo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = ''5''" key="{78adbb76-f65e-493e-b474-829fbe817911}"/>
+   <rule symbol="5" label="Regulação de fluxo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_hidrografico&quot; = ''6''" key="{eef8394b-6a48-46c6-8e3a-81be914fbb67}"/>
   </rules>
   <symbols>
    <symbol clip_to_extent="1" type="marker" force_rhr="0" name="0" alpha="0.8">
@@ -28945,11 +28945,11 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{336b55b2-a831-4940-9dfb-655e2b73f27a}">
-   <rule symbol="0" label="Junção" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = 1" key="{0cc406dd-b75d-4e8a-940d-c412d7d229ec}"/>
-   <rule symbol="1" label="Passagem de nível" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = 2" key="{23619b9e-76b5-4516-9f22-471591165671}"/>
-   <rule symbol="2" label="Pseudo-nó" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = 3" key="{1cec497a-18f1-4c84-b526-3d2fdf739693}"/>
-   <rule symbol="3" label="Fim da via ferroviária" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = 4" key="{aff7eec1-9aaa-4f00-adb2-4e48dd1bf7fc}"/>
-   <rule symbol="4" label="Paragem" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = 5" key="{78adbb76-f65e-493e-b474-829fbe817911}"/>
+   <rule symbol="0" label="Junção" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = ''1''" key="{0cc406dd-b75d-4e8a-940d-c412d7d229ec}"/>
+   <rule symbol="1" label="Passagem de nível" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = ''2''" key="{23619b9e-76b5-4516-9f22-471591165671}"/>
+   <rule symbol="2" label="Pseudo-nó" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = ''3''" key="{1cec497a-18f1-4c84-b526-3d2fdf739693}"/>
+   <rule symbol="3" label="Fim da via ferroviária" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = ''4''" key="{aff7eec1-9aaa-4f00-adb2-4e48dd1bf7fc}"/>
+   <rule symbol="4" label="Paragem" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_ferrov&quot; = ''5''" key="{78adbb76-f65e-493e-b474-829fbe817911}"/>
   </rules>
   <symbols>
    <symbol clip_to_extent="1" type="marker" force_rhr="0" name="0" alpha="0.8">
@@ -29667,11 +29667,11 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{336b55b2-a831-4940-9dfb-655e2b73f27a}">
-   <rule symbol="0" label="Junção" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = 1" key="{0cc406dd-b75d-4e8a-940d-c412d7d229ec}"/>
-   <rule symbol="1" label="Passagem de nível" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = 2" key="{23619b9e-76b5-4516-9f22-471591165671}"/>
-   <rule symbol="2" label="Pseudo-nó" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = 3" key="{1cec497a-18f1-4c84-b526-3d2fdf739693}"/>
-   <rule symbol="3" label="Fim da via rodoviária" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = 4" key="{aff7eec1-9aaa-4f00-adb2-4e48dd1bf7fc}"/>
-   <rule symbol="4" label="Infraestrutura" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = 5" key="{78adbb76-f65e-493e-b474-829fbe817911}"/>
+   <rule symbol="0" label="Junção" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = ''1''" key="{0cc406dd-b75d-4e8a-940d-c412d7d229ec}"/>
+   <rule symbol="1" label="Passagem de nível" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = ''2''" key="{23619b9e-76b5-4516-9f22-471591165671}"/>
+   <rule symbol="2" label="Pseudo-nó" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = ''3''" key="{1cec497a-18f1-4c84-b526-3d2fdf739693}"/>
+   <rule symbol="3" label="Fim da via rodoviária" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = ''4''" key="{aff7eec1-9aaa-4f00-adb2-4e48dd1bf7fc}"/>
+   <rule symbol="4" label="Infraestrutura" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_no_trans_rodov&quot; = ''5''" key="{78adbb76-f65e-493e-b474-829fbe817911}"/>
   </rules>
   <symbols>
    <symbol clip_to_extent="1" type="marker" force_rhr="0" name="0" alpha="0.8">
@@ -30370,11 +30370,11 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{8a81e17b-d622-4046-ae09-e01d3f1a1412}">
-   <rule symbol="0" label="Ponte" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = 1" key="{796e9031-1b87-4cc5-bf48-fd9fa60fbb3d}"/>
-   <rule symbol="1" label="Viaduto | Passagem superior | Passagem inferior" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = 2 OR &quot;valor_tipo_obra_arte&quot; = 3 OR &quot;valor_tipo_obra_arte&quot; = 4 " key="{9bfae465-e470-4769-97ee-adcd6fd307b5}"/>
-   <rule symbol="2" label="Passagem hidráulica" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = 6" key="{90828c74-5c42-4288-864e-e46f8b9672ef}"/>
-   <rule symbol="3" label="Túnel" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = 5" key="{acd5557c-a8f4-4f45-9ad7-a7a171b080a6}"/>
-   <rule symbol="4" label="Passagem pedonal" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = 7" key="{f34769c8-ef32-4fb1-ada6-5eac48807438}"/>
+   <rule symbol="0" label="Ponte" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = ''1''" key="{796e9031-1b87-4cc5-bf48-fd9fa60fbb3d}"/>
+   <rule symbol="1" label="Viaduto | Passagem superior | Passagem inferior" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = ''2'' OR &quot;valor_tipo_obra_arte&quot; = ''3'' OR &quot;valor_tipo_obra_arte&quot; = ''4'' " key="{9bfae465-e470-4769-97ee-adcd6fd307b5}"/>
+   <rule symbol="2" label="Passagem hidráulica" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = ''6''" key="{90828c74-5c42-4288-864e-e46f8b9672ef}"/>
+   <rule symbol="3" label="Túnel" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = ''5''" key="{acd5557c-a8f4-4f45-9ad7-a7a171b080a6}"/>
+   <rule symbol="4" label="Passagem pedonal" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_obra_arte&quot; = ''7''" key="{f34769c8-ef32-4fb1-ada6-5eac48807438}"/>
    <rule symbol="5" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{43c7f163-657d-4551-bb8b-2b789ebbb54a}"/>
   </rules>
   <symbols>
@@ -33062,7 +33062,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{9f5a2bfe-54d4-45e1-9798-b050bd8efd61}">
-   <rule symbol="0" label="Árvore" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_ponto_interesse&quot; = 3" key="{d6cb3f2f-738b-475e-8fad-2c1c8a1e524c}"/>
+   <rule symbol="0" label="Árvore" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_ponto_interesse&quot; = ''3''" key="{d6cb3f2f-738b-475e-8fad-2c1c8a1e524c}"/>
    <rule symbol="1" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{c3dfe0da-81a6-4b08-a058-27e65e3f4875}"/>
   </rules>
   <symbols>
@@ -34419,9 +34419,9 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{7dc2d935-2858-46cc-be0e-a1f4e6834b6f}">
-   <rule symbol="0" label="Comboio (dois carris paralelos)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_linha_ferrea&quot; = 7" key="{12f1a1e5-c385-4671-83d2-2a1f9c146087}"/>
-   <rule symbol="1" label="Metro [Linha superficial]" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_linha_ferrea&quot; = 4 AND &quot;valor_posicao_vertical_transportes&quot; = 0" key="{8d6b86bd-ca41-4451-93e7-87d1db1349e8}"/>
-   <rule symbol="2" label="Metro [Linha subterrânea]" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_linha_ferrea&quot; = 4 AND &quot;valor_posicao_vertical_transportes&quot; = ''-1''" key="{f4735a2a-4dd7-4015-86d2-8f129f509bd0}"/>
+   <rule symbol="0" label="Comboio (dois carris paralelos)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_linha_ferrea&quot; = ''7''" key="{12f1a1e5-c385-4671-83d2-2a1f9c146087}"/>
+   <rule symbol="1" label="Metro [Linha superficial]" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_linha_ferrea&quot; = ''4'' AND &quot;valor_posicao_vertical_transportes&quot; = ''0''" key="{8d6b86bd-ca41-4451-93e7-87d1db1349e8}"/>
+   <rule symbol="2" label="Metro [Linha subterrânea]" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_linha_ferrea&quot; = ''4'' AND &quot;valor_posicao_vertical_transportes&quot; = ''-1''" key="{f4735a2a-4dd7-4015-86d2-8f129f509bd0}"/>
    <rule symbol="3" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{324bc5d6-4946-4173-85f8-1d6eedf57621}"/>
   </rules>
   <symbols>
@@ -36012,27 +36012,27 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{719f5d84-70fc-499b-819a-660fb8635904}">
-   <rule symbol="0" label="Autoestrada ou via reservada a automóveis e motociclos (Ao nível do solo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 1 AND &quot;valor_posicao_vertical_transportes&quot; =  ''0''" key="{fc98f1cd-ff3f-48e0-ad29-ad900e8d1646}"/>
-   <rule symbol="1" label="Autoestrada ou via reservada a automóveis e motociclos (Suspenso ou elevado)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 1 AND &quot;valor_posicao_vertical_transportes&quot; IN (''1'',''2'',''3'')" key="{786b8ede-e514-459c-8c74-36bb208b7581}"/>
-   <rule symbol="2" label="Autoestrada ou via reservada a automóveis e motociclos (No subsolo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 1 AND &quot;valor_posicao_vertical_transportes&quot; IN (''-1'',''-2'',''-3'')" key="{c3ea11d7-840b-4f66-8d83-3c1cbf941675}"/>
-   <rule symbol="3" label="Estrada (Ao nível do solo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 2 AND &quot;valor_posicao_vertical_transportes&quot; =  ''0''" key="{6f24350a-6477-46b5-a3c5-b3a7f9f35a53}"/>
-   <rule symbol="4" label="Estrada (Suspenso ou elevado)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 2 AND &quot;valor_posicao_vertical_transportes&quot; IN (''1'',''2'',''3'')" key="{75ab9230-4507-4df6-98cc-d1b2aa83f18f}"/>
-   <rule symbol="5" label="Estrada (No subsolo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 2 AND &quot;valor_posicao_vertical_transportes&quot; IN (''-1'',''-2'',''-3'')" key="{325ba432-e4c2-4438-bf72-e7173e72e686}"/>
-   <rule symbol="6" label="Via urbana (Ao nível do solo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 3 AND &quot;valor_posicao_vertical_transportes&quot; =  ''0''" key="{cf9b8ede-6861-40c1-8e39-4d2d417272be}"/>
-   <rule symbol="7" label="Via urbana (Suspenso ou elevado)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 3 AND &quot;valor_posicao_vertical_transportes&quot; IN (''1'',''2'',''3'')" key="{d4395bcc-8001-4444-bf70-964aecf95363}"/>
-   <rule symbol="8" label="Via urbana (No subsolo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 3 AND &quot;valor_posicao_vertical_transportes&quot; IN (''-1'',''-2'',''-3'')" key="{84701fe2-40d3-4fea-ad4b-4602727db4fd}"/>
-   <rule symbol="9" label="Via urbana (Trilho)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 3 AND  &quot;valor_tipo_troco_rodoviario&quot; =  ''6'' " key="{1e00ca5c-8f38-49eb-bfcc-1dd46574e64a}"/>
-   <rule symbol="10" label="Via urbana (Via de serviço)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 3 AND  &quot;valor_tipo_troco_rodoviario&quot; =  ''4'' " key="{25fba5db-f510-4e1d-826b-0385a87a3bdd}"/>
-   <rule symbol="11" label="Via rural (Ao nível do solo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 4 AND &quot;valor_posicao_vertical_transportes&quot; =  ''0''" key="{ecc9e190-bd73-4178-931e-b442ff00b275}"/>
-   <rule symbol="12" label="Via rural (Suspenso ou elevado)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 4 AND &quot;valor_posicao_vertical_transportes&quot; IN (''1'',''2'',''3'')" key="{63ecf19a-c7bf-4849-b3e4-35ef66d64eb2}"/>
-   <rule symbol="13" label="Via rural (No subsolo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 4 AND &quot;valor_posicao_vertical_transportes&quot; IN (''-1'',''-2'',''-3'')" key="{f43983df-931f-408b-ae7e-51751b7fe822}"/>
-   <rule symbol="14" label="Aceiro" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 5" key="{c5005121-fac9-40a9-ae9b-04b525f62474}"/>
-   <rule symbol="15" label="Ciclovia" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = 6" key="{78057a36-2f07-4a63-93ca-9ae47218084a}"/>
+   <rule symbol="0" label="Autoestrada ou via reservada a automóveis e motociclos (Ao nível do solo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''1'' AND &quot;valor_posicao_vertical_transportes&quot; =  ''0''" key="{fc98f1cd-ff3f-48e0-ad29-ad900e8d1646}"/>
+   <rule symbol="1" label="Autoestrada ou via reservada a automóveis e motociclos (Suspenso ou elevado)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''1'' AND &quot;valor_posicao_vertical_transportes&quot; IN (''1'',''2'',''3'')" key="{786b8ede-e514-459c-8c74-36bb208b7581}"/>
+   <rule symbol="2" label="Autoestrada ou via reservada a automóveis e motociclos (No subsolo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''1'' AND &quot;valor_posicao_vertical_transportes&quot; IN (''-1'',''-2'',''-3'')" key="{c3ea11d7-840b-4f66-8d83-3c1cbf941675}"/>
+   <rule symbol="3" label="Estrada (Ao nível do solo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''2'' AND &quot;valor_posicao_vertical_transportes&quot; =  ''0''" key="{6f24350a-6477-46b5-a3c5-b3a7f9f35a53}"/>
+   <rule symbol="4" label="Estrada (Suspenso ou elevado)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''2'' AND &quot;valor_posicao_vertical_transportes&quot; IN (''1'',''2'',''3'')" key="{75ab9230-4507-4df6-98cc-d1b2aa83f18f}"/>
+   <rule symbol="5" label="Estrada (No subsolo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''2'' AND &quot;valor_posicao_vertical_transportes&quot; IN (''-1'',''-2'',''-3'')" key="{325ba432-e4c2-4438-bf72-e7173e72e686}"/>
+   <rule symbol="6" label="Via urbana (Ao nível do solo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''3'' AND &quot;valor_posicao_vertical_transportes&quot; =  ''0''" key="{cf9b8ede-6861-40c1-8e39-4d2d417272be}"/>
+   <rule symbol="7" label="Via urbana (Suspenso ou elevado)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''3'' AND &quot;valor_posicao_vertical_transportes&quot; IN (''1'',''2'',''3'')" key="{d4395bcc-8001-4444-bf70-964aecf95363}"/>
+   <rule symbol="8" label="Via urbana (No subsolo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''3'' AND &quot;valor_posicao_vertical_transportes&quot; IN (''-1'',''-2'',''-3'')" key="{84701fe2-40d3-4fea-ad4b-4602727db4fd}"/>
+   <rule symbol="9" label="Via urbana (Trilho)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''3'' AND  &quot;valor_tipo_troco_rodoviario&quot; =  ''6'' " key="{1e00ca5c-8f38-49eb-bfcc-1dd46574e64a}"/>
+   <rule symbol="10" label="Via urbana (Via de serviço)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''3'' AND  &quot;valor_tipo_troco_rodoviario&quot; =  ''4'' " key="{25fba5db-f510-4e1d-826b-0385a87a3bdd}"/>
+   <rule symbol="11" label="Via rural (Ao nível do solo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''4'' AND &quot;valor_posicao_vertical_transportes&quot; =  ''0''" key="{ecc9e190-bd73-4178-931e-b442ff00b275}"/>
+   <rule symbol="12" label="Via rural (Suspenso ou elevado)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''4'' AND &quot;valor_posicao_vertical_transportes&quot; IN (''1'',''2'',''3'')" key="{63ecf19a-c7bf-4849-b3e4-35ef66d64eb2}"/>
+   <rule symbol="13" label="Via rural (No subsolo)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''4'' AND &quot;valor_posicao_vertical_transportes&quot; IN (''-1'',''-2'',''-3'')" key="{f43983df-931f-408b-ae7e-51751b7fe822}"/>
+   <rule symbol="14" label="Aceiro" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''5''" key="{c5005121-fac9-40a9-ae9b-04b525f62474}"/>
+   <rule symbol="15" label="Ciclovia" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_caract_fisica_rodov&quot; = ''6''" key="{78057a36-2f07-4a63-93ca-9ae47218084a}"/>
    <rule symbol="16" label="Ramo de ligação" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_troco_rodoviario&quot;  = ''2'' " key="{54b9a8a6-5633-4080-8942-406034f55cef}"/>
    <rule symbol="17" label="Rotunda" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_troco_rodoviario&quot;  = ''3'' " key="{8b117cf1-2ef9-42ff-bb1b-b08276bcadf1}"/>
    <rule symbol="18" label="Via em escada" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_troco_rodoviario&quot;  =  ''5'' " key="{7b842fa4-9010-4013-abf0-21e4bac755ea}"/>
    <rule symbol="19" label="Passadiço" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_tipo_troco_rodoviario&quot;  =  ''7'' " key="{e4023d63-85e5-4375-8ea5-6ec15a799fba}"/>
-   <rule symbol="20" label="Estado da via rodoviária (em construção)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_estado_via_rodov&quot; = 2  " key="{fd71bc01-a4ab-44a6-b108-ba0dcc679fb8}"/>
+   <rule symbol="20" label="Estado da via rodoviária (em construção)" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_estado_via_rodov&quot; = ''2''  " key="{fd71bc01-a4ab-44a6-b108-ba0dcc679fb8}"/>
    <rule symbol="21" label="No sentido" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_sentido&quot;  =  ''2'' " key="{a7a7aa68-f314-4cc7-8851-ba89028ea4a2}"/>
    <rule symbol="22" label="Sentido contrário" scalemaxdenom="25000" scalemindenom="1" filter=" &quot;valor_sentido&quot;  =  ''3'' " key="{20562f66-894b-4319-a7e0-35ed910fcdaf}"/>
    <rule symbol="23" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{3b34335d-9bc3-41af-aab7-c89d11428bd1}"/>
@@ -42351,8 +42351,8 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{c678cd7a-f640-4efc-b923-093ac7240bf6}">
-   <rule symbol="0" label="Limite exterior sem berma" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_limite&quot; = 1" key="{02381901-949a-4537-80ef-a9adc551cc56}"/>
-   <rule symbol="1" label="Separador" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_limite&quot; = 2" key="{7790073e-5af4-4189-a987-2c1a910d0c61}"/>
+   <rule symbol="0" label="Limite exterior sem berma" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_limite&quot; = ''1''" key="{02381901-949a-4537-80ef-a9adc551cc56}"/>
+   <rule symbol="1" label="Separador" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_tipo_limite&quot; = ''2''" key="{7790073e-5af4-4189-a987-2c1a910d0c61}"/>
    <rule symbol="2" scalemaxdenom="25000" scalemindenom="1" filter="ELSE" key="{aea73e76-8f6f-4694-b912-d9fc9d07c76b}"/>
   </rules>
   <symbols>
@@ -43397,13 +43397,13 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </temporal>
  <renderer-v2 forceraster="0" symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1">
   <rules key="{b1606abe-dd5f-4fda-bf95-03a650825ad3}">
-   <rule symbol="0" label="Em construção" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_condicao_const&quot; = 3" key="{55184595-1aab-4902-a3d5-2e769848e38b}"/>
-   <rule symbol="1" label="Ruína" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_condicao_const&quot; = 5" key="{429c5ae3-7e82-4e6c-bcf3-97aee21b50c3}"/>
-   <rule symbol="2" label="Anfiteatro ao ar livre | Arco | Palácio | Templo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = 1 OR &quot;valor_forma_edificio&quot; = 2 OR &quot;valor_forma_edificio&quot; = 21 OR &quot;valor_forma_edificio&quot; = 28" key="{d266899e-d801-49c0-8972-5e90a367543f}"/>
-   <rule symbol="3" label="Azenha" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = 3" key="{154bd3ff-9041-4fc4-b52c-32013606386d}"/>
-   <rule symbol="4" label="Barraca" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = 4" key="{b2e432db-8f48-45fc-863e-5aa2293f0ef5}"/>
-   <rule symbol="5" label="Barragem | Chaminé" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = 5 OR &quot;valor_forma_edificio&quot; = 9" key="{a49a8a26-8c0f-4c33-9d6f-bda592ba08c5}"/>
-   <rule symbol="6" label="Capela" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = 7" key="{ff8ed959-19c0-4c42-b648-f7a39dadb0e5}"/>
+   <rule symbol="0" label="Em construção" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_condicao_const&quot; = ''3''" key="{55184595-1aab-4902-a3d5-2e769848e38b}"/>
+   <rule symbol="1" label="Ruína" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_condicao_const&quot; = ''5''" key="{429c5ae3-7e82-4e6c-bcf3-97aee21b50c3}"/>
+   <rule symbol="2" label="Anfiteatro ao ar livre | Arco | Palácio | Templo" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = ''1'' OR &quot;valor_forma_edificio&quot; = ''2'' OR &quot;valor_forma_edificio&quot; = ''21'' OR &quot;valor_forma_edificio&quot; = ''28''" key="{d266899e-d801-49c0-8972-5e90a367543f}"/>
+   <rule symbol="3" label="Azenha" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = ''3''" key="{154bd3ff-9041-4fc4-b52c-32013606386d}"/>
+   <rule symbol="4" label="Barraca" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = ''4''" key="{b2e432db-8f48-45fc-863e-5aa2293f0ef5}"/>
+   <rule symbol="5" label="Barragem | Chaminé" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = ''5'' OR &quot;valor_forma_edificio&quot; = ''9''" key="{a49a8a26-8c0f-4c33-9d6f-bda592ba08c5}"/>
+   <rule symbol="6" label="Capela" scalemaxdenom="25000" scalemindenom="1" filter="&quot;valor_forma_edificio&quot; = ''7''" key="{ff8ed959-19c0-4c42-b648-f7a39dadb0e5}"/>
    <rule symbol="7" label="Habitação - Residencial" scalemaxdenom="25000" scalemindenom="1" filter="&quot;edificio_valor_utilizacao_atual_utilizacao_atual&quot; = ''1.1''" key="{42c57051-9371-4af7-99b7-b1e6f2bdd90e}"/>
    <rule symbol="8" label="Habitação - Associado à residência" scalemaxdenom="25000" scalemindenom="1" filter="&quot;edificio_valor_utilizacao_atual_utilizacao_atual&quot; =  ''1.2''" key="{f1fd694c-0db4-4f55-851f-5cb5345e3a3d}"/>
    <rule symbol="9" label="Agricultura e pescas" scalemaxdenom="25000" scalemindenom="1" filter="&quot;edificio_valor_utilizacao_atual_utilizacao_atual&quot; LIKE  ''2%''" key="{0793584f-3114-4b80-b1c7-21c88a07d5d8}"/>
