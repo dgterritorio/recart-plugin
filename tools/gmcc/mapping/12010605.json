@@ -20,13 +20,13 @@
                     "src": "",
                     "dst": "valor_curso_de_agua",
                     "op": "set",
-                    "value": 4
+                    "value": "4"
                 },
                 {
                     "src": "",
                     "dst": "valor_posicao_vertical",
                     "op": "set",
-                    "value": 0
+                    "value": "0"
                 },
                 {
                     "src": "",
