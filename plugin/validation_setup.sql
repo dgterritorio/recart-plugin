@@ -661,7 +661,7 @@ create table validation.curva_de_nivel_points_interval as
 SELECT concat( identificador::text, '-', path[1]::text) as identificador, geom::geometry(POINTZ, 3763) as geometria
 FROM (
 SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, 10.0/st_length(geometria)))).*
-from {schema}.curva_de_nivel cdn
+from (select identificador, (ST_Dump(geometria)).geom as geometria from {schema}.curva_de_nivel) as cdn
 where st_length(geometria) > 10.0
 ) as pontos
 union SELECT concat( identificador::text, '-0') as identificador, ST_PointN(geometria, 1) as geometria
