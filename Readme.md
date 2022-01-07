@@ -18,7 +18,7 @@ O módulo recartDGT é uma aplicação informática, que funciona a partir do QG
 
 #### Descarregar o plugin recartDGT
 
-O módulo recartDGT está disponível em [recartDGT.zip](https://github.com/dgterritorio/recart-plugin/raw/main/plugin/recartDGT.zip). 
+O módulo recartDGT está disponível em [recartDGT.zip](https://github.com/dgterritorio/recart-plugin/releases). 
 
 No [repositório do recart](https://github.com/dgterritorio/recart-plugin) está disponível o código fonte. Pode-se e deve-se usar o repositório para reportar questões.
 
