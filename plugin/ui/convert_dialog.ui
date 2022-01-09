@@ -17,13 +17,6 @@
    <locale language="Portuguese" country="Portugal"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="1">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0" colspan="2">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout_6">
@@ -42,7 +35,7 @@
       <item row="1" column="0" colspan="2">
        <widget class="QGroupBox" name="groupBox_5">
         <property name="title">
-         <string>Log</string>
+         <string>Registo</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
@@ -64,13 +57,13 @@
       <item row="0" column="0" colspan="2">
        <widget class="QGroupBox" name="groupBox_4">
         <property name="title">
-         <string>Configuração</string>
+         <string>Entrada</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>Diretório Output</string>
+            <string>Pasta temporária</string>
            </property>
           </widget>
          </item>
@@ -80,21 +73,21 @@
          <item row="2" column="0">
           <widget class="QLabel" name="label_11">
            <property name="text">
-            <string>Ligação Output</string>
+            <string>Destino</string>
            </property>
           </widget>
          </item>
          <item row="2" column="4">
           <widget class="QLabel" name="label_12">
            <property name="text">
-            <string>DB Schema</string>
+            <string>Esquema</string>
            </property>
           </widget>
          </item>
          <item row="5" column="0" colspan="8">
           <widget class="QGroupBox" name="groupBox">
            <property name="title">
-            <string>Opções mapeamento</string>
+            <string>Opções de conversão</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="0" column="0">
@@ -182,7 +175,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Ficheiro Input</string>
+            <string>Ficheiro(s)</string>
            </property>
           </widget>
          </item>
@@ -229,10 +222,34 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Coordenadas</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" colspan="7">
+          <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
     </widget>
    </item>
   </layout>
@@ -242,6 +259,11 @@
    <class>QgsFileWidget</class>
    <extends>QWidget</extends>
    <header>qgsfilewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsProjectionSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsprojectionselectionwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

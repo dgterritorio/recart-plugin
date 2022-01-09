@@ -85,7 +85,7 @@ PROC_FILES = \
 	$(PROC_DIR)/seg_via_rodov_references.sql $(PROC_DIR)/equip_util_coletiva_references.sql\
 	$(PROC_DIR)/to2D.py $(PROC_DIR)/to3D.py $(PROC_DIR)/to2D.py $(PROC_DIR)/layer_styles.sql
 
-EXTRAS = metadata.txt icon.png carttop.xml validation_rules.sql validation_setup.sql validation_setup_no3d.sql
+EXTRAS = metadata.txt icon.png carttop.xml validation_rules.sql validation_setup.sql validation_reset.sql validation_setup_no3d.sql
 
 EXTRA_DIRS =
 

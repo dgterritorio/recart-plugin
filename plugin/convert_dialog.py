@@ -32,7 +32,7 @@ from PyQt5.QtWidgets import QDialog, QProgressDialog, QMessageBox, QAbstractItem
 from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QVariant
 from PyQt5.QtGui import QIntValidator, QStandardItemModel, QStandardItem
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri
+from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsCoordinateReferenceSystem
 from qgis.gui import QgsFileWidget
 
 from osgeo import gdal
@@ -76,6 +76,10 @@ class ConvertDialog(QDialog, FORM_CLASS):
             self.buttonBox.button(QDialogButtonBox.Ok).setIcon(self.style().standardIcon(QStyle.SP_DialogOkButton))
             
             self.fillDataSources()
+
+            crs = QgsCoordinateReferenceSystem("EPSG:3763")
+            self.mQgsProjectionSelectionWidget.setCrs( crs )
+
             self.initialized = True
 
     def closeEvent(self, event):
@@ -178,6 +182,11 @@ class ConvertDialog(QDialog, FORM_CLASS):
         if self.caliasCheckBox.isChecked():
             res = (res and False) if not self.aliasQgsFileWidget.filePath() else (
                 res and True)
+        
+        srs = self.mQgsProjectionSelectionWidget.crs()
+        # 0 se indefinida
+        # self.writeText( 'Coordenadas: ' + str(srs.postgisSrid()) )
+        res = (res and False) if not srs.postgisSrid() else (res and True)
 
         res = (res and False) if not self.lineEdit.text() else (res and True)
 
@@ -226,6 +235,8 @@ class ConvertDialog(QDialog, FORM_CLASS):
             kwargs['schema'] = self.lineEdit.text()
             kwargs['ndd'] = self.nddCombo.currentText()
 
+            srs = self.mQgsProjectionSelectionWidget.crs()
+
             conString = qgis_configs.getConnString(self, self.getConnection())
 
             if conString is None:
@@ -235,7 +246,7 @@ class ConvertDialog(QDialog, FORM_CLASS):
 
             self.convertProcess = ConvertProcess(self.mapQgsFileWidget.filePath(),
                                                  cm, kwargs, self.inputQgsFileWidget.filePath(),
-                                                 self.configQgsFileWidget.filePath(), conString)
+                                                 self.configQgsFileWidget.filePath(), conString, srs.postgisSrid() )
 
             self.convertProcess.signal.connect(self.writeText)
             self.convertProcess.finished.connect(self.finishedConvert)
@@ -252,7 +263,7 @@ class ConvertDialog(QDialog, FORM_CLASS):
 class ConvertProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, mapDir, cm, args, iptFile, outDir, outConn):
+    def __init__(self, mapDir, cm, args, iptFile, outDir, outConn, srsid):
         QThread.__init__(self)
 
         now = datetime.now()
@@ -265,6 +276,7 @@ class ConvertProcess(QThread):
         self.outDir = outDir
         self.running = False
         self.cancel = False
+        self.srsid = srsid
 
         self.pgutils = PostgisUtils(self, outConn)
 
@@ -288,7 +300,7 @@ class ConvertProcess(QThread):
     def run(self):
         self.running = True
         try:
-            ci = CartImporter(self.mapDir, self.cm, self.write, **self.args)
+            ci = CartImporter(self.mapDir, self.srsid, self.cm, self.write, **self.args)
 
             # ci.read_conf(self.cfgFile)
 

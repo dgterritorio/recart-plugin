@@ -17,8 +17,9 @@ from osgeo import ogr
 class CartImporter:
     """Importador de cartografia"""
 
-    def __init__(self, map_dir, cm, writer, **kwargs):
+    def __init__(self, map_dir, srsid, cm, writer, **kwargs):
         self.map_dir = map_dir
+        self.srsid = srsid
 
         self.base_dir = kwargs.get('base_dir', os.path.dirname(
             os.path.realpath(__file__))+'/base')
@@ -427,7 +428,7 @@ class CartImporter:
         )
 
         prst_handler = PostgisImporter(
-            self.schema, self.base, self.mapping, self.cod_field, self.ndd, self.force_geom, self.force_polygon, self.force_close, self.use_layerName, self.save_src, self.writer)
+            self.schema, self.base, self.mapping, self.cod_field, self.ndd, self.force_geom, self.force_polygon, self.force_close, self.use_layerName, self.save_src, self.writer, self.srsid)
 
         prst_handler.save_styles(os.path.join(bp, pf + '_layer_styles.sql'))
         prst_handler.save_datasource(os.path.join(bp, pf + '_features.sql'))
@@ -435,7 +436,7 @@ class CartImporter:
             os.path.join(bp, pf + '_features.sql'))
         prst_handler.save_remaining(os.path.join(bp, pf + '_remaining.sql'))
         prst_handler.save_errors(os.path.join(bp, pf + '_errors.sql'))
-        prst_handler.save_base(os.path.join(bp, pf + '_base.sql'))
+        prst_handler.save_base(os.path.join(bp, pf + '_base.sql'), self.srsid)
 
         # prst_handler.solve_recart_referances('features.sql')
 
