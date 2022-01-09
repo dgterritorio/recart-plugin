@@ -8,7 +8,7 @@ from . import gm_cart_aux as aux
 class PostgisImporter:
     """Importador de cartografia"""
 
-    def __init__(self, schema, base, mapping, cod_field, ndd, forceGeom, forcePolygon, forceClose, use_layerName, save_src, writer):
+    def __init__(self, schema, base, mapping, cod_field, ndd, forceGeom, forcePolygon, forceClose, use_layerName, save_src, writer, srsid):
         self.schema = schema
         self.base = base
         self.mapping = mapping
@@ -20,6 +20,7 @@ class PostgisImporter:
         self.writer = writer
 
         self.use_layerName = use_layerName
+        self.srsid = srsid
 
         self.save_src = save_src
         self.errors_processing = {
@@ -36,7 +37,7 @@ class PostgisImporter:
 
     def get_field(self, nome, dtype, opcional, ignore_optional=False, geom_3D=True):
         result = ['\"' + nome + '\"']
-        geom = 'geometry(GEOMETRYZ, 3763)' if geom_3D else 'geometry(GEOMETRY, 3763)'
+        geom = 'geometry(GEOMETRYZ, ' + str(self.srsid) + ')' if geom_3D else 'geometry(GEOMETRY, ' + str(self.srsid) + ')'
         if dtype == 'UUID':
             result.append('uuid')
         elif dtype == 'ID':
@@ -76,7 +77,7 @@ class PostgisImporter:
         elif dtype == 'smallint':
             result.append('smallint')
         elif dtype == 'geometry':
-            result.append('geometry(GEOMETRYZ, 3763)')
+            result.append('geometry(GEOMETRYZ, ' + str(self.srsid) + ')')
         elif dtype == 'json':
             result.append('json')
         else:
@@ -125,7 +126,7 @@ class PostgisImporter:
         if self.forceClose is True:
             feature.GetGeometryRef().CloseRings()
 
-        geom = "'srid=3763;" + feature.GetGeometryRef().ExportToWkt() + "'"
+        geom = "'srid=" + str(self.srsid) + ";" + feature.GetGeometryRef().ExportToWkt() + "'"
 
         for pp in layer.post_process:
             if pp['type'] == 'python':
@@ -205,7 +206,7 @@ class PostgisImporter:
                     geom = feature['data'].GetGeometryRef()
                     geom.FlattenTo2D()
                     out_fields.append(
-                        "'srid=3763;" + geom.ExportToWkt() + "'")
+                        "'srid=" + str(self.srsid) + ";" + geom.ExportToWkt() + "'")
 
             elif field['op'] == 'addz':
                 if field['src'] == '1_geom':
@@ -214,7 +215,7 @@ class PostgisImporter:
                     elif not feature['data'].GetGeometryRef().Is3D():
                         geom = feature['data'].GetGeometryRef()
                         out_fields.append(
-                            "ST_Force3D(ST_GeomFromEWKT('srid=3763;" + geom.ExportToWkt() + "'))")
+                            "ST_Force3D(ST_GeomFromEWKT('srid=" + str(self.srsid) + ";" + geom.ExportToWkt() + "'))")
                     elif feature['data'].GetGeometryRef() is not None:
                         geom, auxtable, err = self.get_geom(
                             layer, feature['data'], enforce)
@@ -248,7 +249,7 @@ class PostgisImporter:
             elif field['op'] == 'point_f':
                 if field['src'] == '1_geom':
                     out_fields.append(
-                        "'srid=3763;POINT " + str(feature['data'].GetGeometryRef().GetPoint()).replace(',', '') + "'")
+                        "'srid=" + str(self.srsid) + ";POINT " + str(feature['data'].GetGeometryRef().GetPoint()).replace(',', '') + "'")
 
             elif field['op'] == 'dnow':
                 out_fields.append("now()")
@@ -367,7 +368,7 @@ class PostgisImporter:
             self.writer(
                 'Erro a guardar ficheiro de estilos: \'' + str(e) + '\'')
 
-    def save_base(self, path):
+    def save_base(self, path, srsid):
         bp = os.path.dirname(os.path.realpath(__file__))
         try:
             with open(path, "w", encoding='utf-8') as base_sql_file:
@@ -396,7 +397,9 @@ class PostgisImporter:
 
                 with open(bp + '/' + '/processing/_base_references.sql', encoding='utf-8') as pp_file:
                     pp_src = pp_file.read()
-                    base_sql_file.write( re.sub(r"{schema}", self.schema, pp_src) )
+                    aux = re.sub(r"{schema}", self.schema, pp_src)
+                    aux = re.sub(r", 3763", ', ' + str(srsid), aux)
+                    base_sql_file.write( aux )
 
         except Exception as e:
             self.writer('Erro a guardar ficheiro base: \'' + str(e) + '\'')
@@ -574,7 +577,7 @@ class PostgisImporter:
                     out.append('\'' + f['src'] + '\'')
                     out.append('\'' + f['map_ops']['table'] + '\'')
                     if f['data'].GetGeometryRef() is not None:
-                        out.append("ST_Force3D(ST_GeomFromEWKT('srid=3763;" +
+                        out.append("ST_Force3D(ST_GeomFromEWKT('srid=" + str(self.srsid) + ";" +
                                    f['data'].GetGeometryRef().ExportToWkt() + "'))")
                     else:
                         out.append('null')
