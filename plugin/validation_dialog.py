@@ -25,7 +25,7 @@ import re
 from datetime import datetime
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QHeaderView, QCheckBox, QStyle
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QHeaderView, QCheckBox, QStyle
 from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QFont
 
@@ -596,26 +596,30 @@ class ValidationDialog(QDialog, FORM_CLASS):
         iface.layerTreeView().refreshLayerSymbology(qlayer.id())
 
     def reset(self):
-        self.writeText('[Aviso] Apaga os esquemas validation, errors e remove funções e procedimentos')
 
-        conString = qgis_configs.getConnString(self, self.getConnection())
-        schema = str(self.schemaName.currentText())
+        res = QMessageBox.question(self,'', "Tem a cereteza que quer remover os esquemas, as tabelas e as funções de validação?", QMessageBox.Yes | QMessageBox.No)
 
-        srsid = self.mQgsProjectionSelectionWidget.crs()
-        self.writeText( 'Validar com o SRS {}'.format( srsid.postgisSrid() ) )
-        self.srsid = srsid.postgisSrid()
+        if res == QMessageBox.Yes:
+            self.writeText('[Aviso] Apaga os esquemas validation, errors e remove funções e procedimentos')
 
-        valid3d = self.checkBox.isChecked()
+            conString = qgis_configs.getConnString(self, self.getConnection())
+            schema = str(self.schemaName.currentText())
 
-        self.resetProcess = ResetProcess(conString, schema, valid3d, self.srsid )
+            srsid = self.mQgsProjectionSelectionWidget.crs()
+            self.writeText( 'Validar com o SRS {}'.format( srsid.postgisSrid() ) )
+            self.srsid = srsid.postgisSrid()
 
-        self.resetProcess.signal.connect(self.writeText)
-        self.resetProcess.finished.connect(self.finishedReset)
+            valid3d = self.checkBox.isChecked()
 
-        # self.iface.messageBar().pushMessage("Criar estrutura de validação.")
-        self.writeText("\tA apagar a estrutura de validação e erros anteriores...")
-        self.isRunning = True
-        self.resetProcess.start()
+            self.resetProcess = ResetProcess(conString, schema, valid3d, self.srsid )
+
+            self.resetProcess.signal.connect(self.writeText)
+            self.resetProcess.finished.connect(self.finishedReset)
+
+            # self.iface.messageBar().pushMessage("Criar estrutura de validação.")
+            self.writeText("\tA apagar a estrutura de validação e erros anteriores...")
+            self.isRunning = True
+            self.resetProcess.start()
 
     def process(self):
         # carregou em OK
