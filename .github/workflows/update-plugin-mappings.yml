@@ -1,0 +1,23 @@
+name: update-plugin-mappings
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  update-plugin-mappings:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Update plugin mappings
+        run: |
+          cd ./tools/gmcc
+          ./generate_plugin_mapping_file.py
+      - name: Automatic push changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          branch: ${{github.head_ref}}
+          add: './plugin/convert/mapping.py'

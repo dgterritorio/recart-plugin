@@ -8771,13 +8771,13 @@ cmap = {
                         "src": "",
                         "dst": "valor_curso_de_agua",
                         "op": "set",
-                        "value": 4
+                        "value": "4"
                     },
                     {
                         "src": "",
                         "dst": "valor_posicao_vertical",
                         "op": "set",
-                        "value": 0
+                        "value": "0"
                     },
                     {
                         "src": "",
@@ -14039,23 +14039,12 @@ cmap = {
         "objeto": "CAMPOS DE JOGOS",
         "map": [
             {
-                "table": "constru_polig",
+                "table": "",
                 "fields": [
                     {
                         "src": "1_geom",
                         "dst": "geometria",
                         "op": "eq"
-                    },
-                    {
-                        "src": "",
-                        "dst": "inicio_objeto",
-                        "op": "dnow"
-                    },
-                    {
-                        "src": "",
-                        "dst": "valor_tipo_construcao",
-                        "op": "set",
-                        "value": 5
                     }
                 ]
             }
@@ -30922,7 +30911,7 @@ cmap = {
                 ],
                 "references": [
                     {
-                        "table": "equip_util_coletiva",
+                        "table": "inst_gestao_ambiental",
                         "fields": [
                             {
                                 "src": "",
@@ -30937,14 +30926,14 @@ cmap = {
                             },
                             {
                                 "src": "",
-                                "dst": "valor_tipo_equipamento_coletivo",
+                                "dst": "valor_instalacao_gestao_ambiental",
                                 "op": "set",
                                 "value": [
                                     "1"
                                 ]
                             }
                         ],
-                        "connection": "lig_equip_util_coletiva_edificio"
+                        "attribute": "inst_gestao_ambiental_id"
                     }
                 ]
             }
@@ -30996,7 +30985,7 @@ cmap = {
                 ],
                 "references": [
                     {
-                        "table": "equip_util_coletiva",
+                        "table": "inst_gestao_ambiental",
                         "fields": [
                             {
                                 "src": "",
@@ -31011,14 +31000,14 @@ cmap = {
                             },
                             {
                                 "src": "",
-                                "dst": "valor_tipo_equipamento_coletivo",
+                                "dst": "valor_instalacao_gestao_ambiental",
                                 "op": "set",
                                 "value": [
                                     "3"
                                 ]
                             }
                         ],
-                        "connection": "lig_equip_util_coletiva_edificio"
+                        "attribute": "inst_gestao_ambiental_id"
                     }
                 ]
             }
@@ -31070,7 +31059,7 @@ cmap = {
                 ],
                 "references": [
                     {
-                        "table": "equip_util_coletiva",
+                        "table": "inst_gestao_ambiental",
                         "fields": [
                             {
                                 "src": "",
@@ -31085,14 +31074,14 @@ cmap = {
                             },
                             {
                                 "src": "",
-                                "dst": "valor_tipo_equipamento_coletivo",
+                                "dst": "valor_instalacao_gestao_ambiental",
                                 "op": "set",
                                 "value": [
                                     "1"
                                 ]
                             }
                         ],
-                        "connection": "lig_equip_util_coletiva_edificio"
+                        "attribute": "inst_gestao_ambiental_id"
                     }
                 ]
             }

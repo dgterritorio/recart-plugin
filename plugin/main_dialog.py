@@ -208,10 +208,12 @@ class MainDialog(QDialog, FORM_CLASS):
                 item = QStandardItem(layer.GetName())
 
                 # detetar o sistema de corrdenadas a partir de qualquer uma das camadas
-                if layer.GetSpatialRef() and self.srs == '':
+
+                if layer.GetSpatialRef():
                     authid = layer.GetSpatialRef().GetAuthorityCode( 'PROJCS' )
-                    self.srs = authid
-                    self.writeText("Detetada camada {} com o sistema de coordenadas {}".format( layer.GetName(), authid ) )
+                    if self.srs != authid:
+                        self.srs = authid
+                        self.writeText("Detetada camada {} com o sistema de coordenadas {}".format( layer.GetName(), authid ) )
 
                 if self.displayLayerList[layer.GetName()]['name'] in roots:
                     roots[self.displayLayerList[layer.GetName()]['name']
