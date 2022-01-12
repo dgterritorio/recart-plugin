@@ -3,4 +3,4 @@ def get_feature(feature):
     if geom.Is3D():
         geom.FlattenTo2D()
 
-    return "'srid=3763;" + geom.ExportToWkt() + "'"
+    return "'srid=" + self.srsid + ";" + geom.ExportToWkt() + "'"

@@ -32,7 +32,7 @@ begin
 			-- table without indexes
 			tbl := 'errors.' || onerule.entity || '_' || onerule.code;
 			raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I)', tbl, onerule.entity);
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, onerule.entity);
 			execute format('delete from %s', tbl);
 			execute format('insert into %s %s', tbl, onerule.report);
 		end if;
@@ -76,7 +76,7 @@ begin
 		-- table without indexes
 		tbl := 'errors.' || _entity || '_' || _code;
 		raise notice '%', tbl;
-		execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I)', tbl, _entity);
+		execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
 		execute format('delete from %s', tbl);
 		execute format('insert into %s %s', tbl, _report);
 	end if;
@@ -245,7 +245,7 @@ begin
 			-- table without indexes
 			tabela_erro := 'errors.' || tabela || '_rg_' || rg;
 			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I)', tabela_erro, tabela);
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela_erro, tabela, cvalue);
 		end if;
 	end loop;
@@ -290,7 +290,7 @@ begin
 			-- table without indexes
 			tabela_erro := 'errors.' || tabela || '_rg_5';
 			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I)', tabela_erro, tabela);
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
 				where not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela);
 		end if;
@@ -344,7 +344,7 @@ begin
 			-- table without indexes
 			tabela_erro := 'errors.' || tabela || '_rg_6';
 			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I)', tabela_erro, tabela);
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('insert into %s select * from {schema}.%I where validation.validcap_pt(nome)<>true', tabela_erro, tabela);
 		end if;
 	end loop;
@@ -399,7 +399,7 @@ begin
 			-- table without indexes
 			tabela_erro := 'errors.' || tabela || '_rg_7';
 			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I)', tabela_erro, tabela);
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('insert into %s select * from {schema}.%I where validation.valid_noabbr(%s)<>true', tabela_erro, tabela, coluna);
 		end if;
 	end loop;
@@ -425,7 +425,7 @@ begin
 		-- table without indexes
 		tabela_erro := 'errors.' || tabela || '_' || rg;
 		-- raise notice '%', tbl;
-		execute format('create table if not exists %s (like {schema}.%I)', tabela_erro, tabela);
+		execute format('create table if not exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 		execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela_erro, tabela, minv);
 	end if;
 
@@ -476,7 +476,7 @@ begin
 		CREATE SCHEMA IF NOT EXISTS errors;
 		-- table without indexes
 		-- raise notice '%', tbl;
-		CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel);
+		CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel INCLUDING ALL);
 
 		insert into errors.curva_de_nivel_re3_2 (
 			with 
@@ -551,7 +551,7 @@ begin
 			-- table without indexes
 			tabela_erro := 'errors.' || tabela || '_re4_10_1';
 			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I)', tabela_erro, tabela);
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 
 			execute format('insert into %1$s select t.* from {schema}.%2$I t
 				where (not (select ST_intersects(t.geometria, f.geometria) from 

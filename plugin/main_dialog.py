@@ -33,7 +33,7 @@ from PyQt5.QtWidgets import QDialog, QProgressDialog, QMessageBox, QAbstractItem
 from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QVariant
 from PyQt5.QtGui import QIntValidator, QStandardItemModel, QStandardItem
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsStyle, QgsEditorWidgetSetup, QgsLayerTreeGroup, QgsLayerTreeLayer
+from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsStyle, QgsEditorWidgetSetup, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsCoordinateReferenceSystem
 from qgis.utils import iface
 
 from qgis.PyQt.QtTest import QSignalSpy
@@ -66,6 +66,8 @@ class MainDialog(QDialog, FORM_CLASS):
             ['utf-8', 'iso-8859-1'])
 
         self.displayLayerList = displayList
+        # para se adivinhar o CRS da fonte de dados
+        self.srs = ''
 
     def showEvent(self, event):
         super(MainDialog, self).showEvent(event)
@@ -168,7 +170,7 @@ class MainDialog(QDialog, FORM_CLASS):
 
         if conString is None:
             self.plainTextEdit.appendPlainText(
-                        "[Aviso] {0}\n".format("Conexão inválida"))
+                        "[Aviso] {0}\n".format("Ligação inválida"))
             return
 
         self.loadLayersProcess = LoadLayersProcess(conString, schema)
@@ -183,6 +185,10 @@ class MainDialog(QDialog, FORM_CLASS):
         try:
             self.dataSource = self.loadLayersProcess.dataSource
             self.fillLayerList(self.dataSource)
+
+            crs = QgsCoordinateReferenceSystem("EPSG:" + self.srs)
+            self.mQgsProjectionSelectionWidget.setCrs( crs )
+
         except AttributeError as e:
             print(e)
             self.plainTextEdit.appendPlainText(
@@ -200,6 +206,13 @@ class MainDialog(QDialog, FORM_CLASS):
 
             if layer.GetName() in self.displayLayerList:
                 item = QStandardItem(layer.GetName())
+
+                # detetar o sistema de corrdenadas a partir de qualquer uma das camadas
+                if layer.GetSpatialRef():
+                    authid = layer.GetSpatialRef().GetAuthorityCode( 'PROJCS' )
+                    if self.srs != authid:
+                        self.srs = authid
+                        self.writeText("Detetada camada {} com o sistema de coordenadas {}".format( layer.GetName(), authid ) )
 
                 if self.displayLayerList[layer.GetName()]['name'] in roots:
                     roots[self.displayLayerList[layer.GetName()]['name']
@@ -227,6 +240,10 @@ class MainDialog(QDialog, FORM_CLASS):
         self.writeText("A exportar camadas ...")
         self.progressBar.setVisible(True)
 
+        srsid = self.mQgsProjectionSelectionWidget.crs()
+        # self.writeText( 'Exportar no SRS {}'.format( srsid.authid() ) )
+        self.writeText( 'Exportar no SRS {}'.format( srsid.postgisSrid() ) )
+
         outFormat = self.exportFormat.currentText()
         outEncoding = self.exportEncoding.currentText()
         layerList = []
@@ -238,7 +255,8 @@ class MainDialog(QDialog, FORM_CLASS):
 
         self.exportLayersProcess = ExportLayersProcess(
             self.loadLayersProcess.conString, self.loadLayersProcess.schema,
-            self.dataSource, layerList, outFormat, outEncoding, self.mQgsFileWidget.filePath(), self.aliasCheckBox.isChecked())
+            self.dataSource, layerList, outFormat, outEncoding, self.mQgsFileWidget.filePath(), self.aliasCheckBox.isChecked(), 
+            srsid.postgisSrid() )
 
         self.exportLayersProcess.signal.connect(self.writeText)
         self.exportLayersProcess.addLayer.connect(self.addLayer)
@@ -336,7 +354,7 @@ class ExportLayersProcess(QThread):
     addLayer = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject',
                           'PyQt_PyObject', 'PyQt_PyObject')
 
-    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias):
+    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid):
         QThread.__init__(self)
 
         self.conn = connection
@@ -347,6 +365,7 @@ class ExportLayersProcess(QThread):
         self.outEncoding = outEncoding
         self.outDir = outDir
         self.exportAlias = exportAlias
+        self.exportSrsId = srsid
 
         if not self.outDir:
             self.outDir = str(Path.home())
@@ -422,7 +441,7 @@ class ExportLayersProcess(QThread):
                         ln = displayList[slayer]["alias"] if len(
                             displayList[slayer]["geom"]) == 1 else displayList[slayer]["alias"] + " (" + gt + ")"
                         con = self.conn
-                        con = con + " srid=3763 type=" + gt
+                        con = con + " srid=" + str(self.exportSrsId) + " type=" + gt
                         con = con + " table='" + self.schema + \
                             "'.'" + slayer + "' (geometria) sql="
                         self.addLayer.emit(

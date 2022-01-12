@@ -25,11 +25,11 @@ import re
 from datetime import datetime
 
 from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QHeaderView, QCheckBox, QStyle
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QHeaderView, QCheckBox, QStyle
 from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QFont
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel
+from qgis.core import QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem
 from qgis.utils import iface
 
 from psycopg2 import OperationalError
@@ -55,6 +55,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(
             QDialogButtonBox.Ok).clicked.connect(self.process)
 
+        self.buttonBox.button(
+            QDialogButtonBox.Reset).clicked.connect(self.reset)
+
         self.comboBox.addItems(['NdD1', 'NdD2'])
         self.versaocomboBox.addItems(['V 1.1', 'V 1.1.1', 'V 1.1.2'])
 
@@ -63,6 +66,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.pgutils = None
         self.ruleSetup = False
+
+        self.srsid = 0
 
     def showEvent(self, event):
         super(ValidationDialog, self).showEvent(event)
@@ -83,6 +88,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.tableView.setVisible(False)
 
             self.fillDataSources()
+
+            crs = QgsCoordinateReferenceSystem("EPSG:3763")
+            self.mQgsProjectionSelectionWidget.setCrs( crs )
 
             self.isRunning = False
             self.initialized = True
@@ -505,7 +513,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             conString = qgis_configs.getConnString(self, self.getConnection())
             self.schema = str(self.schemaName.currentText())
 
-            self.addLayersProcess = AddLayersProcess(conString, self.schema)
+            self.addLayersProcess = AddLayersProcess(conString, self.schema, self.srsid)
             self.addLayersProcess.signal.connect(self.writeText)
             self.addLayersProcess.addLayer.connect(self.addLayer)
             self.addLayersProcess.finished.connect(self.finishedAddLayers)
@@ -553,6 +561,16 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.progressBar.setVisible(False)
             self.createProcess = None
 
+    def finishedReset(self):
+        if self.resetProcess is not None:
+            self.resetProcess = None
+
+        self.ruleSetup = False
+        self.isRunning = False
+
+        self.testValidationRules()
+
+
     @pyqtSlot('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject', name='addLayer')
     def addLayer(self, group, layerDef, layerName, layerStyle="default", pos=-1):
         # self.iface.messageBar().pushMessage("Adicionar camada '" + layerName + "'")
@@ -577,6 +595,32 @@ class ValidationDialog(QDialog, FORM_CLASS):
         treeGroup.addLayer(qlayer)
         iface.layerTreeView().refreshLayerSymbology(qlayer.id())
 
+    def reset(self):
+
+        res = QMessageBox.question(self,'', "Tem a cereteza que quer remover os esquemas, as tabelas e as funções de validação?", QMessageBox.Yes | QMessageBox.No)
+
+        if res == QMessageBox.Yes:
+            self.writeText('[Aviso] Apaga os esquemas validation, errors e remove funções e procedimentos')
+
+            conString = qgis_configs.getConnString(self, self.getConnection())
+            schema = str(self.schemaName.currentText())
+
+            srsid = self.mQgsProjectionSelectionWidget.crs()
+            self.writeText( 'Validar com o SRS {}'.format( srsid.postgisSrid() ) )
+            self.srsid = srsid.postgisSrid()
+
+            valid3d = self.checkBox.isChecked()
+
+            self.resetProcess = ResetProcess(conString, schema, valid3d, self.srsid )
+
+            self.resetProcess.signal.connect(self.writeText)
+            self.resetProcess.finished.connect(self.finishedReset)
+
+            # self.iface.messageBar().pushMessage("Criar estrutura de validação.")
+            self.writeText("\tA apagar a estrutura de validação e erros anteriores...")
+            self.isRunning = True
+            self.resetProcess.start()
+
     def process(self):
         # carregou em OK
         if self.testValidProcessing() and not self.isRunning:
@@ -586,9 +630,13 @@ class ValidationDialog(QDialog, FORM_CLASS):
             conString = qgis_configs.getConnString(self, self.getConnection())
             schema = str(self.schemaName.currentText())
 
+            srsid = self.mQgsProjectionSelectionWidget.crs()
+            self.writeText( 'Validar com o SRS {}'.format( srsid.postgisSrid() ) )
+            self.srsid = srsid.postgisSrid()
+
             valid3d = self.checkBox.isChecked()
 
-            self.createProcess = CreateProcess(conString, schema, valid3d)
+            self.createProcess = CreateProcess(conString, schema, valid3d, self.srsid )
 
             self.createProcess.signal.connect(self.writeText)
             self.createProcess.finished.connect(self.finishedCreate)
@@ -635,10 +683,11 @@ class AddLayersProcess(QThread):
     addLayer = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject',
                           'PyQt_PyObject', 'PyQt_PyObject')
 
-    def __init__(self, conn, schema):
+    def __init__(self, conn, schema, srsid):
         QThread.__init__(self)
         self.conn = conn
         self.schema = schema
+        self.srsid = srsid
         self.pgutils = PostgisUtils(self, conn)
 
     def trnl(self, text):
@@ -676,7 +725,7 @@ class AddLayersProcess(QThread):
                                 ln = tb[0] if len(
                                     displayList[slayer]["geom"]) == 1 else tb[0] + " (" + self.trnl(gt) + ")"
                                 con = self.conn
-                                con = con + " srid=3763 type=" + gt
+                                con = con + " srid=" + str(self.srsid) + " type=" + gt
                                 con = con + " table='errors'.'" + \
                                     tb[0] + "' (geometria) sql="
                                 self.addLayer.emit(
@@ -692,15 +741,69 @@ class AddLayersProcess(QThread):
             self.write(("\tException: {}".format(e)))
 
 
-class CreateProcess(QThread):
+class ResetProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, conn, schema, valid3d):
+    def __init__(self, conn, schema, valid3d, srsid):
         QThread.__init__(self)
 
         self.conn = conn
         self.schema = schema
         self.valid3d = valid3d
+        self.srsid = srsid
+
+        self.bp = os.path.dirname(os.path.realpath(__file__))
+
+        self.cancel = False
+
+        self.pgutils = PostgisUtils(self, conn)
+
+        self.actconn = None
+
+    def write(self, text):
+        self.signal.emit(text)
+
+    def setCancel(self, state):
+        self.cancel = state
+
+        if state is True and self.actconn is not None:
+            try:
+                self.actconn.cancel()
+                self.write("\t [Aviso] Operação cancelada")
+            except Exception as e:
+                self.actconn.close()
+                self.actconn = None
+
+    def run(self):
+        try:
+            file = None
+
+            with open(self.bp + '/validation_reset.sql', 'r', encoding='utf-8') as f:
+                cnt = f.read()
+            cnt = re.sub(r"{schema}", self.schema, cnt)
+            cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
+
+            self.actconn = self.pgutils.get_connection()
+            self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
+
+            if file is not None:
+                file.close()
+        except Exception as e:
+            if not self.cancel:
+                self.write("[Erro 12]")
+                self.write(("\tException: {}".format(e)))
+
+
+class CreateProcess(QThread):
+    signal = pyqtSignal('PyQt_PyObject')
+
+    def __init__(self, conn, schema, valid3d, srsid):
+        QThread.__init__(self)
+
+        self.conn = conn
+        self.schema = schema
+        self.valid3d = valid3d
+        self.srsid = srsid
 
         self.bp = os.path.dirname(os.path.realpath(__file__))
 
@@ -731,6 +834,7 @@ class CreateProcess(QThread):
                 with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
                     cnt = f.read()
                 cnt = re.sub(r"{schema}", self.schema, cnt)
+                cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
                 self.actconn = self.pgutils.get_connection()
                 self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
@@ -738,6 +842,7 @@ class CreateProcess(QThread):
                 file = open(self.bp + '/validation_setup_no3d.sql', "r", encoding='utf-8')
                 cnt = file.read()
                 cnt = re.sub(r"{schema}", self.schema, cnt)
+                cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
                 self.actconn = self.pgutils.get_connection()
                 self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
