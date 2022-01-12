@@ -1,6 +1,6 @@
 # Guia
 
-O plugin para a importação e conversão de cartografia encontra-se disponível no Gitlab. Devemos começar por descarregar o zip com o plugin: https://gitlab.com/geomaster/dgt-recart/-/raw/master/plugin/recartDGT.zip.
+O plugin para a importação e conversão de cartografia encontra-se disponível no Gitlab. Devemos começar por descarregar o zip com o plugin: [recartDGT.zip](https://github.com/dgterritorio/recart-plugin/releases).
 
 Depois vamos abrir o QGIS e selecionar o menu 'Módulos'>'Gerir e instalar módulos...'
 
