@@ -31760,12 +31760,23 @@ cmap = {
         "objeto": "ESTAÇÃO ELEVATÓRIA",
         "map": [
             {
-                "table": "",
+                "table": "elem_assoc_agua",
                 "fields": [
                     {
                         "src": "1_geom",
                         "dst": "geometria",
                         "op": "eq"
+                    },
+                    {
+                        "src": "",
+                        "dst": "inicio_objeto",
+                        "op": "dnow"
+                    },
+                    {
+                        "src": "",
+                        "dst": "valor_elemento_associado_agua",
+                        "op": "set",
+                        "value": "2"
                     }
                 ]
             }
