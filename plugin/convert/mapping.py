@@ -31058,12 +31058,50 @@ cmap = {
         "objeto": "ÁREA PARA TRATAMENTO DE RESÍDUOS TÓXICOS",
         "map": [
             {
-                "table": "",
+                "table": "areas_artificializadas",
                 "fields": [
                     {
                         "src": "1_geom",
                         "dst": "geometria",
                         "op": "eq"
+                    },
+                    {
+                        "src": "",
+                        "dst": "inicio_objeto",
+                        "op": "dnow"
+                    },
+                    {
+                        "src": "",
+                        "dst": "valor_areas_artificializadas",
+                        "op": "set",
+                        "value": "5"
+                    }
+                ],
+                "references": [
+                    {
+                        "table": "inst_gestao_ambiental",
+                        "fields": [
+                            {
+                                "src": "",
+                                "dst": "inicio_objeto",
+                                "op": "dnow"
+                            },
+                            {
+                                "src": "",
+                                "dst": "nome",
+                                "op": "set",
+                                "value": "SEM DADOS"
+                            },
+                            {
+                                "src": "",
+                                "dst": "valor_instalacao_gestao_ambiental",
+                                "op": "set",
+                                "value": [
+                                    "4"
+                                ]
+                            }
+                        ],
+                        "attribute": "inst_gestao_ambiental_id"
                     }
                 ]
             }
