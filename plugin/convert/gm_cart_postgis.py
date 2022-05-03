@@ -8,7 +8,7 @@ from . import gm_cart_aux as aux
 class PostgisImporter:
     """Importador de cartografia"""
 
-    def __init__(self, schema, base, mapping, cod_field, ndd, forceGeom, forcePolygon, forceClose, use_layerName, save_src, writer, srsid):
+    def __init__(self, schema, base, mapping, cod_field, ndd, forceGeom, forcePolygon, forceClose, cellHeaderOrigin, use_layerName, save_src, writer, srsid):
         self.schema = schema
         self.base = base
         self.mapping = mapping
@@ -16,6 +16,7 @@ class PostgisImporter:
         self.ndd = ndd
         self.forceGeom = forceGeom
         self.forcePolygon = forcePolygon
+        self.cellHeaderOrigin = cellHeaderOrigin
         self.forceClose = forceClose
         self.writer = writer
 
