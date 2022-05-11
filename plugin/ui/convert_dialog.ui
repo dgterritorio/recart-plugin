@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>830</width>
-    <height>720</height>
+    <height>781</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,6 +90,30 @@
             <string>Opções de conversão</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
+            <item row="1" column="0" colspan="3">
+             <widget class="QCheckBox" name="forceGeomCheckBox">
+              <property name="text">
+               <string>Forçar dimensões geometria</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QCheckBox" name="overwriteLNCheckBox">
+              <property name="text">
+               <string>Mapear com nome camada</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QComboBox" name="fieldsComboBox"/>
+            </item>
+            <item row="6" column="0">
+             <widget class="QCheckBox" name="cmapCheckBox">
+              <property name="text">
+               <string>Mapeamento personalizado</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_4">
               <property name="text">
@@ -97,34 +121,30 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="0">
-             <widget class="QCheckBox" name="forceCloseCheckBox">
-              <property name="text">
-               <string>Forçar fecho geometria</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
+            <item row="7" column="0">
              <widget class="QCheckBox" name="caliasCheckBox">
               <property name="text">
                <string>Alias p / Códigos</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="2">
+            <item row="7" column="2">
+             <widget class="QgsFileWidget" name="aliasQgsFileWidget">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="storageMode">
+               <enum>QgsFileWidget::GetFile</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
              <widget class="QgsFileWidget" name="mapQgsFileWidget">
               <property name="enabled">
                <bool>false</bool>
               </property>
               <property name="storageMode">
                <enum>QgsFileWidget::GetDirectory</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QCheckBox" name="cmapCheckBox">
-              <property name="text">
-               <string>Mapeamento personalizado</string>
               </property>
              </widget>
             </item>
@@ -135,30 +155,20 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="3">
-             <widget class="QCheckBox" name="forceGeomCheckBox">
+            <item row="3" column="0">
+             <widget class="QCheckBox" name="forceCloseCheckBox">
               <property name="text">
-               <string>Forçar dimensões geometria</string>
+               <string>Forçar fecho geometria</string>
               </property>
              </widget>
-            </item>
-            <item row="6" column="2">
-             <widget class="QgsFileWidget" name="aliasQgsFileWidget">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="storageMode">
-               <enum>QgsFileWidget::GetFile</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QComboBox" name="fieldsComboBox"/>
             </item>
             <item row="4" column="0">
-             <widget class="QCheckBox" name="overwriteLNCheckBox">
+             <widget class="QCheckBox" name="cellHeaderOrigin">
               <property name="text">
-               <string>Mapear com nome camada</string>
+               <string>Aproveitar apenas a origem das células CAD</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>

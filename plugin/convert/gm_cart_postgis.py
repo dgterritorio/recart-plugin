@@ -8,7 +8,7 @@ from . import gm_cart_aux as aux
 class PostgisImporter:
     """Importador de cartografia"""
 
-    def __init__(self, schema, base, mapping, cod_field, ndd, forceGeom, forcePolygon, forceClose, use_layerName, save_src, writer, srsid):
+    def __init__(self, schema, base, mapping, cod_field, ndd, forceGeom, forcePolygon, forceClose, cellHeaderOrigin, use_layerName, save_src, writer, srsid):
         self.schema = schema
         self.base = base
         self.mapping = mapping
@@ -16,6 +16,7 @@ class PostgisImporter:
         self.ndd = ndd
         self.forceGeom = forceGeom
         self.forcePolygon = forcePolygon
+        self.cellHeaderOrigin = cellHeaderOrigin
         self.forceClose = forceClose
         self.writer = writer
 
@@ -153,6 +154,9 @@ class PostgisImporter:
         if layer.create_atable and self.forcePolygon and geom_type.lower() == 'line' and 'polygon' in layer.geom_type.lower():
             auxtable = True
             geom_type = 'polygon'
+
+        if feature.GetGeometryRef().IsEmpty():
+            return (None, auxtable, {'type': 'Geometry type', 'msg': 'Geometry is empty'})
 
         if geom_type.lower() in layer.geom_type.lower() or not enforce:
             if self.forceGeom and layer.is_3D() and not is_3D\
@@ -458,8 +462,10 @@ class PostgisImporter:
                                     first = False
                                 feat_sql_file.write(cfeat)
                                 feat_sql_file.write('\n')
-                            else:
+                            elif not feat['data'].GetGeometryRef().IsEmpty():
                                 self.base['_import_error'].add_element(feat)
+                            else:
+                                print("Empty geometry")
 
                         feat_sql_file.write(';\n')
         except Exception as e:
@@ -519,6 +525,10 @@ class PostgisImporter:
                             # print(feature['data'].GetFieldAsString('ulink'))
                             # print(feature['data'].GetGeometryRef().GetGeometryType())
                             # print(aux.OGRwkbGeomTypes[feature['data'].GetGeometryRef().GetGeometryType()])
+
+                            if feature['data'].GetGeometryRef().IsEmpty():
+                                continue
+
                             if not first:
                                 remaining_sql_file.write(', ')
                             else:

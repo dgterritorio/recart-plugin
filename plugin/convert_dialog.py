@@ -229,7 +229,7 @@ class ConvertDialog(QDialog, FORM_CLASS):
             kwargs['force_geom'] = self.forceGeomCheckBox.isChecked()
             kwargs['force_polygon'] = self.forcePolygonCheckBox.isChecked()
             kwargs['force_close'] = self.forceCloseCheckBox.isChecked()
-
+            kwargs['cell_headers_origin'] = self.cellHeaderOrigin.isChecked()
             kwargs['use_layerName'] = self.overwriteLNCheckBox.isChecked()
 
             kwargs['schema'] = self.lineEdit.text()

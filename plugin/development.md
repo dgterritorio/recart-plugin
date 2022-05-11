@@ -4,7 +4,7 @@ The following steps can be used to setup the project for testing and developing:
 
 ### Development dependencies
 
-The following software is needed to develop and build the puglin
+The following software is needed to develop and build the plugin
 ```
 apt install qttools5-dev-tools
 ```

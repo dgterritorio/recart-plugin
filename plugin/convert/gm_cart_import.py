@@ -29,6 +29,7 @@ class CartImporter:
         self.alias_file = kwargs.get('alias', None)
         self.force_geom = kwargs.get('force_geom', False)
         self.force_polygon = kwargs.get('force_polygon', False)
+        self.cell_headers_origin = kwargs.get('cell_headers_origin', False)
         self.force_close = kwargs.get('force_close', False)
         self.use_layerName = kwargs.get('use_layerName', False)
 
@@ -45,6 +46,7 @@ class CartImporter:
         self.layers = []
 
         os.environ["DGN_ULINK_TYPE"] = self.ulink_type
+        os.environ["DGN_CELL_HEADER_ORIGIN"] = "YES" if self.cell_headers_origin else "NO"
         self.valid_extensions = ['.dgn', '.top', '.shp', '.dwg']
         self.schema = kwargs.get('schema', 'import')
         self.save_src = True
@@ -428,7 +430,7 @@ class CartImporter:
         )
 
         prst_handler = PostgisImporter(
-            self.schema, self.base, self.mapping, self.cod_field, self.ndd, self.force_geom, self.force_polygon, self.force_close, self.use_layerName, self.save_src, self.writer, self.srsid)
+            self.schema, self.base, self.mapping, self.cod_field, self.ndd, self.force_geom, self.force_polygon, self.cell_headers_origin, self.force_close, self.use_layerName, self.save_src, self.writer, self.srsid)
 
         prst_handler.save_styles(os.path.join(bp, pf + '_layer_styles.sql'))
         prst_handler.save_datasource(os.path.join(bp, pf + '_features.sql'))
