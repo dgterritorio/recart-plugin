@@ -94,13 +94,22 @@ Com esta opção ativada, o módulo tenta ajustar a dimensão da geometria origi
 
 Com esta opção ativada, o módulo tenta correr um algoritmo de **poligonização** de linhas. Por exemplo, se uma construção estiver como linha, tenta-se formar um polígono com as linhas das geometrias originais.
 
-#### Associar código desconhecidos a códigos existentes
+
+#### Aproveitar apenas a origem das células CAD
+
+Na cartografia DGN, se estiverem a ser utilizados elementos "cell headers", todos os elementos gráficos que compoõem esse "cell header" são convertidos para elementos distintos. 
+
+Ativando a opção **Aproveitar apenas origem células CAD** só é criado um elemento do tipo POINT para cada "cell header". As coordenadas do ponto referem-se à origem (ponto de inserção) do "cell header". 
+
+Esta possibilidade depende de uma versão do GDAL >= 3.5. Pode-se usar uma versão compilada, que inclua o [PR#5664](https://github.com/OSGeo/gdal/pull/5664).
+
+#### Associar códigos desconhecidos a códigos existentes
 
 Na conversão de cartografia, podem surgir códigos nos DGN/DWG desconhecidos. 
 
 Os códigos desconhecidos podem ser tratados de duas formas:
 1. A forma mais complexa consiste em acrescentar novos mapeamentos para esses códigos desconhecidos, há semelhança dos muitos mapeamentos existentes. Para tal, é preciso editar o `plugin/convert/mapping.py`.
-2. A forma mais simples consiste em mapear os códigos desconhecidos em códigos conhecidos. Isso faz-se criando um ficheiro de __alias p/ códigos__, que depois é indicado na correspondente opção no plugin.
+2. A forma alternativa consiste em mapear os códigos desconhecidos em códigos conhecidos. Isso faz-se criando um ficheiro de __alias p/ códigos__. Esse ficheiro tem que ser escolhido na correspondente opção no plugin.
 
 ##### Alias p/ Códigos
 
