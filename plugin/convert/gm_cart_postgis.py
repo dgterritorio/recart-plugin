@@ -155,6 +155,9 @@ class PostgisImporter:
             auxtable = True
             geom_type = 'polygon'
 
+        if feature.GetGeometryRef().IsEmpty():
+            return (None, auxtable, {'type': 'Geometry type', 'msg': 'Geometry is empty'})
+
         if geom_type.lower() in layer.geom_type.lower() or not enforce:
             if self.forceGeom and layer.is_3D() and not is_3D\
                     and not layer.name.startswith('_skipped') and not layer.name.startswith('_import_error'):
@@ -459,8 +462,10 @@ class PostgisImporter:
                                     first = False
                                 feat_sql_file.write(cfeat)
                                 feat_sql_file.write('\n')
-                            else:
+                            elif not feat['data'].GetGeometryRef().IsEmpty():
                                 self.base['_import_error'].add_element(feat)
+                            else:
+                                print("Empty geometry")
 
                         feat_sql_file.write(';\n')
         except Exception as e:
@@ -520,6 +525,10 @@ class PostgisImporter:
                             # print(feature['data'].GetFieldAsString('ulink'))
                             # print(feature['data'].GetGeometryRef().GetGeometryType())
                             # print(aux.OGRwkbGeomTypes[feature['data'].GetGeometryRef().GetGeometryType()])
+
+                            if feature['data'].GetGeometryRef().IsEmpty():
+                                continue
+
                             if not first:
                                 remaining_sql_file.write(', ')
                             else:
