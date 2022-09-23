@@ -564,6 +564,15 @@ begin
 end;
 $$ language plpgsql;
 
+-- Criar area de trabalho multi-poligono para casos com multiplas areas de trabalho no mesmo projecto
+
+CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
+(
+	SELECT st_collect(geometria)::geometry(multipolygon,3763) as geometria
+	FROM {schema}.area_trabalho
+);
+CREATE INDEX ON validation.area_trabalho_multi USING gist(geometria);
+
 
 CREATE TABLE IF NOT EXISTS validation.no_hidro AS (
 	SELECT ST_Collect(f.geometria) AS geom_col FROM (

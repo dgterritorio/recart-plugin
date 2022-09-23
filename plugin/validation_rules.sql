@@ -367,12 +367,12 @@ $$"Curva de nível".$$, 'curva_de_nivel',
 $$with 
 total as (select count(*) from {schema}.curva_de_nivel),
 good as (select count(cdn.identificador)
-	from {schema}.curva_de_nivel cdn, {schema}.area_trabalho adt
+	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
 		and st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria)))
 ),
 bad as (select count(cdn.identificador) 
-	from {schema}.curva_de_nivel cdn, {schema}.area_trabalho adt
+	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where not ST_IsClosed(cdn.geometria) 
 		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria))
 )
@@ -381,19 +381,19 @@ from total, good, bad $$,
 $$with 
 total as (select count(*) from {schema}.curva_de_nivel),
 good as (select count(cdn.identificador)
-	from {schema}.curva_de_nivel cdn, {schema}.area_trabalho adt
+	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
 		and st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria)))
 ),
 bad as (select count(cdn.identificador) 
-	from {schema}.curva_de_nivel cdn, {schema}.area_trabalho adt
+	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where not ST_IsClosed(cdn.geometria) 
 		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria))
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select cdn.*
-	from {schema}.curva_de_nivel cdn, {schema}.area_trabalho adt
+	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where not ST_IsClosed(cdn.geometria) 
 		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria))$$);
 
@@ -444,7 +444,7 @@ good as (select count(*) from {schema}.ponto_cotado),
 bad as (with cdn_buffer as (select st_union(st_buffer(cdn.geometria, 50)) as geometria from {schema}.curva_de_nivel cdn),
 	pc_buffer as (select st_union(st_buffer(pc.geometria, 50)) as geometria from {schema}.ponto_cotado pc),
 	difference as (select (st_dump(st_difference( st_difference(adt.geometria, cdn_buffer.geometria), pc_buffer.geometria))).*
-		from {schema}.area_trabalho adt, cdn_buffer, pc_buffer)
+		from validation.area_trabalho_multi adt, cdn_buffer, pc_buffer)
 	select count(d.*)
 	from difference d
 	where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10))
@@ -456,7 +456,7 @@ good as (select count(*) from {schema}.ponto_cotado),
 bad as (with cdn_buffer as (select st_union(st_buffer(cdn.geometria, 250)) as geometria from {schema}.curva_de_nivel cdn),
 	pc_buffer as (select st_union(st_buffer(pc.geometria, 250)) as geometria from {schema}.ponto_cotado pc),
 	difference as (select (st_dump(st_difference( st_difference(adt.geometria, cdn_buffer.geometria), pc_buffer.geometria))).*
-		from {schema}.area_trabalho adt, cdn_buffer, pc_buffer)
+		from validation.area_trabalho_multi adt, cdn_buffer, pc_buffer)
 	select count(d.*)
 	from difference d
 	where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10))
@@ -465,7 +465,7 @@ from total, good, bad $$,
 $$with cdn_buffer as (select st_union(st_buffer(cdn.geometria, 50)) as geometria from {schema}.curva_de_nivel cdn),
 pc_buffer as (select st_union(st_buffer(pc.geometria, 50)) as geometria from {schema}.ponto_cotado pc),
 difference as (select (st_dump(st_difference( st_difference(adt.geometria, cdn_buffer.geometria), pc_buffer.geometria))).*
-	from {schema}.area_trabalho adt, cdn_buffer, pc_buffer)
+	from validation.area_trabalho_multi adt, cdn_buffer, pc_buffer)
 select uuid_generate_v1mc() as identificador, now() as inicio_objeto, null as fim_objeto, 1 as valor_classifica_las, ST_Force3D(st_centroid(d.geom)) as geometria
 from difference d
 where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)$$);
@@ -991,12 +991,12 @@ $$"Curso de água - eixo" e "Nó hidrográfico".$$, 'curso_de_agua_eixo',
 $$with 
 total as (select count(*) from {schema}.curso_de_agua_eixo),
 good as (select count(cdae.*)
-	from {schema}.curso_de_agua_eixo cdae, {schema}.area_trabalho adt
+	from {schema}.curso_de_agua_eixo cdae, validation.area_trabalho_multi adt
 	where (ST_StartPoint(cdae.geometria) in (select geometria from {schema}.no_hidrografico) and ST_EndPoint(cdae.geometria) in (select geometria from {schema}.no_hidrografico))
 		or st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))
 ),
 bad as (select count(cdae.*)
-	from {schema}.curso_de_agua_eixo cdae, {schema}.area_trabalho adt
+	from {schema}.curso_de_agua_eixo cdae, validation.area_trabalho_multi adt
 	where (ST_StartPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico) or ST_EndPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico))
 		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))
 )
@@ -1005,19 +1005,19 @@ from total, good, bad$$,
 $$with 
 total as (select count(*) from {schema}.curso_de_agua_eixo),
 good as (select count(cdae.*)
-	from {schema}.curso_de_agua_eixo cdae, {schema}.area_trabalho adt
+	from {schema}.curso_de_agua_eixo cdae, validation.area_trabalho_multi adt
 	where (ST_StartPoint(cdae.geometria) in (select geometria from {schema}.no_hidrografico) and ST_EndPoint(cdae.geometria) in (select geometria from {schema}.no_hidrografico))
 		or st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))
 ),
 bad as (select count(cdae.*)
-	from {schema}.curso_de_agua_eixo cdae, {schema}.area_trabalho adt
+	from {schema}.curso_de_agua_eixo cdae, validation.area_trabalho_multi adt
 	where (ST_StartPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico) or ST_EndPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico))
 		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select cdae.*
-	from {schema}.curso_de_agua_eixo cdae, {schema}.area_trabalho adt
+	from {schema}.curso_de_agua_eixo cdae, validation.area_trabalho_multi adt
 	where (ST_StartPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico) or ST_EndPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico))
 		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))$$);
 
@@ -1555,12 +1555,12 @@ $$"Segmento da via-férrea" e "Nó de transporte ferroviário".$$, 'seg_via_ferr
 $$with 
 total as (select count(*) from {schema}.seg_via_ferrea),
 good as (select count(svf.*)
-	from {schema}.seg_via_ferrea svf, {schema}.area_trabalho adt
+	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov) and ST_EndPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov))
 		or st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
 ),
 bad as (select count(svf.*)
-	from {schema}.seg_via_ferrea svf, {schema}.area_trabalho adt
+	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
 		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
 )
@@ -1569,19 +1569,19 @@ from total, good, bad$$,
 $$with 
 total as (select count(*) from {schema}.seg_via_ferrea),
 good as (select count(svf.*)
-	from {schema}.seg_via_ferrea svf, {schema}.area_trabalho adt
+	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov) and ST_EndPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov))
 		or st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
 ),
 bad as (select count(svf.*)
-	from {schema}.seg_via_ferrea svf, {schema}.area_trabalho adt
+	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
 		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select svf.*
-	from {schema}.seg_via_ferrea svf, {schema}.area_trabalho adt
+	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
 		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))$$);
 
@@ -1682,12 +1682,12 @@ $$"Segmento da via rodoviária" e "Nó de transporte rodoviário".$$, 'seg_via_r
 $$with 
 total as (select count(*) from {schema}.seg_via_rodov),
 good as (select count(svr.*)
-	from {schema}.seg_via_rodov svr, {schema}.area_trabalho adt
+	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov) and ST_EndPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov))
 		or st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))
 ),
 bad as (select count(svr.*)
-	from {schema}.seg_via_rodov svr, {schema}.area_trabalho adt
+	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
 		and not st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))
 )
@@ -1696,19 +1696,19 @@ from total, good, bad$$,
 $$with 
 total as (select count(*) from {schema}.seg_via_rodov),
 good as (select count(svr.*)
-	from {schema}.seg_via_rodov svr, {schema}.area_trabalho adt
+	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov) and ST_EndPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov))
 		or st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))
 ),
 bad as (select count(svr.*)
-	from {schema}.seg_via_rodov svr, {schema}.area_trabalho adt
+	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
 		and not st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select svr.*
-	from {schema}.seg_via_rodov svr, {schema}.area_trabalho adt
+	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
 		and not st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))$$);
 

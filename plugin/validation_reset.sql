@@ -28,6 +28,8 @@ drop table if exists validation.curva_de_nivel_ponto_cotado;
 
 drop TABLE IF EXISTS validation.tin;
 
+drop TABLE IF EXISTS validation.area_trabalho_multi;
+
 drop TABLE IF EXISTS validation.no_hidro;
 
 drop TABLE IF EXISTS validation.no_hidro_juncao;
