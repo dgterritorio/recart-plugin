@@ -689,6 +689,15 @@ with tin as (SELECT ST_DelaunayTriangles(st_union(geometria)) as geom
 from validation.curva_de_nivel_ponto_cotado cnpc)
 select (ST_Dump(geom)).geom As geometria from tin;
 
+-- Criar area de trabalho multi-poligono para casos com multiplas areas de trabalho no mesmo projecto
+
+CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
+(
+	SELECT st_collect(geometria)::geometry(multipolygon,3763) as geometria
+	FROM {schema}.area_trabalho
+);
+CREATE INDEX ON validation.area_trabalho_multi USING gist(geometria);
+
 CREATE TABLE IF NOT EXISTS validation.no_hidro AS (
 	SELECT ST_Collect(f.geometria) AS geom_col FROM (
 		SELECT geometria FROM {schema}.no_hidrografico
