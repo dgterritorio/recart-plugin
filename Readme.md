@@ -129,3 +129,5 @@ Para ajudar a identificar os multicódigos presentes num arquivo que se pretende
 python3 create_map.py -f 29_2_31MNT2K.dwg -a Layer
 ```
 É gerado um arquivo `map.json` com todos os multicódigos presentes em `29_2_31MNT2K.dwg`. Deve ser posteriormente editado manualmente.
+
+test
