@@ -1,6 +1,6 @@
 ## A aplicação informática recartDGT
 
-A aplicação recartDGT oferece algumas funcionalidades para se tirar o melhor partido do modelo CartTop (até à base de dados v1.1.2). Esta aplicação resulta das [especificações técnicas](https://github.com/dgterritorio/recart-carttop-arquivo) de cartografia topográfica publicadas pela Direção Geral do Território até 1 de maio de 2024. Existem novas [especificações técnicas v2.0](https://www.dgterritorio.pt/sites/default/files/ficheiros-cartografia/NormasEspecificacoesTecnicasCartTop.pdf) a partir de 1 de maio de 2024. 
+A aplicação recartDGT oferece algumas funcionalidades para se tirar o melhor partido do modelo CartTop (até à base de dados v1.1.2). Esta aplicação resulta das [especificações técnicas](https://github.com/dgterritorio/recart-carttop-arquivo) de cartografia topográfica publicadas pela Direção Geral do Território até 1 de maio de 2024. Existem novas [especificações técnicas v2.0](https://github.com/dgterritorio/RECART) a partir de 1 de maio de 2024. 
 
 ### recartDGT: um módulo QGIS
 
