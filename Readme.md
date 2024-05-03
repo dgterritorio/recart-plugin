@@ -1,6 +1,6 @@
 ## A aplicação informática recartDGT
 
-A aplicação recartDGT oferece algumas funcionalidades para se tirar o melhor partido do novo modelo CartTop. O modelo CartTop resulta das [especificações técnicas](https://www.dgterritorio.pt/sites/default/files/ficheiros-cartografia/NormasEspecificacoesTecnicasCartTop.pdf) de cartografia topográfica publicadas pela Direção Geral do Território.
+A aplicação recartDGT oferece algumas funcionalidades para se tirar o melhor partido do modelo CartTop (até à base de dados v1.1.2). Esta aplicação resulta das [especificações técnicas](https://github.com/dgterritorio/recart-carttop-arquivo) de cartografia topográfica publicadas pela Direção Geral do Território até 1 de maio de 2024. Existem novas [especificações técnicas v2.0](https://www.dgterritorio.pt/sites/default/files/ficheiros-cartografia/NormasEspecificacoesTecnicasCartTop.pdf) a partir de 1 de maio de 2024. 
 
 ### recartDGT: um módulo QGIS
 
@@ -56,7 +56,7 @@ As relações entre as tabelas do modelo CartTop são também adicionadas ao pro
 
 #### Validação da informação em CartTop
 
-Esta opção permite identificar elementos que possam não estar a cumprir as regras definidas nas [especificações técnicas](https://www.dgterritorio.pt/sites/default/files/ficheiros-cartografia/NormasEspecificacoesTecnicasCartTop.pdf).
+Esta opção permite identificar elementos que possam não estar a cumprir as regras definidas nas [especificações técnicas](https://github.com/dgterritorio/recart-carttop-arquivo) de cartografia topográfica publicadas pela Direção Geral do Território até 1 de maio de 2024.
 
 As regras dividem-se em Regras Gerais (RG) e Regras Específicas (RE). Cada uma destas regras são concretizadas em PostgreSQL através de uma ou mais queries.
 
