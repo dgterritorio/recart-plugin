@@ -549,8 +549,12 @@ class ExportLayersProcess(QThread):
                 if l[1] in self.layerList or l[2] is True:
                     if l[0] is not None:
                         aux.append(l[0])
+                        if l[1] is not None:
+                            aux.append(l[1])
                     else:
                         aux.append(l[1][:-3])
+                        for rf in l[3]:
+                            aux.append(rf[0])
             for r in self.flatLayers[layer]['refs']:
                 aux.append(r)
 
