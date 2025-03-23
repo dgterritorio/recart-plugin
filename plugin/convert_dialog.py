@@ -27,13 +27,13 @@ import json
 from enum import Enum
 from pathlib import Path
 
-from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog, QProgressDialog, QMessageBox, QAbstractItemView, QDialogButtonBox, QStyle
-from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QVariant
-from PyQt5.QtGui import QIntValidator, QStandardItemModel, QStandardItem
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDialog, QProgressDialog, QMessageBox, QAbstractItemView, QDialogButtonBox, QStyle
+from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QVariant
+from qgis.PyQt.QtGui import QIntValidator, QStandardItemModel, QStandardItem
+from qgis.gui import QgsFileWidget
 
 from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsCoordinateReferenceSystem
-from qgis.gui import QgsFileWidget
 
 from osgeo import gdal
 from osgeo import ogr
@@ -57,7 +57,7 @@ class ConvertDialog(QDialog, FORM_CLASS):
 
         self.iface = iface
         self.buttonBox.button(
-            QDialogButtonBox.Ok).clicked.connect(self.process)
+            QDialogButtonBox.StandardButton.Ok).clicked.connect(self.process)
 
         self.nddCombo.addItems(['ndd1', 'ndd2'])
 
@@ -70,10 +70,10 @@ class ConvertDialog(QDialog, FORM_CLASS):
         self.def_config = dc
 
         if not self.initialized:
-            self.buttonBox.button(QDialogButtonBox.Cancel).setText("Fechar")
-            self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogCancelButton))
-            self.buttonBox.button(QDialogButtonBox.Ok).setText("Converter")
-            self.buttonBox.button(QDialogButtonBox.Ok).setIcon(self.style().standardIcon(QStyle.SP_DialogOkButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setText("Converter")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogOkButton))
             
             self.fillDataSources()
 
@@ -89,9 +89,9 @@ class ConvertDialog(QDialog, FORM_CLASS):
         if self.convertProcess is not None and self.convertProcess.running is True:
             self.convertProcess.cancel = True
             # self.progressBar.setVisible(False)
-            # self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-            # self.buttonBox.button(QDialogButtonBox.Cancel).setText("Fechar")
-            # self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogCancelButton))
+            # self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+            # self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
+            # self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
         else:
             self.plainTextEdit.clear()
             super(ConvertDialog, self).reject()
@@ -208,9 +208,9 @@ class ConvertDialog(QDialog, FORM_CLASS):
 
     def finishedConvert(self):
         self.progressBar.setVisible(False)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-        self.buttonBox.button(QDialogButtonBox.Cancel).setText("Fechar")
-        self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogCancelButton))
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
 
         self.convertProcess = None
 
@@ -253,9 +253,9 @@ class ConvertDialog(QDialog, FORM_CLASS):
 
             self.iface.messageBar().pushMessage("Converter dados.")
             self.convertProcess.start()
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-            self.buttonBox.button(QDialogButtonBox.Cancel).setText("Cancelar")
-            self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Cancelar")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogDiscardButton))
         else:
             self.writeText('[Aviso] Configuração inválida')
 

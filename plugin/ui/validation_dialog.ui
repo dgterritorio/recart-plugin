@@ -226,7 +226,7 @@
   </connection>
   <connection>
    <sender>connCombo</sender>
-   <signal>currentIndexChanged(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>ValidationDialog</receiver>
    <slot>changeConn(QString)</slot>
    <hints>
@@ -306,7 +306,7 @@
   </connection>
   <connection>
    <sender>schemaName</sender>
-   <signal>currentIndexChanged(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>ValidationDialog</receiver>
    <slot>changeSchema(QString)</slot>
    <hints>
@@ -321,4 +321,12 @@
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>changeConn(QString)</slot>
+  <slot>validate3dChange(bool)</slot>
+  <slot>setupRules()</slot>
+  <slot>exportRel()</slot>
+  <slot>validateAllChange(bool)</slot>
+  <slot>changeSchema(QString)</slot>
+ </slots>
 </ui>

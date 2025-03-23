@@ -24,10 +24,10 @@ import re
 
 from datetime import datetime
 
-from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QHeaderView, QCheckBox, QStyle
-from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QFont
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QHeaderView, QCheckBox, QStyle
+from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QFont
 
 from qgis.core import QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem
 from qgis.utils import iface
@@ -53,10 +53,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.iface = iface
         self.buttonBox.button(
-            QDialogButtonBox.Ok).clicked.connect(self.process)
+            QDialogButtonBox.StandardButton.Ok).clicked.connect(self.process)
 
         self.buttonBox.button(
-            QDialogButtonBox.Reset).clicked.connect(self.reset)
+            QDialogButtonBox.StandardButton.Reset).clicked.connect(self.reset)
 
         self.comboBox.addItems(['NdD1', 'NdD2'])
         self.versaocomboBox.addItems(['V 1.1', 'V 1.1.1', 'V 1.1.2'])
@@ -77,13 +77,13 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.updateProcess = None
 
         if not self.initialized:
-            self.buttonBox.button(QDialogButtonBox.Cancel).setText("Fechar")
-            self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogCancelButton))
-            self.buttonBox.button(QDialogButtonBox.Ok).setText("Validar")
-            self.buttonBox.button(QDialogButtonBox.Ok).setIcon(self.style().standardIcon(QStyle.SP_DialogOkButton))
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setText("Validar")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogOkButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
-            self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+            self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
             self.tableView.horizontalHeader().setStretchLastSection(True)
             self.tableView.setVisible(False)
 
@@ -104,9 +104,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.isRunning = False
         elif self.validateProcess is not None:
             self.validateProcess.setCancel(True)
-            self.buttonBox.button(QDialogButtonBox.Cancel).setText("Fechar")
-            self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogCancelButton))
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
             self.isRunning = False
         else:
             self.plainTextEdit.clear()
@@ -506,8 +506,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
     def finishedValidate(self):
         self.updateProcess.setStop(True)
         self.updateTable()
-        self.buttonBox.button(QDialogButtonBox.Cancel).setText("Fechar")
-        self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogCancelButton))
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
 
         if not self.validateProcess.cancel is True:
             conString = qgis_configs.getConnString(self, self.getConnection())
@@ -521,14 +521,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
         else:
             self.isRunning = False
             self.progressBar.setVisible(False)
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
         self.validateProcess = None
 
     def finishedAddLayers(self):
         self.isRunning = False
         self.progressBar.setVisible(False)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
         self.writeText("Terminada a validação")
 
@@ -550,14 +550,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.writeText("\tA executar validações ...\n")
             self.validateProcess.start()
 
-            self.buttonBox.button(QDialogButtonBox.Cancel).setText("Cancelar")
-            self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Cancelar")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogDiscardButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
             self.createProcess = None
         elif self.createProcess is not None:
-            self.buttonBox.button(QDialogButtonBox.Cancel).setText("Fechar")
-            self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogCancelButton))
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
             self.progressBar.setVisible(False)
             self.createProcess = None
 
@@ -644,9 +644,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.writeText("\tA criar estrutura de validação ...")
             self.isRunning = True
             self.createProcess.start()
-            self.buttonBox.button(QDialogButtonBox.Cancel).setText("Cancelar")
-            self.buttonBox.button(QDialogButtonBox.Cancel).setIcon(self.style().standardIcon(QStyle.SP_DialogDiscardButton))
-            self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Cancelar")
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogDiscardButton))
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
         else:
             self.writeText('[Aviso] Configuração inválida')
 
