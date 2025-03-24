@@ -553,8 +553,9 @@ class ExportLayersProcess(QThread):
                             aux.append(l[1])
                     else:
                         aux.append(l[1][:-3])
-                        for rf in l[3]:
-                            aux.append(rf[0])
+
+                    for rf in l[3]:
+                        aux.append(rf[0])
             for r in self.flatLayers[layer]['refs']:
                 aux.append(r)
 
