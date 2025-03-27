@@ -33,7 +33,7 @@ from PyQt5.QtWidgets import QDialog, QProgressDialog, QMessageBox, QAbstractItem
 from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QVariant
 from PyQt5.QtGui import QIntValidator, QStandardItemModel, QStandardItem
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsStyle, QgsEditorWidgetSetup, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsCoordinateReferenceSystem
+from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsStyle, QgsEditorWidgetSetup, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsVectorLayerJoinInfo
 from qgis.utils import iface
 
 from qgis.PyQt.QtTest import QSignalSpy
@@ -46,7 +46,7 @@ import re
 
 from . import qgis_configs
 from .postgis_helper import PostgisUtils
-from .aux_export import displayList, recartStructure, fieldNameMap
+from .aux_export import displayList, recartStructure, fieldNameMap, joins
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'ui/main_dialog.ui'))
@@ -303,6 +303,23 @@ class MainDialog(QDialog, FORM_CLASS):
                 widget_setup = QgsEditorWidgetSetup('RelationReference',config)
                 layer.setEditorWidgetSetup(field_idx, widget_setup)
                 # print( "Camada {} configurada com base na relação".format( layer.name() ) )
+
+            for j in joins:
+                slayers = QgsProject.instance().mapLayersByName(j)
+                if slayers and len(slayers) > 0:
+                    qlayer = slayers[0]
+                    jls = QgsProject.instance().mapLayersByName(joins[j]['join_table'])
+                    if jls and len(jls) > 0:
+                        jl = jls[0]
+                        jo = QgsVectorLayerJoinInfo()
+                        jo.setJoinLayer(jl)
+                        jo.setJoinFieldName(joins[j]['join_field'])
+                        jo.setTargetFieldName(joins[j]['target_field'])
+                        jo.setJoinFieldNamesSubset(joins[j]['joined_fields'])
+                        jo.setUsingMemoryCache(joins[j]['memory_cache'])
+                        jo.setPrefix(joins[j]['prefix'])
+
+                        qlayer.addJoin(jo)
 
             self.writeText('Aguarde a contagem dos elementos em cada camada, por favor...')
 

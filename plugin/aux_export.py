@@ -308,6 +308,25 @@ recartStructure = {
         'refs': []}
 }
 
+joins = {
+    'lig_segviarodov_viarodov': {
+        'join_table': 'via_rodov',
+        'join_field': 'identificador',
+        'target_field': 'via_rodov_id',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'vr_'
+    },
+    'lig_segviaferrea_linhaferrea': {
+        'join_table': 'Linha férrea',
+        'join_field': 'identificador',
+        'target_field': 'linha_ferrea_id',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lf_'
+    }
+}
+
 fieldNameMap = {
     'freguesia': {
         'identificador': 'identifica',
