@@ -324,6 +324,22 @@ joins = {
         'joined_fields': ['nome'],
         'memory_cache': True,
         'prefix': 'lf_'
+    },
+    'lig_adm_publica_edificio': {
+        'join_table': 'adm_publica',
+        'join_field': 'identificador',
+        'target_field': 'linha_ferrea_id',
+        'joined_fields': ['nome', 'ponto_de_contacto', 'valor_tipo_adm_publica'],
+        'memory_cache': True,
+        'prefix': 'ap_'
+    },
+    'lig_equip_util_coletiva_edificio': {
+        'join_table': 'equip_util_coletiva',
+        'join_field': 'identificador',
+        'target_field': 'linha_ferrea_id',
+        'joined_fields': ['nome', 'ponto_de_contacto'],
+        'memory_cache': True,
+        'prefix': 'euc_'
     }
 }
 

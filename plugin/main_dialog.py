@@ -288,7 +288,13 @@ class MainDialog(QDialog, FORM_CLASS):
             rels = manager.discoverRelations( relations.values(), layers.values() )
             self.writeText( "Relações encontradas: {}".format( len(rels) ) )
 
+            rel_names = {}
             for rel in rels:
+                if rel.name() in rel_names:
+                    rel_names[rel.name()] += 1
+                    rel.setName(rel.name() + '_' + str(rel_names[rel.name()]))
+                else:
+                    rel_names[rel.name()] = 0
                 # if rel.name().startswith('valor_zona'):
                 manager.addRelation(rel)
                 # print(rel.name(), rel.referencedLayer().name(), rel.referencingLayer().name())
