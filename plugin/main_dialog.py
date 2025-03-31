@@ -442,15 +442,24 @@ class ExportLayersProcess(QThread):
         # Injetar layer_styles.sql na BD
 
         bp = os.path.dirname(os.path.realpath(__file__))
+        utils = PostgisUtils(self, self.conn)
         try:
             with open(bp + '/convert/processing/layer_styles.sql', encoding='utf-8') as pp_file:
                 pp_src = pp_file.read()
                 styles = re.sub(r"{schema}", self.schema, pp_src)
-                utils = PostgisUtils(self, self.conn)
                 utils.run_query(styles)
         except Exception as e:
             self.write(
                 'Erro a inserir os estilos em base de dados: \'' + str(e) + '\'')
+
+        try:
+            with open(bp + '/convert/processing/aux_views.sql', encoding='utf-8') as av_file:
+                av_src = av_file.read()
+                views = re.sub(r"{schema}", self.schema, av_src)
+                utils.run_query(views, None, True)
+        except Exception as e:
+            self.write(
+                'Erro a criar views auxiliares: \'' + str(e) + '\'')
 
 
         layer_was_added_spy = QSignalSpy(QgsProject.instance().layerWasAdded)
@@ -490,6 +499,19 @@ class ExportLayersProcess(QThread):
 
                         exportedLayers[tb] = 1
                         self.write('\tTabela \'' + tb + '\' exportada')
+
+        self.addLayer.emit("Tabelas Auxiliares",
+                           self.conn + " key='edificio_id' table='" + self.schema + "'.'ls_edificio_label_view'",
+                           'ls_edificio_label_view', "default", 0)
+        self.addLayer.emit("Tabelas Auxiliares",
+                           self.conn + " key='areas_artificializadas_id' table='" + self.schema + "'.'ls_areas_artificializadas_label_view'",
+                           'ls_areas_artificializadas_label_view', "default", 0)
+        self.addLayer.emit("Tabelas Auxiliares",
+                           self.conn + " key='seg_via_rodov_id' table='" + self.schema + "'.'ls_seg_via_rodov_label_view'",
+                           'ls_seg_via_rodov_label_view', "default", 0)
+        self.addLayer.emit("Tabelas Auxiliares",
+                           self.conn + " key='seg_via_ferrea_id' table='" + self.schema + "'.'ls_seg_via_ferrea_label_view'",
+                           'ls_seg_via_ferrea_label_view', "default", 0)
 
         # Wait for loading all layers... 30 seg. maximum
         # self.write('Aguarde o carregamento das camadas, por favor...')

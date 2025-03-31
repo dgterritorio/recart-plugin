@@ -65,7 +65,7 @@ class PostgisUtils:
                 cur.close()
                 conn.close()
 
-    def run_query(self, sql, writer=None):
+    def run_query(self, sql, writer=None, no_fetch=False):
         conn = None
         res = None
         try:
@@ -78,7 +78,7 @@ class PostgisUtils:
                     for notice in conn.notices:
                         writer(f'NOTICE: {notice}.')
                 conn.commit()
-                if re.match(r'^SELECT [1-9]+', cur.statusmessage):
+                if re.match(r'^SELECT [1-9]+', cur.statusmessage) and no_fetch is False:
                     res = cur.fetchall()
         except (Exception, psycopg2.Error) as error:
             raise ValueError(

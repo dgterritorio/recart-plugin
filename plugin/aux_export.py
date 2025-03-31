@@ -309,22 +309,6 @@ recartStructure = {
 }
 
 joins = {
-    'lig_segviarodov_viarodov': {
-        'join_table': 'via_rodov',
-        'join_field': 'identificador',
-        'target_field': 'via_rodov_id',
-        'joined_fields': ['nome'],
-        'memory_cache': True,
-        'prefix': 'vr_'
-    },
-    'lig_segviaferrea_linhaferrea': {
-        'join_table': 'Linha férrea',
-        'join_field': 'identificador',
-        'target_field': 'linha_ferrea_id',
-        'joined_fields': ['nome'],
-        'memory_cache': True,
-        'prefix': 'lf_'
-    },
     'lig_adm_publica_edificio': {
         'join_table': 'adm_publica',
         'join_field': 'identificador',
@@ -340,6 +324,46 @@ joins = {
         'joined_fields': ['nome', 'ponto_de_contacto'],
         'memory_cache': True,
         'prefix': 'euc_'
+    },
+    'Edifício (POINT)': {
+        'join_table': 'ls_edificio_label_view',
+        'join_field': 'edificio_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    },
+    'Edifício (POLYGON)': {
+        'join_table': 'ls_edificio_label_view',
+        'join_field': 'edificio_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    },
+    'Área artificializada': {
+        'join_table': 'ls_areas_artificializadas_label_view',
+        'join_field': 'areas_artificializadas_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    },
+    'Segmento da via rodoviária': {
+        'join_table': 'ls_seg_via_rodov_label_view',
+        'join_field': 'seg_via_rodov_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    },
+    'Segmento da via-férrea': {
+        'join_table': 'ls_seg_via_ferrea_label_view',
+        'join_field': 'seg_via_ferrea_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
     }
 }
 
