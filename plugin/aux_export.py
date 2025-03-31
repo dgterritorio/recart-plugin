@@ -328,7 +328,7 @@ joins = {
     'lig_adm_publica_edificio': {
         'join_table': 'adm_publica',
         'join_field': 'identificador',
-        'target_field': 'linha_ferrea_id',
+        'target_field': 'adm_publica_id',
         'joined_fields': ['nome', 'ponto_de_contacto', 'valor_tipo_adm_publica'],
         'memory_cache': True,
         'prefix': 'ap_'
@@ -336,7 +336,7 @@ joins = {
     'lig_equip_util_coletiva_edificio': {
         'join_table': 'equip_util_coletiva',
         'join_field': 'identificador',
-        'target_field': 'linha_ferrea_id',
+        'target_field': 'equip_util_coletiva_id',
         'joined_fields': ['nome', 'ponto_de_contacto'],
         'memory_cache': True,
         'prefix': 'euc_'
