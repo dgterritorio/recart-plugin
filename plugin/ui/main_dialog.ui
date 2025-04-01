@@ -200,7 +200,7 @@
  <connections>
   <connection>
    <sender>connCombo</sender>
-   <signal>currentIndexChanged(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>MainDialog</receiver>
    <slot>changeConn(QString)</slot>
    <hints>
@@ -264,7 +264,7 @@
   </connection>
   <connection>
    <sender>exportFormat</sender>
-   <signal>currentIndexChanged(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>MainDialog</receiver>
    <slot>onChangeFormat(QString)</slot>
    <hints>
@@ -279,4 +279,11 @@
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>changeConn(QString)</slot>
+  <slot>doLoadLayers()</slot>
+  <slot>doExportLayers()</slot>
+  <slot>selectAll(int)</slot>
+  <slot>onChangeFormat(QString)</slot>
+ </slots>
 </ui>

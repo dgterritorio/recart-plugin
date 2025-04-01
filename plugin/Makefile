@@ -89,9 +89,9 @@ EXTRAS = metadata.txt icon.png carttop.xml validation_rules.sql validation_setup
 
 EXTRA_DIRS =
 
-COMPILED_RESOURCE_FILES = resources.py
+COMPILED_RESOURCE_FILES = resources5.py resources6.py
 
-PEP8EXCLUDE=resources.py,ui
+PEP8EXCLUDE=resources5.py,resources6.py,ui
 
 
 #################################################
@@ -110,8 +110,11 @@ default: compile
 
 compile: $(COMPILED_RESOURCE_FILES)
 
-%.py : %.qrc $(RESOURCES_SRC)
-	pyrcc5 -o $*.py  $<
+%5.py : %.qrc $(RESOURCES_SRC)
+	pyrcc5 -o $*5.py  $<
+
+%6.py : %.qrc $(RESOURCES_SRC)
+	pyside6-rcc -o $*6.py  $<
 
 %.qm : %.ts
 	$(LRELEASE) $<

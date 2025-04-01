@@ -21,16 +21,20 @@
 """
 import os.path
 
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+from qgis.PyQt.QtCore import QT_VERSION_STR, QSettings, QTranslator, qVersion, QCoreApplication
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 
 from .main_dialog import MainDialog
 from .convert_dialog import ConvertDialog
 from .validation_dialog import ValidationDialog
 
-# Initialize Qt resources from file resources.py
-from .resources import *
+# Initialize Qt resources from file resources*.py
+QT_MAJOR_VERSION = int(QT_VERSION_STR.split(".")[0])
+if QT_MAJOR_VERSION < 6:
+    from .resources5 import *
+else:
+    from .resources6 import *
 
 
 class recartDGT:

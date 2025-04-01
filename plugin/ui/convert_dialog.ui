@@ -201,9 +201,6 @@
            <property name="storageMode">
             <enum>QgsFileWidget::GetDirectory</enum>
            </property>
-           <property name="options">
-            <set>QFileDialog::ShowDirsOnly</set>
-           </property>
           </widget>
          </item>
          <item row="4" column="0" colspan="8">
@@ -344,7 +341,7 @@
   </connection>
   <connection>
    <sender>connCombo</sender>
-   <signal>currentIndexChanged(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>ConvertDialog</receiver>
    <slot>changeConn(QString)</slot>
    <hints>
@@ -375,4 +372,10 @@
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>changeInputFile(QString)</slot>
+  <slot>changeCustomMap(int)</slot>
+  <slot>changeAliasMap(int)</slot>
+  <slot>changeConn(QString)</slot>
+ </slots>
 </ui>
