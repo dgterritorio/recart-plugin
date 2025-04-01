@@ -18,8 +18,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLineEdit
+from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtWidgets import QInputDialog, QMessageBox, QLineEdit
 from qgis.core import QgsApplication, QgsAuthMethodConfig
 
 def listDataSources():

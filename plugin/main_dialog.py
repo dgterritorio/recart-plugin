@@ -28,10 +28,10 @@ import json
 from enum import Enum
 from pathlib import Path
 
-from PyQt5 import uic
-from PyQt5.QtWidgets import QDialog, QProgressDialog, QMessageBox, QAbstractItemView
-from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QVariant
-from PyQt5.QtGui import QIntValidator, QStandardItemModel, QStandardItem
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDialog, QProgressDialog, QMessageBox, QAbstractItemView
+from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QVariant
+from qgis.PyQt.QtGui import QIntValidator, QStandardItemModel, QStandardItem
 
 from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsStyle, QgsEditorWidgetSetup, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsVectorLayerJoinInfo
 from qgis.utils import iface
@@ -59,7 +59,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self.iface = iface
-        self.treeView.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.treeView.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
         self.exportFormat.addItems(
             ['Shapefile', 'GeoJSON', 'GeoPackage', 'Projeto QGIS'])
         self.exportEncoding.addItems(
