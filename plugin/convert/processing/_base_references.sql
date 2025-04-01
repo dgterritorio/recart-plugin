@@ -180,7 +180,7 @@ create table if not exists {schema}.linha_de_quebra (
 	valor_classifica varchar(10) NOT NULL,
 	valor_natureza_linha varchar(10) NOT NULL,
 	artificial bool NULL,
-	geometria geometry(LINESTRING, 3763) NOT NULL,
+	geometria geometry(linestringz, 3763) NOT NULL,
 	CONSTRAINT linha_de_quebra_pkey PRIMARY KEY (identificador),
 	CONSTRAINT valor_classifica_id FOREIGN KEY (valor_classifica) REFERENCES {schema}.valor_classifica(identificador),
 	CONSTRAINT valor_natureza_linha_id FOREIGN KEY (valor_natureza_linha) REFERENCES {schema}.valor_natureza_linha(identificador)
@@ -199,7 +199,7 @@ create table if not exists {schema}.ponto_cotado (
 	inicio_objeto timestamp NOT NULL,
 	fim_objeto timestamp NULL,
 	valor_classifica_las varchar(10) NOT NULL,
-	geometria geometry(POINT, 3763) NOT NULL,
+	geometria geometry(pointz, 3763) NOT NULL,
 	CONSTRAINT ponto_cotado_pkey PRIMARY KEY (identificador),
 	CONSTRAINT valor_classifica_las_id FOREIGN KEY (valor_classifica_las) REFERENCES {schema}.valor_classifica_las(identificador)
 );
@@ -219,7 +219,7 @@ create table if not exists {schema}.curva_de_nivel (
 	inicio_objeto timestamp NOT NULL,
 	fim_objeto timestamp NULL,
 	valor_tipo_curva varchar(10) NOT NULL,
-	geometria geometry(LINESTRING, 3763) NOT NULL,
+	geometria geometry(linestringz, 3763) NOT NULL,
 	CONSTRAINT curva_de_nivel_pkey PRIMARY KEY (identificador),
 	CONSTRAINT valor_tipo_curva_id FOREIGN KEY (valor_tipo_curva) REFERENCES {schema}.valor_tipo_curva(identificador)
 );
@@ -639,7 +639,7 @@ create table if not exists {schema}.sinal_geodesico (
 	valor_local_geodesico varchar(10) NOT NULL,
 	valor_ordem varchar(10) NOT NULL,
 	valor_tipo_sinal_geodesico varchar(10) NOT NULL,
-	geometria geometry(POINT, 3763) not null,
+	geometria geometry(pointz, 3763) not null,
 	CONSTRAINT sinal_geodesico_pkey PRIMARY KEY (identificador)
 );
 
@@ -1095,7 +1095,7 @@ create table if not exists {schema}.seg_via_ferrea (
 	valor_tipo_troco_via_ferrea varchar(10) NOT NULL,
 	valor_via_ferrea varchar(10),
 	jurisdicao varchar(255),
-	geometria geometry(LINESTRING, 3763) not null,
+	geometria geometry(linestringz, 3763) not null,
 	CONSTRAINT seg_via_ferrea_pkey PRIMARY KEY (identificador)
 );
 
@@ -1165,7 +1165,7 @@ create table if not exists {schema}.no_trans_ferrov (
 	inicio_objeto timestamp without time zone NOT NULL,
 	fim_objeto timestamp without time zone,
 	valor_tipo_no_trans_ferrov varchar(10) NOT NULL,
-	geometria geometry(POINT, 3763) not null,
+	geometria geometry(pointz, 3763) not null,
 	constraint no_trans_ferrov_pk PRIMARY KEY (identificador)
 );
 
@@ -1260,7 +1260,7 @@ create table if not exists {schema}.seg_via_rodov (
 	valor_restricao_acesso varchar(10),
 	valor_sentido varchar(10) NOT NULL,
 	valor_tipo_troco_rodoviario varchar(10) NOT NULL,
-	geometria geometry(LINESTRING, 3763) not null,
+	geometria geometry(linestringz, 3763) not null,
 	constraint seg_via_rodov_pk PRIMARY KEY (identificador)
 );
 
@@ -1338,7 +1338,7 @@ create table if not exists {schema}.no_trans_rodov (
 	inicio_objeto timestamp without time zone NOT NULL,
 	fim_objeto timestamp without time zone,
 	valor_tipo_no_trans_rodov varchar(10) NOT NULL,
-	geometria geometry(POINT, 3763) not null,
+	geometria geometry(pointz, 3763) not null,
 	CONSTRAINT no_trans_rodov_pkey PRIMARY KEY (identificador)
 );
 
@@ -1372,7 +1372,7 @@ create table if not exists {schema}.via_rodov_limite (
 	inicio_objeto timestamp without time zone NOT NULL,
 	fim_objeto timestamp without time zone,
 	valor_tipo_limite varchar(10) NOT NULL,
-	geometria geometry(LINESTRING, 3763) not null,
+	geometria geometry(linestringz, 3763) not null,
 	CONSTRAINT via_rodov_limite_pkey PRIMARY KEY (identificador)
 );
 
@@ -1397,7 +1397,7 @@ create table if not exists {schema}.obra_arte (
 	fim_objeto timestamp without time zone,
 	nome varchar(255),
 	valor_tipo_obra_arte varchar(10) NOT NULL,
-	geometria geometry(POLYGON, 3763) not null,
+	geometria geometry(polygonz, 3763) not null,
 	CONSTRAINT obra_arte_pkey PRIMARY KEY (identificador)
 );
 
@@ -1432,7 +1432,7 @@ create table if not exists {schema}.nascente (
 	id_hidrografico varchar(255),
 	valor_persistencia_hidrologica varchar(10),
 	valor_tipo_nascente varchar(10),
-	geometria geometry(POINT, 3763) not null,
+	geometria geometry(pointz, 3763) not null,
 	CONSTRAINT nascente_pkey PRIMARY KEY (identificador)
 );
 
@@ -1459,7 +1459,7 @@ create table if not exists {schema}.agua_lentica (
 	id_hidrografico varchar(255),
 	valor_agua_lentica varchar(10) NOT NULL,
 	valor_persistencia_hidrologica varchar(10),
-	geometria geometry(POLYGON, 3763) not null,
+	geometria geometry(polygonz, 3763) not null,
 	CONSTRAINT agua_lentica_pkey PRIMARY KEY (identificador)
 );
 
@@ -1519,7 +1519,7 @@ create table if not exists {schema}.curso_de_agua_eixo (
 	valor_curso_de_agua varchar(10) NOT NULL,
 	valor_persistencia_hidrologica varchar(10),
 	valor_posicao_vertical varchar(10) NOT NULL,
-	geometria geometry(LINESTRING, 3763) not null,
+	geometria geometry(linestringz, 3763) not null,
 	CONSTRAINT curso_de_agua_eixo_pkey PRIMARY KEY (identificador)
 );
 
@@ -1528,7 +1528,7 @@ create table if not exists {schema}.curso_de_agua_area (
 	inicio_objeto timestamp without time zone NOT NULL,
 	fim_objeto timestamp without time zone,
 	delimitacao_conhecida bool NOT NULL,
-	geometria geometry(POLYGON, 3763) not null,
+	geometria geometry(polygonz, 3763) not null,
 	CONSTRAINT curso_de_agua_area_pkey PRIMARY KEY (identificador)
 );
 
@@ -1539,7 +1539,7 @@ create table if not exists {schema}.queda_de_agua (
 	nome varchar(255),
 	altura real,
 	id_hidrografico varchar(255),
-	geometria geometry(POINT, 3763) not null,
+	geometria geometry(pointz, 3763) not null,
 	CONSTRAINT queda_de_agua_pkey PRIMARY KEY (identificador)
 );
 
@@ -1561,7 +1561,7 @@ create table if not exists {schema}.zona_humida (
 	mare bool NOT NULL,
 	id_hidrografico varchar(255),
 	valor_zona_humida varchar(10) NOT NULL,
-	geometria geometry(POLYGON, 3763) not null,
+	geometria geometry(polygonz, 3763) not null,
 	CONSTRAINT zona_humida_pkey PRIMARY KEY (identificador)
 );
 
@@ -1586,7 +1586,7 @@ create table if not exists {schema}.no_hidrografico (
 	nome varchar(255),
 	id_hidrografico varchar(255),
 	valor_tipo_no_hidrografico varchar(10) NOT NULL,
-	geometria geometry(POINT, 3763) not null,
+	geometria geometry(pointz, 3763) not null,
 	CONSTRAINT no_hidrografico_pkey PRIMARY KEY (identificador)
 );
 
@@ -1620,7 +1620,7 @@ create table if not exists {schema}.fronteira_terra_agua (
 	fim_objeto timestamp without time zone,
 	data_fonte_dados date NOT NULL,
 	ilha bool NOT NULL,
-	geometria geometry(LINESTRING, 3763) not null,
+	geometria geometry(linestringz, 3763) not null,
 	CONSTRAINT fronteira_terra_agua_pkey PRIMARY KEY (identificador)
 );
 

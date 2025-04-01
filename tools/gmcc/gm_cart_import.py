@@ -141,6 +141,12 @@ class CartImporter:
                             r'valorElementoAssociadoPGQ', 'valor_elemento_associado_pgq', attr['Atributo'])
                         attr['Atributo'] = re.sub(
                             r'XY', 'Xy', attr['Atributo'])
+                        attr['Atributo'] = re.sub(
+                            r'datahomologacao', 'data_homologacao', attr['Atributo'])
+                        attr['Atributo'] = re.sub(
+                            r'nomeDoProdutor', 'nome_produtor', attr['Atributo'])
+                        attr['Atributo'] = re.sub(
+                            r'nomeDoProprietario', 'nome_proprietario', attr['Atributo'])
                         campos.append({
                             'nome': re.sub(r'(?<!^)(?=[A-Z])', '_', attr['Atributo']).lower(),
                             'tipo': attr['Tipo'],
