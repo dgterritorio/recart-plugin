@@ -11,7 +11,7 @@
 # update public.layer_styles set type = 'Point' where type = 'Unknown geometry';
 #
 # Save all layer styles to the database
-# pg_dump -h localhost -U geobox -t layer_styles --no-owner --no-privileges --attribute-inserts -d 5035_carttop2_santa_marta_penaguiao_20211210 > layer_styles.new.sql
+# pg_dump service=portimao -t layer_styles --no-owner --no-privileges --attribute-inserts > layer_styles.new.sql
 
 # sed -i "s/VALUES ([0-9]\+, '[^']\+', '[^']\+', /VALUES ( current_database(), '{schema}', /g" layer_styles.new.sql
 # sed -i "s/layer_styles (id,/layer_styles (/g" layer_styles.new.sql

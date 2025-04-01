@@ -308,6 +308,65 @@ recartStructure = {
         'refs': []}
 }
 
+joins = {
+    'lig_adm_publica_edificio': {
+        'join_table': 'adm_publica',
+        'join_field': 'identificador',
+        'target_field': 'adm_publica_id',
+        'joined_fields': ['nome', 'ponto_de_contacto', 'valor_tipo_adm_publica'],
+        'memory_cache': True,
+        'prefix': 'ap_'
+    },
+    'lig_equip_util_coletiva_edificio': {
+        'join_table': 'equip_util_coletiva',
+        'join_field': 'identificador',
+        'target_field': 'equip_util_coletiva_id',
+        'joined_fields': ['nome', 'ponto_de_contacto'],
+        'memory_cache': True,
+        'prefix': 'euc_'
+    },
+    'Edifício (POINT)': {
+        'join_table': 'ls_edificio_label_view',
+        'join_field': 'edificio_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    },
+    'Edifício (POLYGON)': {
+        'join_table': 'ls_edificio_label_view',
+        'join_field': 'edificio_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    },
+    'Área artificializada': {
+        'join_table': 'ls_areas_artificializadas_label_view',
+        'join_field': 'areas_artificializadas_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    },
+    'Segmento da via rodoviária': {
+        'join_table': 'ls_seg_via_rodov_label_view',
+        'join_field': 'seg_via_rodov_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    },
+    'Segmento da via-férrea': {
+        'join_table': 'ls_seg_via_ferrea_label_view',
+        'join_field': 'seg_via_ferrea_id',
+        'target_field': 'identificador',
+        'joined_fields': ['nome'],
+        'memory_cache': True,
+        'prefix': 'lbl_'
+    }
+}
+
 fieldNameMap = {
     'freguesia': {
         'identificador': 'identifica',

@@ -33,7 +33,7 @@ from qgis.PyQt.QtWidgets import QDialog, QProgressDialog, QMessageBox, QAbstract
 from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QVariant
 from qgis.PyQt.QtGui import QIntValidator, QStandardItemModel, QStandardItem
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsStyle, QgsEditorWidgetSetup, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsCoordinateReferenceSystem
+from qgis.core import QgsProject, QgsVectorLayer, QgsDataSourceUri, QgsStyle, QgsEditorWidgetSetup, QgsLayerTreeGroup, QgsLayerTreeLayer, QgsCoordinateReferenceSystem, QgsVectorLayerJoinInfo
 from qgis.utils import iface
 
 from qgis.PyQt.QtTest import QSignalSpy
@@ -46,7 +46,7 @@ import re
 
 from . import qgis_configs
 from .postgis_helper import PostgisUtils
-from .aux_export import displayList, recartStructure, fieldNameMap
+from .aux_export import displayList, recartStructure, fieldNameMap, joins
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'ui/main_dialog.ui'))
@@ -288,7 +288,13 @@ class MainDialog(QDialog, FORM_CLASS):
             rels = manager.discoverRelations( relations.values(), layers.values() )
             self.writeText( "Relações encontradas: {}".format( len(rels) ) )
 
+            rel_names = {}
             for rel in rels:
+                if rel.name() in rel_names:
+                    rel_names[rel.name()] += 1
+                    rel.setName(rel.name() + '_' + str(rel_names[rel.name()]))
+                else:
+                    rel_names[rel.name()] = 0
                 # if rel.name().startswith('valor_zona'):
                 manager.addRelation(rel)
                 # print(rel.name(), rel.referencedLayer().name(), rel.referencingLayer().name())
@@ -303,6 +309,23 @@ class MainDialog(QDialog, FORM_CLASS):
                 widget_setup = QgsEditorWidgetSetup('RelationReference',config)
                 layer.setEditorWidgetSetup(field_idx, widget_setup)
                 # print( "Camada {} configurada com base na relação".format( layer.name() ) )
+
+            for j in joins:
+                slayers = QgsProject.instance().mapLayersByName(j)
+                if slayers and len(slayers) > 0:
+                    qlayer = slayers[0]
+                    jls = QgsProject.instance().mapLayersByName(joins[j]['join_table'])
+                    if jls and len(jls) > 0:
+                        jl = jls[0]
+                        jo = QgsVectorLayerJoinInfo()
+                        jo.setJoinLayer(jl)
+                        jo.setJoinFieldName(joins[j]['join_field'])
+                        jo.setTargetFieldName(joins[j]['target_field'])
+                        jo.setJoinFieldNamesSubset(joins[j]['joined_fields'])
+                        jo.setUsingMemoryCache(joins[j]['memory_cache'])
+                        jo.setPrefix(joins[j]['prefix'])
+
+                        qlayer.addJoin(jo)
 
             self.writeText('Aguarde a contagem dos elementos em cada camada, por favor...')
 
@@ -419,15 +442,24 @@ class ExportLayersProcess(QThread):
         # Injetar layer_styles.sql na BD
 
         bp = os.path.dirname(os.path.realpath(__file__))
+        utils = PostgisUtils(self, self.conn)
         try:
             with open(bp + '/convert/processing/layer_styles.sql', encoding='utf-8') as pp_file:
                 pp_src = pp_file.read()
                 styles = re.sub(r"{schema}", self.schema, pp_src)
-                utils = PostgisUtils(self, self.conn)
                 utils.run_query(styles)
         except Exception as e:
             self.write(
                 'Erro a inserir os estilos em base de dados: \'' + str(e) + '\'')
+
+        try:
+            with open(bp + '/convert/processing/aux_views.sql', encoding='utf-8') as av_file:
+                av_src = av_file.read()
+                views = re.sub(r"{schema}", self.schema, av_src)
+                utils.run_query(views, None, True)
+        except Exception as e:
+            self.write(
+                'Erro a criar views auxiliares: \'' + str(e) + '\'')
 
 
         layer_was_added_spy = QSignalSpy(QgsProject.instance().layerWasAdded)
@@ -467,6 +499,19 @@ class ExportLayersProcess(QThread):
 
                         exportedLayers[tb] = 1
                         self.write('\tTabela \'' + tb + '\' exportada')
+
+        self.addLayer.emit("Tabelas Auxiliares",
+                           self.conn + " key='edificio_id' table='" + self.schema + "'.'ls_edificio_label_view'",
+                           'ls_edificio_label_view', "default", 0)
+        self.addLayer.emit("Tabelas Auxiliares",
+                           self.conn + " key='areas_artificializadas_id' table='" + self.schema + "'.'ls_areas_artificializadas_label_view'",
+                           'ls_areas_artificializadas_label_view', "default", 0)
+        self.addLayer.emit("Tabelas Auxiliares",
+                           self.conn + " key='seg_via_rodov_id' table='" + self.schema + "'.'ls_seg_via_rodov_label_view'",
+                           'ls_seg_via_rodov_label_view', "default", 0)
+        self.addLayer.emit("Tabelas Auxiliares",
+                           self.conn + " key='seg_via_ferrea_id' table='" + self.schema + "'.'ls_seg_via_ferrea_label_view'",
+                           'ls_seg_via_ferrea_label_view', "default", 0)
 
         # Wait for loading all layers... 30 seg. maximum
         # self.write('Aguarde o carregamento das camadas, por favor...')
@@ -546,11 +591,15 @@ class ExportLayersProcess(QThread):
         aux = []
         if layer in self.flatLayers:
             for l in self.flatLayers[layer]['ligs']:
-                if l[1] in self.layerList or l[2] is True:
-                    if l[0] is not None:
-                        aux.append(l[0])
-                    else:
-                        aux.append(l[1][:-3])
+                if l[0] is not None:
+                    aux.append(l[0])
+                    if l[1] is not None:
+                        aux.append(l[1])
+                else:
+                    aux.append(l[1][:-3])
+
+                for rf in l[3]:
+                    aux.append(rf[0])
             for r in self.flatLayers[layer]['refs']:
                 aux.append(r)
 
