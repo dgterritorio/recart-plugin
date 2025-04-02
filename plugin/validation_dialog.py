@@ -487,8 +487,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.writeText(("\tException: {}".format(e)))
 
     def changeSchema(self):
-        if self.ruleSetup:
-            self.setupRules()
+        # if self.ruleSetup:
+        #     self.setupRules()
+        pass
 
     def setupRules(self):
         self.bp = os.path.dirname(os.path.realpath(__file__))
