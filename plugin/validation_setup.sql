@@ -246,6 +246,7 @@ begin
 			tabela_erro := 'errors.' || tabela || '_rg_' || rg;
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
 			execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela_erro, tabela, cvalue);
 		end if;
 	end loop;
@@ -291,6 +292,7 @@ begin
 			tabela_erro := 'errors.' || tabela || '_rg_5';
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
 			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
 				where not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela);
 		end if;
@@ -345,6 +347,7 @@ begin
 			tabela_erro := 'errors.' || tabela || '_rg_6';
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
 			execute format('insert into %s select * from {schema}.%I where validation.validcap_pt(nome)<>true', tabela_erro, tabela);
 		end if;
 	end loop;
@@ -400,6 +403,7 @@ begin
 			tabela_erro := 'errors.' || tabela || '_rg_7';
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
 			execute format('insert into %s select * from {schema}.%I where validation.valid_noabbr(%s)<>true', tabela_erro, tabela, coluna);
 		end if;
 	end loop;
@@ -426,6 +430,7 @@ begin
 		tabela_erro := 'errors.' || tabela || '_' || rg;
 		-- raise notice '%', tbl;
 		execute format('create table if not exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+		execute format('delete from %s', tabela_erro);
 		execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela_erro, tabela, minv);
 	end if;
 
@@ -478,6 +483,7 @@ begin
 		-- raise notice '%', tbl;
 		CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel INCLUDING ALL);
 
+		delete from errors.curva_de_nivel_re3_2;
 		insert into errors.curva_de_nivel_re3_2 (
 			with 
 				pares as (select all_cdn.identificador,
@@ -553,6 +559,7 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 
+			execute format('delete from %1$s', tabela_erro);
 			execute format('insert into %1$s select t.* from {schema}.%2$I t
 				where (not (select ST_intersects(t.geometria, f.geometria) from 
 						(select geom_col as geometria from validation.no_hidro) as f)
@@ -719,24 +726,24 @@ CREATE TABLE IF NOT EXISTS validation.interrupcao_fluxo AS (
 	) AS f
 );
 
+CREATE INDEX IF NOT EXISTS idx_val_curso_de_agua_eixo_geometria ON {schema}.curso_de_agua_eixo USING GIST (geometria);
 CREATE TABLE IF NOT EXISTS validation.juncao_fluxo_dattr AS (
-SELECT ST_Collect(f.geometria) AS geom_col FROM (
-	select st_intersection(a.geometria, b.geometria) as geometria
-		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not st_isempty(st_intersection(a.geometria, b.geometria))
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-) as f);
+	select st_intersection(a.geometria, b.geometria) as geom_col
+		from {schema}.curso_de_agua_eixo a
+		inner join {schema}.curso_de_agua_eixo b ON a.identificador <> b.identificador AND ST_Intersects(a.geometria, b.geometria)
+		where not (coalesce(a.nome, '')<>coalesce(b.nome, '') or
+				coalesce(a.delimitacao_conhecida, false)<>coalesce(b.delimitacao_conhecida, false) or
+				coalesce(a.ficticio, false)<>coalesce(b.ficticio, false) or
+				coalesce(a.largura, 0)<>coalesce(b.largura, 0) or
+				coalesce(a.id_hidrografico, '')<>coalesce(b.id_hidrografico, '') or
+				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')<>coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') or
+				coalesce(a.ordem_hidrologica, '')<>coalesce(b.ordem_hidrologica, '') or
+				coalesce(a.origem_natural, false)<>coalesce(b.origem_natural, false) or
+				coalesce(a.valor_curso_de_agua, '')<>coalesce(b.valor_curso_de_agua, '') or
+				coalesce(a.valor_persistencia_hidrologica, '')<>coalesce(b.valor_persistencia_hidrologica, '') or
+				coalesce(a.valor_posicao_vertical, '')<>coalesce(b.valor_posicao_vertical, ''))
+);
+CREATE INDEX IF NOT EXISTS idx_val_juncao_fluxo_dattr_geom ON validation.juncao_fluxo_dattr USING GIST (geom_col);
 
 drop index IF EXISTS validation.tin_geom_idx;
 create index tin_geom_idx ON validation.tin using gist(geometria);

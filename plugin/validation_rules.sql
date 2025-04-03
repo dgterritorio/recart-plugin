@@ -1270,42 +1270,63 @@ $$Apenas é inserido um nó que assume o valor "Junção" prevalecendo este sobr
 $$"Nó hidrográfico".$$, 'no_hidrografico',
 $$with 
 total as (select count(*) from {schema}.no_hidrografico t
-	where (t.valor_tipo_no_hidrografico='3' or t.valor_tipo_no_hidrografico='4') and (select st_intersects(t.geometria, f.geometria) from
-		(select geom_col as geometria from validation.juncao_fluxo_dattr) as f)
+	where (t.valor_tipo_no_hidrografico='3' or t.valor_tipo_no_hidrografico='4') and exists (
+            select 1 
+            from validation.juncao_fluxo_dattr f
+            where st_intersects(t.geometria, f.geom_col)
+        )
 ),
 good as (select count(t.*)
 	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='3' and (select st_intersects(t.geometria, f.geometria) from
-		(select geom_col as geometria from validation.juncao_fluxo_dattr) as f)
+	where t.valor_tipo_no_hidrografico='3' and exists (
+            select 1 
+            from validation.juncao_fluxo_dattr f
+            where st_intersects(t.geometria, f.geom_col)
+        )
 ),
 bad as (select count(t.*)
 	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='4' and (select st_intersects(t.geometria, f.geometria) from
-		(select geom_col as geometria from validation.juncao_fluxo_dattr) as f)
+	where t.valor_tipo_no_hidrografico='4' and exists (
+            select 1 
+            from validation.juncao_fluxo_dattr f
+            where st_intersects(t.geometria, f.geom_col)
+        )
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$with 
 total as (select count(*) from {schema}.no_hidrografico t
-	where (t.valor_tipo_no_hidrografico='3' or t.valor_tipo_no_hidrografico='4') and (select st_intersects(t.geometria, f.geometria) from
-		(select geom_col as geometria from validation.juncao_fluxo_dattr) as f)
+	where (t.valor_tipo_no_hidrografico='3' or t.valor_tipo_no_hidrografico='4') and exists (
+            select 1 
+            from validation.juncao_fluxo_dattr f
+            where st_intersects(t.geometria, f.geom_col)
+        )
 ),
 good as (select count(t.*)
 	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='3' and (select st_intersects(t.geometria, f.geometria) from
-		(select geom_col as geometria from validation.juncao_fluxo_dattr) as f)
+	where t.valor_tipo_no_hidrografico='3' and exists (
+            select 1 
+            from validation.juncao_fluxo_dattr f
+            where st_intersects(t.geometria, f.geom_col)
+        )
 ),
 bad as (select count(t.*)
 	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='4' and (select st_intersects(t.geometria, f.geometria) from
-		(select geom_col as geometria from validation.juncao_fluxo_dattr) as f)
+	where t.valor_tipo_no_hidrografico='4' and exists (
+            select 1 
+            from validation.juncao_fluxo_dattr f
+            where st_intersects(t.geometria, f.geom_col)
+        )
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select t.*
 	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='4' and (select st_intersects(t.geometria, f.geometria) from
-		(select geom_col as geometria from validation.juncao_fluxo_dattr) as f)$$);
+	where t.valor_tipo_no_hidrografico='4' and exists (
+            select 1 
+            from validation.juncao_fluxo_dattr f
+            where st_intersects(t.geometria, f.geom_col)
+        )$$);
 
 -- pseudo-nós
 -- Entre dois nós só pode haver um segmento
