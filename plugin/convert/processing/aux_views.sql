@@ -1,3 +1,17 @@
+DROP MATERIALIZED VIEW IF EXISTS {schema}.ls_areas_artificializadas_label_view;
+CREATE MATERIALIZED VIEW {schema}.ls_areas_artificializadas_label_view
+TABLESPACE pg_default
+AS SELECT aa.identificador as areas_artificializadas_id,
+    COALESCE(string_agg(DISTINCT ip.nome::text, ' | '::text), string_agg(DISTINCT iga.nome::text, ' | '::text), string_agg(DISTINCT euc.nome, ' | '::text)) AS nome,
+    geometria
+   FROM {schema}.areas_artificializadas aa
+     LEFT JOIN {schema}.inst_producao ip ON aa.inst_producao_id = ip.identificador
+     LEFT JOIN {schema}.inst_gestao_ambiental iga ON aa.inst_gestao_ambiental_id = iga.identificador
+     LEFT JOIN {schema}.equip_util_coletiva euc ON aa.equip_util_coletiva_id = euc.identificador
+  GROUP BY aa.identificador
+WITH DATA;
+
+
 DROP MATERIALIZED VIEW IF EXISTS {schema}.ls_edificio_label_view;
 CREATE MATERIALIZED VIEW {schema}.ls_edificio_label_view
 TABLESPACE pg_default
@@ -18,24 +32,11 @@ AS WITH euc AS (
     COALESCE(string_agg(DISTINCT ip.nome::text, ' | '::text), string_agg(DISTINCT iga.nome::text, ' | '::text), string_agg(DISTINCT euc.nome, ' | '::text), string_agg(DISTINCT ap.nome, ' | '::text), string_agg(DISTINCT ne.nome::text, ' | '::text)) AS nome
    FROM {schema}.edificio e
      LEFT JOIN {schema}.nome_edificio ne ON ne.edificio_id = e.identificador
-     LEFT JOIN {schema}.inst_producao ip ON e.inst_producao_id = ip.identificador
-     LEFT JOIN {schema}.inst_gestao_ambiental iga ON e.inst_gestao_ambiental_id = iga.identificador
+     LEFT JOIN {schema}.inst_producao ip ON e.inst_producao_id = ip.identificador AND e.inst_producao_id NOT IN (SELECT inst_producao_id FROM {schema}.areas_artificializadas)
+     LEFT JOIN {schema}.inst_gestao_ambiental iga ON e.inst_gestao_ambiental_id = iga.identificador AND e.inst_gestao_ambiental_id NOT IN (SELECT inst_gestao_ambiental_id FROM {schema}.areas_artificializadas)
      LEFT JOIN euc ON euc.edificio_id = e.identificador
      LEFT JOIN ap ON ap.edificio_id = e.identificador
   GROUP BY e.identificador
-WITH DATA;
-
-
-DROP MATERIALIZED VIEW IF EXISTS {schema}.ls_areas_artificializadas_label_view;
-CREATE MATERIALIZED VIEW {schema}.ls_areas_artificializadas_label_view
-TABLESPACE pg_default
-AS SELECT aa.identificador as areas_artificializadas_id,
-    COALESCE(string_agg(DISTINCT ip.nome::text, ' | '::text), string_agg(DISTINCT iga.nome::text, ' | '::text), string_agg(DISTINCT euc.nome, ' | '::text)) AS nome
-   FROM {schema}.areas_artificializadas aa
-     LEFT JOIN {schema}.inst_producao ip ON aa.inst_producao_id = ip.identificador
-     LEFT JOIN {schema}.inst_gestao_ambiental iga ON aa.inst_gestao_ambiental_id = iga.identificador
-     LEFT JOIN {schema}.equip_util_coletiva euc ON aa.equip_util_coletiva_id = euc.identificador
-  GROUP BY aa.identificador
 WITH DATA;
 
 
@@ -61,3 +62,6 @@ AS SELECT svf.identificador AS seg_via_ferrea_id,
      JOIN {schema}.linha_ferrea lf ON lsl.linha_ferrea_id = lf.identificador
   GROUP BY svf.identificador
 WITH DATA;
+
+
+
