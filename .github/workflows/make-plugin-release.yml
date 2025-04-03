@@ -19,6 +19,7 @@ jobs:
       - name: Create zip file
         run: |
           pip install PyQt5
+          pip install PySide6
           cd ./plugin
           make zip
       - name: Automatic push changes

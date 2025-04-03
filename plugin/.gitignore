@@ -4,4 +4,4 @@ env
 test
 
 __pycache__
-resources.py
+resources*.py
