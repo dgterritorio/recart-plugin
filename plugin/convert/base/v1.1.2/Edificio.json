@@ -35,20 +35,6 @@
 			"D2": "x",
 			"Definição": ""
 		}, {
-			"Atributo": "inst_producao_id",
-			"Multip.": "1",
-			"Definição": "",
-			"Tipo": "ID",
-			"D1": "",
-			"D2": ""
-		}, {
-			"Atributo": "inst_gestao_ambiental_id",
-			"Multip.": "1",
-			"Definição": "",
-			"Tipo": "ID",
-			"D1": "",
-			"D2": ""
-		}, {
 			"Atributo": "valorCondicaoConst",
 			"Multip.": "[0..1]",
 			"Tipo": "Lista de códigos",
