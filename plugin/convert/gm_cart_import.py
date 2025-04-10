@@ -95,11 +95,11 @@ class CartImporter:
                                         pp["output_type"] = "any"
                                         pp["output_dim"] = "2D"
                                 aux.read_post_process(
-                                    self.base, lyr, self.schema, self.save_src, pp, False)
+                                    self.base, lyr, self.schema, self.save_src, pp, False, self.vrs)
             for lyr, pp_cfg in self.base_pp:
                 if lyr in self.base or lyr == '_base':
                     aux.read_post_process(
-                        self.base, lyr, self.schema, self.save_src, pp_cfg, False)
+                        self.base, lyr, self.schema, self.save_src, pp_cfg, False, self.vrs)
         except Exception as e:
             self.writer(
                 "Falhou leitura do ficheiro de configuração.\n\t" + str(e))
@@ -109,7 +109,7 @@ class CartImporter:
         for lyr, pp_cfg in self.base_pp:
             if lyr in self.base or lyr == '_base':
                 aux.read_post_process(
-                    self.base, lyr, self.schema, self.save_src, pp_cfg, False)
+                    self.base, lyr, self.schema, self.save_src, pp_cfg, False, self.vrs)
 
     def build_base(self):
         """Carregar ficheiros base"""
@@ -437,7 +437,7 @@ class CartImporter:
         )
 
         prst_handler = PostgisImporter(
-            self.schema, self.base, self.mapping, self.cod_field, self.ndd, self.force_geom, self.force_polygon, self.cell_headers_origin, self.force_close, self.use_layerName, self.save_src, self.writer, self.srsid)
+            self.schema, self.base, self.mapping, self.cod_field, self.ndd, self.force_geom, self.force_polygon, self.cell_headers_origin, self.force_close, self.use_layerName, self.save_src, self.writer, self.srsid, self.vrs)
 
         prst_handler.save_styles(os.path.join(bp, pf + '_layer_styles.sql'))
         prst_handler.save_datasource(os.path.join(bp, pf + '_features.sql'))

@@ -61,11 +61,12 @@ SCM_FILES = \
 
 PROC_DIR = convert/processing
 PROC_FILES = \
-	$(PROC_DIR)/_base_references.sql $(PROC_DIR)/_cleanup.sql\
-	$(PROC_DIR)/polygonize.sql $(PROC_DIR)/edificio_references.sql\
-	$(PROC_DIR)/area_infra_trans_rodov_references.sql $(PROC_DIR)/infra_trans_rodov_references.sql\
-	$(PROC_DIR)/seg_via_rodov_references.sql $(PROC_DIR)/equip_util_coletiva_references.sql\
-	$(PROC_DIR)/to2D.py $(PROC_DIR)/to3D.py $(PROC_DIR)/to2D.py $(PROC_DIR)/layer_styles.sql $(PROC_DIR)/aux_views.sql
+	$(PROC_DIR)/polygonize.sql $(PROC_DIR)/to2D.py $(PROC_DIR)/to3D.py\
+	$(PROC_DIR)/layer_styles.sql $(PROC_DIR)/aux_views.sql
+
+PROC_DIR_V112 = $(PROC_DIR)/v1.1.2
+PROC_DIR_V201 = $(PROC_DIR)/v2.0.1
+PROC_DIR_V202 = $(PROC_DIR)/v2.0.2
 
 EXTRAS = metadata.txt icon.png carttop.xml validation_rules.sql validation_setup.sql validation_reset.sql validation_setup_no3d.sql
 
@@ -135,6 +136,9 @@ deploy: compile
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V202)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(SCM_DIR)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V112)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V201)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V202)
 	cp -vf $(PY_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(UI_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(UI_DIR)/
 	cp -vf $(CONV_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(CONV_DIR)/
@@ -143,6 +147,9 @@ deploy: compile
 	cp -vrf $(BASE_DIR_V202)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V202)/
 	cp -vf $(SCM_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(SCM_DIR)/
 	cp -vf $(PROC_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR)/
+	cp -vrf $(PROC_DIR_V112)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V112)/
+	cp -vrf $(PROC_DIR_V201)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V201)/
+	cp -vrf $(PROC_DIR_V202)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V202)/
 	cp -vf $(COMPILED_RESOURCE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(EXTRAS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	# cp -vfr i18n $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
