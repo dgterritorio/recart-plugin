@@ -60,6 +60,7 @@ class ConvertDialog(QDialog, FORM_CLASS):
             QDialogButtonBox.StandardButton.Ok).clicked.connect(self.process)
 
         self.nddCombo.addItems(['ndd1', 'ndd2'])
+        self.vrsCombo.addItems(['v1.1.2', 'v2.0.1', 'v2.0.2'])
 
         self.convertProcess = None
 
@@ -234,6 +235,7 @@ class ConvertDialog(QDialog, FORM_CLASS):
 
             kwargs['schema'] = self.lineEdit.text()
             kwargs['ndd'] = self.nddCombo.currentText()
+            kwargs['vrs'] = self.vrsCombo.currentText()
 
             srs = self.mQgsProjectionSelectionWidget.crs()
 

@@ -21,8 +21,9 @@ class CartImporter:
         self.map_dir = map_dir
         self.srsid = srsid
 
+        self.vrs = kwargs.get('vrs', 'v2.0.2')
         self.base_dir = kwargs.get('base_dir', os.path.dirname(
-            os.path.realpath(__file__))+'/base')
+            os.path.realpath(__file__))+'/base/'+self.vrs)
         self.input_dir = kwargs.get('input_dir', './input')
         self.ulink_type = kwargs.get('ulink_type', '6549')
         self.cod_field = kwargs.get('cod_field', 'ulink')
