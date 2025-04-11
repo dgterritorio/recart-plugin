@@ -14,20 +14,6 @@
 			"D1": "x",
 			"D2": "x"
 		}, {
-			"Atributo": "inicioObjeto",
-			"Multip.": "1",
-			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi inserida ou alterada.",
-			"Tipo": "DataTempo",
-			"D1": "x",
-			"D2": "x"
-		}, {
-			"Atributo": "fimObjeto",
-			"Multip.": "[0..1]",
-			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi substituída.",
-			"Tipo": "DataTempo",
-			"D1": "",
-			"D2": ""
-		}, {
 			"Atributo": "codigoLinhaFerrea",
 			"Multip.": "1",
 			"Tipo": "Texto",
