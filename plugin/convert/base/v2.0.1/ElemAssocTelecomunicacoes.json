@@ -1,0 +1,85 @@
+{
+	"objecto": {
+		"Tema": "INFRAESTRUTURAS E SERVIÇOS DE INTERESSE PÚBLICO",
+		"Característica geográfica": "Elemento associado de telecomunicações",
+		"Objeto INSPIRE": "",
+		"objeto": "ElemAssocTelecomunicacoes",
+		"Definição": "Infraestrutura associada ao funcionamento da rede de telecomunicações.",
+		"Dim.": "2D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi inserida ou alterada na base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi substituída ou retirada da base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (ponto)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "valorElementoAssociadoTelecomunicacoes",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Tipo de elemento associado às telecomunicações."
+		}],
+		"listas de códigos": [{
+			"nome": "valorElementoAssociadoTelecomunicacoes",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Apoio de telecomunicações",
+				"Valores INSPIRE": "Pole",
+				"D1": "x",
+				"D2": "",
+				"Definição": "Elemento de sustentação apto para interligação de cabos e equipamentos de traçados aéreos de redes de comunicações eletrónicas."
+			}, {
+				"Valores": "2",
+				"Descrição": "Cabina telefónica",
+				"Valores INSPIRE": "phoneBooth",
+				"D1": "x",
+				"D2": "",
+				"Definição": "Pequena construção ou compartimento isolado para proteção do utente no uso de telefone público."
+			}, {
+				"Valores": "3",
+				"Descrição": "Antena",
+				"Valores INSPIRE": "OtherConstruction (antenna)",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Estrutura destinada às comunicações por meio da captação e irradiação de ondas eletromagnéticas ou radielétricas. Devem também ser consideradas “Antena” as mais variadas e diversas antenas acopladas em torres/mastros de telecomunicações fixados no solo. As antenas ligadas a edifícios ou no topo dos mesmos, não devem ser consideradas."
+			}, {
+				"Valores": "4",
+				"Descrição": "Armário",
+				"Valores INSPIRE": "Cabinet",
+				"D1": "",
+				"D2": "",
+				"Definição": "Conjunto de caixa, ou bastidor, estanque, e dos dispositivos e equipamentos alojados no seu interior."
+			}, {
+				"Valores": "5",
+				"Descrição": "Câmara de visita",
+				"Valores INSPIRE": "Manhole",
+				"D1": "",
+				"D2": "",
+				"Definição": "Compartimento ou caixa de acesso aos troços de tubagem subterrâneos, situados geralmente no exterior de edifícios, através da qual é possível instalar, retirar e ligar cabos e proceder a trabalhos de manutenção."
+			}]
+		}]
+	}
+}

@@ -1,0 +1,130 @@
+{
+	"objecto": {
+		"Tema": "CONSTRUÇÕES",
+		"Característica geográfica": "Sinal geodésico",
+		"Objeto INSPIRE": "",
+		"objeto": "SinalGeodesico",
+		"Definição": "Ponto da rede geodésica nacional cujas coordenadas geográficas e posição relativa, referidas a um elipsoide de referência, são conhecidas com grande exatidão. A coordenada altimétrica é representada através da altitude ortométrica do topo do sinal geodésico.",
+		"Dim.": "3D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi inserida ou alterada na base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi substituída ou retirada da base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (ponto)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "valorCategoria",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Identificação da categoria a que pertence o sinal geodésico (aplica-se apenas ao Vértice Geodésico)."
+		}, {
+			"Atributo": "valorTipoSinalGeodesico",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Especifica qual o tipo de sinal geodésico."
+		}, {
+			"Atributo": "dataRevisao",
+			"Multip.": "1",
+			"Tipo": "Data",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Data da revisão da informação sobre o sinal geodésico."
+		}, {
+			"Atributo": "nome",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Nome do sinal geodésico."
+		}],
+		"listas de códigos": [{
+			"nome": "valorCategoria",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Primordial",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Vértices geodésicos, cujas coordenadas referidas ao sistema de referência oficial são conhecidas com grande exatidão e foram obtidas por métodos rigorosos."
+			}, {
+				"Valores": "2",
+				"Descrição": "Auxiliar",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Vértices geodésicos, cujas coordenadas referidas ao sistema de referência oficial foram determinadas por métodos de transformação de coordenadas."
+			}, {
+				"Valores": "995",
+				"Descrição": "Não aplicável",
+				"Valores INSPIRE": "notApplicable",
+				"D1": "x",
+				"D2": "x",
+				"Definição": ""
+			}]
+		}, {
+			"nome": "valorTipoSinalGeodesico",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Estação Permanente",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Estação Permanente GNSS (Global Navigation Satellite System)"
+			}, {
+				"Valores": "2",
+				"Descrição": "Vértice Geodésico",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Vértice Geodésico"
+			}, {
+				"Valores": "3",
+				"Descrição": "Marca de Nivelamento",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Marca de Nivelamento"
+			}, {
+				"Valores": "4",
+				"Descrição": "Marégrafo",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Marégrafo"
+			}, {
+				"Valores": "5",
+				"Descrição": "Estação Gravimétrica",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Estação Gravimétrica"
+			}]
+		}]
+	}
+}

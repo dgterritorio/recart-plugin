@@ -1,0 +1,92 @@
+{
+	"objecto": {
+		"Tema": "ALTIMETRIA",
+		"Característica geográfica": "Ponto cotado",
+		"Objeto INSPIRE": "SpotElevation",
+		"objeto": "PontoCotado",
+		"Definição": "Objeto pontual espacial que descreve a elevação numa localização geográfica específica.",
+		"Dim.": "3D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi inserida ou alterada na base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi substituída ou retirada da base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (ponto)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "valorClassificaLAS",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Identificação da localização geográfica do ponto cotado. Classificação decorrente da ASPRS Standard LIDAR Point Classes."
+		}],
+		"listas de códigos": [{
+			"nome": "valorClassificaLAS",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Terreno",
+				"Valores INSPIRE": "Ground (Lidar point classification = 2)",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Ponto cotado no terreno."
+			}, {
+				"Valores": "2",
+				"Descrição": "Edifício",
+				"Valores INSPIRE": "Building (Lidar point classification = 6)",
+				"D1": "",
+				"D2": "",
+				"Definição": "Ponto cotado no edifício."
+			}, {
+				"Valores": "2.1",
+				"Descrição": "Edifício - soleira",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Ponto cotado na soleira do edifício."
+			}, {
+				"Valores": "2.2",
+				"Descrição": "Edifício - beirado",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Ponto cotado no remate inferior do telhado."
+			}, {
+				"Valores": "2.3",
+				"Descrição": "Edifício - ponto mais alto",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Ponto cotado em cumeeira ou na zona mais elevada do edifício."
+			}, {
+				"Valores": "3",
+				"Descrição": "Tabuleiro suspenso ou elevado",
+				"Valores INSPIRE": "Bridge Deck (Lidar point classification = 17)",
+				"D1": "",
+				"D2": "",
+				"Definição": "Ponto cotado sobre obra de arte (via rodoviária, ferroviária, etc.) elevada ou suspensa."
+			}]
+		}]
+	}
+}

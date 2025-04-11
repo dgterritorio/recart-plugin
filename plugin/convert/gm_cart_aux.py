@@ -65,35 +65,35 @@ OGRFieldTypes = {
 base_pp = [
     ('edificio', {
         "type": "sql",
-                "path": "processing/edificio_references.sql",
+                "path": "edificio_references.sql",
                 "input_types": ["any"],
                 "output_type": "any",
                 "output_dim": "any"
     }),
     ('area_infra_trans_rodov', {
         "type": "sql",
-                "path": "processing/area_infra_trans_rodov_references.sql",
+                "path": "area_infra_trans_rodov_references.sql",
                 "input_types": ["any"],
                 "output_type": "any",
                 "output_dim": "any"
     }),
     ('infra_trans_rodov', {
         "type": "sql",
-                "path": "processing/infra_trans_rodov_references.sql",
+                "path": "infra_trans_rodov_references.sql",
                 "input_types": ["any"],
                 "output_type": "any",
                 "output_dim": "any"
     }),
     ('seg_via_rodov', {
         "type": "sql",
-                "path": "processing/seg_via_rodov_references.sql",
+                "path": "seg_via_rodov_references.sql",
                 "input_types": ["any"],
                 "output_type": "any",
                 "output_dim": "any"
     }),
     ('equip_util_coletiva', {
         "type": "sql",
-                "path": "processing/equip_util_coletiva_references.sql",
+                "path": "equip_util_coletiva_references.sql",
                 "input_types": ["any"],
                 "output_type": "any",
                 "output_dim": "any"
@@ -180,12 +180,13 @@ def get_geom_type(type):
     return result
 
 
-def read_post_process(base, lyr, schema, save_src, pp, frst):
+def read_post_process(base, lyr, schema, save_src, pp, frst, vrs = None):
     bp = os.path.dirname(os.path.realpath(__file__))
+    vrs_path = vrs+'/' if vrs is not None else ''
     try:
         # print(pp)
         if pp['type'] == 'sql':
-            with open(bp + '/' + pp['path']) as pp_file:
+            with open(bp + '/processing/' + vrs_path + pp['path']) as pp_file:
                 pp_src = pp_file.read()
                 cols = [f['nome'] for f in base[lyr].get_fields(
                 ) if f['nome'] != 'identificador' and f['nome'] != 'geometria']

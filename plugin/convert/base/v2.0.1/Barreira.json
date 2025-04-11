@@ -1,0 +1,151 @@
+{
+	"objecto": {
+		"Tema": "HIDROGRAFIA",
+		"Característica geográfica": "Barreira",
+		"Objeto INSPIRE": "",
+		"objeto": "Barreira",
+		"Definição": "Barreira permanente num curso de água utilizada para reter a água ou para controlar o seu caudal.",
+		"Dim.": "2D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi inserida ou alterada na base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi substituída ou retirada da base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (linha; polígono)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "valorBarreira",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Tipo de barreira."
+		}, {
+			"Atributo": "valorEstadoInstalacao",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "",
+			"D2": "",
+			"Definição": "O estado de uma instalação no que diz respeito à sua completude e utilização."
+		}, {
+			"Atributo": "iDHidrografico",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "",
+			"D2": "",
+			"Definição": "Identificador do objeto no mundo real."
+		}, {
+			"Atributo": "nome",
+			"Multip.": "[0..1]",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Topónimo da entidade no mundo real."
+		}],
+		"listas de códigos": [{
+			"nome": "valorBarreira",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Comporta",
+				"Valores INSPIRE": "Sluice",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Porta que sustem as águas de diques, açudes, represas ou barragens e que pode abrir-se para o seu escoamento."
+			}, {
+				"Valores": "2",
+				"Descrição": "Eclusa",
+				"Valores INSPIRE": "Lock",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Obra hidráulica, construída sobre um rio ou em zona portuária, com uma ou várias comportas, que permite a navegação quando é necessário vencer grandes desníveis."
+			}, {
+				"Valores": "3",
+				"Descrição": "Barragem de betão",
+				"Valores INSPIRE": "DamOrWeir",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Barragem de betão que retém a água de um curso de água."
+			}, {
+				"Valores": "4",
+				"Descrição": "Barragem de aterro",
+				"Valores INSPIRE": "DamOrWeir",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Barragem de aterro que retém a água de um curso de água. Estas barragens podem ser construídas com terra, madeira, pedra, pedra solta, enrocamento, mistas ou outro material."
+			}, {
+				"Valores": "5",
+				"Descrição": "Açude ou represa",
+				"Valores INSPIRE": "DamOrWeir",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Pequena barreira artificial ou natural que retém a água de um curso de água."
+			}, {
+				"Valores": "6",
+				"Descrição": "Dique",
+				"Valores INSPIRE": "Embankment",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Obra hidráulica, construída para desviar ou conter a invasão da água do mar ou de um curso de água."
+			}]
+			},{
+				"nome": "valorEstadoInstalacao",
+				"valores": [{
+					"Valores": "1",
+					"Descrição": "Desmantelada",
+					"Valores INSPIRE": "decommissioned",
+					"D1": "",
+					"D2": "",
+					"Definição": "A instalação já não é utilizada e foi ou está a ser desmantelada."
+				}, {
+					"Valores": "2",
+					"Descrição": "Em construção",
+					"Valores INSPIRE": "underConstruction",
+					"D1": "",
+					"D2": "",
+					"Definição": "A instalação encontra-se em fase de construção e ainda não está funcional. Este valor aplica-se unicamente à construção inicial da instalação e não a trabalhos de manutenção."
+				}, {
+					"Valores": "3",
+					"Descrição": "Em desuso",
+					"Valores INSPIRE": "disused",
+					"D1": "",
+					"D2": "",
+					"Definição": "A instalação já não é utilizada, mas não está a ser ou não foi desmantelada."
+				}, {
+					"Valores": "4",
+					"Descrição": "Projetada",
+					"Valores INSPIRE": "projected",
+					"D1": "",
+					"D2": "",
+					"Definição": "A instalação encontra-se em fase de projeto. Os trabalhos de construção ainda não tiveram início."
+				}, {
+					"Valores": "5",
+					"Descrição": "Funcional",
+					"Valores INSPIRE": "functional",
+					"D1": "",
+					"D2": "",
+					"Definição": "A instalação está funcional."
+					}]
+		}]
+	}
+}
