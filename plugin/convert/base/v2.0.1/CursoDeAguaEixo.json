@@ -105,6 +105,20 @@
 			"D2": "",
 			"Definição": "Identificador do objeto no mundo real."
 		}, {
+			"Atributo": "id_curso_de_agua_area",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "id_agua_lentica",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "",
+			"D2": ""
+		}, {
 			"Atributo": "largura",
 			"Multip.": "1",
 			"Tipo": "Real",

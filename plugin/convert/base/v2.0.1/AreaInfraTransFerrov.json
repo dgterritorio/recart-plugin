@@ -34,6 +34,13 @@
 			"D1": "x",
 			"D2": "x",
 			"Definição": ""
+		}, {
+			"Atributo": "infra_trans_ferrov_id",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "x",
+			"D2": "x"
 		}],
 		"listas de códigos": []
 	}

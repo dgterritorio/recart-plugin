@@ -28,7 +28,7 @@
 			"D1": "",
 			"D2": ""
 		}, {
-			"Atributo": "valorInstalacaoDeGestaoAmbiental",
+			"Atributo": "valorInstalacaoGestaoAmbiental",
 			"Multip.": "1",
 			"Tipo": "Lista de códigos",
 			"D1": "x",
@@ -43,7 +43,7 @@
 			"Definição": "Topónimo utilizado para identificar o objeto no mundo real."
 		}],
 		"listas de códigos": [{
-			"nome": "valorInstalacaoDeGestaoAmbiental",
+			"nome": "valorInstalacaoGestaoAmbiental",
 			"valores": [{
 				"Valores": "1",
 				"Descrição": "Aterro",
