@@ -8,7 +8,9 @@ import argparse
 from . import gm_cart_aux as aux
 from .gm_cart_postgis import PostgisImporter
 
-from .mapping import cmap
+from .mapping_112 import cmap as cmap112
+from .mapping_201 import cmap as cmap201
+from .mapping_202 import cmap as cmap202
 
 from osgeo import gdal
 from osgeo import ogr
@@ -196,7 +198,8 @@ class CartImporter:
                     return
         else:
             try:
-                self.mapping = cmap
+                self.mapping = cmap112 if self.vrs == '1.1.2'\
+                    else cmap201 if self.vrs == '2.0.1' else cmap202
             except Exception as e:
                 self.writer("Falhou leitura de ficheiro configuração")
                 return

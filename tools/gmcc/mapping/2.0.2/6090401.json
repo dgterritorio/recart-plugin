@@ -1,0 +1,50 @@
+{
+    "dominio": "Construções",
+    "subdominio": "INSTALAÇÕES DESTINADAS AO ABASTECIMENTO",
+    "familia": "PETRÓLEO",
+    "objeto": "DEPÓSITO DE PETRÓLEO",
+    "map": [
+        {
+            "table": "edificio",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_edificio_xy",
+                    "op": "set",
+                    "value": {
+                      "ndd1": "4",
+                      "ndd2": "6"
+                    }
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_edificio_z",
+                    "op": "set",
+                    "value": "14"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_forma_edificio",
+                    "op": "set",
+                    "value": "26"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_utilizacao_atual",
+                    "op": "set",
+                    "value": "888"
+                }
+            ]
+        }
+    ]
+}

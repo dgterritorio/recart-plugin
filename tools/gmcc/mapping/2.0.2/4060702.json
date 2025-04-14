@@ -1,0 +1,18 @@
+{
+    "dominio": "Toponímia",
+    "subdominio": "CONSTRUÇÕES",
+    "familia": "LOCAIS DE CULTO",
+    "objeto": "SANTUÁRIO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

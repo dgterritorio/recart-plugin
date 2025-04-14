@@ -1,0 +1,18 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "",
+    "familia": "PASSAGENS NIVELADAS, DESNIVELADAS E TÚNEIS",
+    "objeto": "BOCA DE TÚNEL",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

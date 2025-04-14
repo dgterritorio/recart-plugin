@@ -1,0 +1,54 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "TRÁFEGO FERROVIÁRIO - METRO",
+    "familia": "METRO",
+    "objeto": "LINHA SUPERFICIAL",
+    "map": [
+        {
+            "table": "",
+            "table": "seg_via_ferrea",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_categoria_bitola",
+                    "op": "set",
+                    "value": "888"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_posicao_vertical_transportes",
+                    "op": "set",
+                    "value": "0"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_linha_ferrea",
+                    "op": "set",
+                    "value": "4"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_troco_via_ferrea",
+                    "op": "set",
+                    "value": "888"
+                },
+                {
+                    "src": "",
+                    "dst": "eletrific",
+                    "op": "set",
+                    "value": "false"
+                }
+            ]
+        }
+    ]
+}

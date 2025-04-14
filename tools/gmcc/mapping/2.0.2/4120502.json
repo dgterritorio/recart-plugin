@@ -1,0 +1,18 @@
+{
+    "dominio": "Toponímia",
+    "subdominio": "HIDROGRAFIA",
+    "familia": "TOPONIMIA COSTEIRA",
+    "objeto": "PORTO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

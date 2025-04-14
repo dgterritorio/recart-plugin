@@ -1,0 +1,40 @@
+{
+    "tema": "NASCENTES E CURSOS DE ÁGUA",
+    "camada": "NascentesCursosDeAgua_Rios_2D/3D",
+    "nome": "Lagoa_3D",
+    "map": [
+        {
+            "table": "agua_lentica",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "cota_plena_armazenamento",
+                    "op": "set",
+                    "value": "False"
+                },
+                {
+                    "src": "",
+                    "dst": "mare",
+                    "op": "set",
+                    "value": "False"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_agua_lentica",
+                    "op": "set",
+                    "value": "1"
+                }
+            ]
+        }
+    ]
+}

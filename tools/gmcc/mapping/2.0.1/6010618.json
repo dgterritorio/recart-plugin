@@ -1,0 +1,29 @@
+{
+    "dominio": "Construções",
+    "subdominio": "EDIFÍCIOS PÚBLICOS E OFICIAIS",
+    "familia": "PATRIMÓNIO CULTURAL E ARQUIOLÓGICO",
+    "objeto": "ANTA Sem representação à escala ????????????????????????",
+    "map": [
+        {
+            "table": "ponto_interesse",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_ponto_interesse",
+                    "op": "set",
+                    "value": "2"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "dominio": "Construções",
+    "subdominio": "INSTALAÇÕES DESTINADAS AO ABASTECIMENTO",
+    "familia": "ÁGUA",
+    "objeto": "CONDUTA ELEVADA (AQUEDUTO)",
+    "map": [
+        {
+            "table": "conduta_de_agua",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_conduta_agua",
+                    "op": "set",
+                    "value": "2"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_posicao_vertical",
+                    "op": "set",
+                    "value": "1"
+                }
+            ]
+        }
+    ]
+}

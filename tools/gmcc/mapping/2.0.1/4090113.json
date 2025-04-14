@@ -1,0 +1,18 @@
+{
+    "dominio": "Toponímia",
+    "subdominio": "ÁREAS DE LAZER E DE RECREIO",
+    "familia": "ÁREAS DESPORTIVAS",
+    "objeto": "PISTA DE MOTOCICLISMO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

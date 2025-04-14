@@ -1,0 +1,29 @@
+{
+    "dominio": "Áreas de lazer e Recreio",
+    "subdominio": "ÁREAS DESPORTIVAS",
+    "familia": "PISCINAS",
+    "objeto": "PISCINA DE ÁGUA NATURAL",
+    "map": [
+        {
+            "table": "areas_artificializadas",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_areas_artificializadas",
+                    "op": "set",
+                    "value": "7"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "dominio": "Hidrografia",
+    "subdominio": "SUPERFÍCIES AQUÁTICAS",
+    "familia": "LAGOS ARTIFICIAIS",
+    "objeto": "ALBUFEIRA",
+    "map": [
+        {
+            "table": "agua_lentica",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "cota_plena_armazenamento",
+                    "op": "set",
+                    "value": "false"
+                },
+                {
+                    "src": "",
+                    "dst": "mare",
+                    "op": "set",
+                    "value": "false"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_agua_lentica",
+                    "op": "set",
+                    "value": "2"
+                }
+            ]
+        }
+    ]
+}

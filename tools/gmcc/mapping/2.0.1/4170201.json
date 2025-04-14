@@ -1,0 +1,18 @@
+{
+    "dominio": "Toponímia",
+    "subdominio": "MOLDURA",
+    "familia": "",
+    "objeto": "OUTROS ELEMENTOS",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

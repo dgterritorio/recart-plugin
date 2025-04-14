@@ -1,0 +1,54 @@
+{
+    "dominio": "Hidrografia",
+    "subdominio": "PORTOS",
+    "familia": "",
+    "objeto": "PORTO FLUVIAL",
+    "map": [
+        {
+            "table": "area_infra_trans_via_navegavel",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_area_infra_trans_via_navegavel",
+                    "op": "set",
+                    "value": "1"
+                }
+            ],
+            "references": [
+                {
+                    "table": "infra_trans_via_navegavel",
+                    "fields": [
+                        {
+                            "src": "",
+                            "dst": "inicio_objeto",
+                            "op": "dnow"
+                        },
+                        {
+                            "src": "",
+                            "dst": "nome",
+                            "op": "set",
+                            "value": "SEM DADOS"
+                        },
+                        {
+                            "src": "",
+                            "dst": "valor_tipo_infra_trans_via_navegavel",
+                            "op": "set",
+                            "value": "1"
+                        }
+                    ],
+                    "operation": "centroid"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,28 @@
+{
+    "tema": "ALTIMETRIA 3D E 2D",
+    "camada": "Altimetria_CurvasDeNivel_3D",
+    "nome": "PontoCotado_3D",
+    "map": [
+        {
+            "table": "ponto_cotado",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "point_f"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_classifica_las",
+                    "op": "set",
+                    "value": "1"
+                }
+            ]
+        }
+    ]
+}

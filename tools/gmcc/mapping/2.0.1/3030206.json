@@ -1,0 +1,35 @@
+{
+    "dominio": "Altimetria",
+    "subdominio": "ACIDENTES TOPOGRÁFICOS (ORIGEM ARTIFICIAL)",
+    "familia": "ATERROS/ DESATERROS/SOCALCOS",
+    "objeto": "COMBRO (Limite Inferior)",
+        "map": [
+        {
+            "table": "linha_de_quebra",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_classifica",
+                    "op": "set",
+                    "value": "1"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_natureza_linha",
+                    "op": "set",
+                    "value": "4"
+                }
+            ]
+        }
+    ]
+}

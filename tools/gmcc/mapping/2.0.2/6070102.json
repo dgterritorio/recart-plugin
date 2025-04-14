@@ -1,0 +1,50 @@
+{
+    "dominio": "Construções",
+    "subdominio": "EDIFÍCIOS COM OUTRAS UTILIZAÇÕES",
+    "familia": "MOINHOS   (QUANDO N/ FOREM INDUSTRIAIS)",
+    "objeto": "AZENHA",
+    "map": [
+        {
+            "table": "edificio",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "altura_edificio",
+                    "op": "set",
+                    "value": "-99999"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_edificio_xy",
+                    "op": "set",
+                    "value": {
+                      "ndd1": "4",
+                      "ndd2": "6"
+                    }
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_edificio_z",
+                    "op": "set",
+                    "value": "14"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_forma_edificio",
+                    "op": "set",
+                    "value": "3"
+                }
+            ]
+        }
+    ]
+}

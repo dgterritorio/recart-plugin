@@ -47,7 +47,8 @@ UI_FILES = \
 
 CONV_DIR = convert
 CONV_FILES = \
-	$(CONV_DIR)/conf.py $(CONV_DIR)/mapping.py\
+	$(CONV_DIR)/conf.py $(CONV_DIR)/mapping_112.py\
+	$(CONV_DIR)/mapping_201.py $(CONV_DIR)/mapping_202.py\
 	$(CONV_DIR)/gm_cart_aux.py $(CONV_DIR)/gm_cart_postgis.py\
 	$(CONV_DIR)/gm_cart_import.py
 

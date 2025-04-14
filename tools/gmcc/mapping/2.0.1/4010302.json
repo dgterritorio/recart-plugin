@@ -1,0 +1,34 @@
+{
+    "dominio": "Toponímia",
+    "subdominio": "LOCALIDADES",
+    "familia": "OUTROS",
+    "objeto": "LUGARES, CASAIS E OUTRAS POVOAÇÕES",
+    "map": [
+        {
+            "table": "designacao_local",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_local_nomeado",
+                    "op": "set",
+                    "value": "7.3"
+                },
+                {
+                    "src": "Text",
+                    "dst": "nome",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

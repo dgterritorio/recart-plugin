@@ -1,0 +1,18 @@
+{
+    "dominio": "Áreas com outras utilizações",
+    "subdominio": "ÁREAS PÚBLICAS E OFICIAIS",
+    "familia": "",
+    "objeto": "ÁREA DE UTILIZAÇÃO PÚBLICA E OFICIAL",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

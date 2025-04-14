@@ -1,0 +1,18 @@
+{
+    "dominio": "Limites",
+    "subdominio": "LIMITES ADMINISTRATIVOS, FISCAIS E JURÍDICOS",
+    "familia": "LIMITES ADMINISTRATIVOS",
+    "objeto": "LIMITE NÃO DEFINIDO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

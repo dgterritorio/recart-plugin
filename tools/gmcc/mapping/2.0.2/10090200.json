@@ -1,0 +1,18 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "ÁREAS  DE APOIO AO TRÁFEGO MARÍTIMO|ÁREAS DE APOIO AO TRÁFEGO MARÍTIMO",
+    "familia": "CAIS DE EMBARQUE",
+    "objeto": "CAIS DE EMBARQUE",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}
