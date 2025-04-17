@@ -45,13 +45,13 @@
                     "src": "",
                     "dst": "valor_sentido",
                     "op": "set",
-                    "value": "888"
+                    "value": "1"
                 },
                 {
                     "src": "",
                     "dst": "valor_tipo_circulacao",
                     "op": "set",
-                    "value": "888"
+                    "value": "1"
                 },
                 {
                     "src": "",

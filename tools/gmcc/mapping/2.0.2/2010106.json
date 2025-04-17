@@ -4,7 +4,7 @@
     "nome": "LimiteDeConcelho",
     "map": [
         {
-            "table": "concelho",
+            "table": "municipio",
             "fields": [
                 {
                     "src": "1_geom",

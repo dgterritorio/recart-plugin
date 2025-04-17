@@ -781,21 +781,21 @@ CREATE TABLE IF NOT EXISTS {schema}.valor_elemento_edificio_z (
 );
 INSERT INTO {schema}.valor_elemento_edificio_z (identificador, descricao) VALUES
 ('1', 'Invólucro acima do solo')
-('2', 'Base do edifício')
-('3', 'Ponto de entrada')
-('4', 'Cornija geral')
-('5', 'Solo geral')
-('6', 'Telhado geral')
-('7', 'Beira do telhado geral')
-('8', 'Cornija mais alta')
-('9', 'Ponto mais alto')
-('10', 'Beira mais alta do telhado')
-('11', 'Cornija mais baixa')
-('12', 'Piso mais baixo acima do solo')
-('13', 'Beira do telhado mais baixa')
-('14', 'Topo do edifício')
-('15', 'Ponto mais alto no solo')
-('16', 'Ponto mais baixo no solo');
+, ('2', 'Base do edifício')
+, ('3', 'Ponto de entrada')
+, ('4', 'Cornija geral')
+, ('5', 'Solo geral')
+, ('6', 'Telhado geral')
+, ('7', 'Beira do telhado geral')
+, ('8', 'Cornija mais alta')
+, ('9', 'Ponto mais alto')
+, ('10', 'Beira mais alta do telhado')
+, ('11', 'Cornija mais baixa')
+, ('12', 'Piso mais baixo acima do solo')
+, ('13', 'Beira do telhado mais baixa')
+, ('14', 'Topo do edifício')
+, ('15', 'Ponto mais alto no solo')
+, ('16', 'Ponto mais baixo no solo');
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_forma_edificio (
 	identificador varchar(10) NOT NULL,
@@ -1438,7 +1438,7 @@ CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_obra_arte (
 	descricao varchar(255) NOT NULL,
 	CONSTRAINT valor_tipo_obra_arte_pkey PRIMARY KEY (identificador)
 );
-INSERT INTO IF NOT EXISTS {schema}.valor_tipo_obra_arte (identificador, descricao) VALUES
+INSERT INTO {schema}.valor_tipo_obra_arte (identificador, descricao) VALUES
 ('1', 'Ponte')
 , ('2', 'Viaduto')
 , ('3', 'Passagem superior')
@@ -1779,6 +1779,81 @@ CREATE TABLE IF NOT EXISTS {schema}.zona_humida (
 	CONSTRAINT zona_humida_pkey PRIMARY KEY (identificador)
 );
 ALTER TABLE {schema}.zona_humida ADD CONSTRAINT valor_zona_humida_id FOREIGN KEY (valor_zona_humida) REFERENCES {schema}.valor_zona_humida(identificador);
+
+
+CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_circulacao (
+	identificador varchar(10) NOT NULL,
+	descricao varchar(255) NOT NULL,
+	CONSTRAINT valor_tipo_circulacao_pkey PRIMARY KEY (identificador)
+);
+INSERT INTO {schema}.valor_tipo_circulacao (identificador, descricao) VALUES
+('1', 'Veículo ligeiro ou pesado')
+, ('2', 'Veículo agrícola ou com tração às quatro rodas')
+, ('3', 'Velocipede')
+, ('4', 'Pedonal')
+, ('5', 'Autocarro público');
+
+
+CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_equipamento_coletivo (
+	identificador varchar(10) NOT NULL,
+	descricao varchar(255) NOT NULL,
+	CONSTRAINT valor_tipo_equipamento_coletivo_pkey PRIMARY KEY (identificador)
+);
+INSERT INTO {schema}.valor_tipo_equipamento_coletivo (identificador, descricao) VALUES
+('1', 'Educação e investigação'), ('1.1', 'Creche, infantário ou ensino pré-escolar'), ('1.2', 'Ensino básico ou secundário'), ('1.3', 'Ensino superior e investigação'), ('1.4', 'Serviços de apoio - Educação e investigação'), ('1.5', 'Outros - Educação e investigação')
+, ('2', 'Saúde'), ('2.1', 'Hospital'), ('2.2', 'Centro de saúde'), ('2.100', 'Outro - saúde')
+, ('3', 'Ação social')
+, ('4', 'Segurança e ordem pública'), ('4.1', 'Proteção civil e bombeiros'), ('4.2', 'Forças de segurança')
+, ('5', 'Defesa')
+, ('6', 'Justiça'), ('6.1', 'Tribunal'), ('6.2', 'Estabelecimento prisional')
+, ('7', 'Desporto e lazer'), ('7.1', 'Parque e jardim'), ('7.2', 'Área verde'), ('7.3', 'Campo de golfe'), ('7.4', 'Outro – desporto e lazer'), ('7.5', 'Parque infantil')
+, ('8', 'Cemitério')
+, ('9', 'Centro cívico');
+
+
+CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_servico (
+	identificador varchar(10) NOT NULL,
+	descricao varchar(255) NOT NULL,
+	CONSTRAINT valor_tipo_servico_pkey PRIMARY KEY (identificador)
+);
+INSERT INTO {schema}.valor_tipo_servico (identificador, descricao) VALUES
+('1', 'Abastecimento de combustível')
+, ('2', 'Carregamento elétrico')
+, ('3', 'Loja de conveniência')
+, ('4', 'Restauração')
+, ('5', 'Estacionamento para veículos ligeiros')
+, ('6', 'Estacionamento para veículos pesados')
+, ('7', 'Estacionamento para caravanas')
+, ('8', 'Apoio automóvel')
+, ('9', 'Parque infantil')
+, ('10', 'Instalações sanitárias')
+, ('11', 'Duche')
+, ('12', 'Área de piquenique')
+, ('13', 'Estacionamento mobilidade condicionada')
+, ('14', 'Estacionamento para velocípedes')
+, ('15', 'Estacionamento para motociclos')
+, ('995', 'Não aplicável');
+
+
+CREATE TABLE IF NOT EXISTS {schema}.valor_utilizacao_atual (
+	identificador varchar(10) NOT NULL,
+	descricao varchar(255) NOT NULL,
+	CONSTRAINT valor_utilizacao_atual_pkey PRIMARY KEY (identificador)
+);
+INSERT INTO {schema}.valor_utilizacao_atual (identificador, descricao) VALUES
+('1', 'Habitação'), ('1.1', 'Residencial'), ('1.2', 'Asssociado à residencia')
+, ('2', 'Agricultura e pescas'), ('2.1', 'Agricultura'), ('2.2', 'Floresta'), ('2.3', 'Pesca e aquicultura')
+, ('3', 'Indústria')
+, ('4', 'Comércio'), ('4.1', 'Pequena loja'), ('4.2', 'Mercado'), ('4.3', 'Centro comercial'), ('4.4', 'Grande loja'), ('4.5', 'Armazém')
+, ('5', 'Alojamento e restauração'), ('5.1', 'Alojamento'), ('5.2', 'Edifício de apoio ao alojamento'), ('5.3', 'Restauração')
+, ('6', 'Transportes'), ('6.1', 'Transporte aéreo'), ('6.1.1', 'Terminal aéreo'), ('6.1.2', 'Torre de controlo')
+, ('6.2', 'Transporte ferroviário'), ('6.2.1', 'Estação'), ('6.2.2', 'Apeadeiro')
+, ('6.3', 'Transporte por via navegável'), ('6.3.1', 'Terminal marítimo ou fluvial'), ('6.3.2', 'Centro de controlo')
+, ('6.4', 'Transporte rodoviário'), ('6.4.1', 'Abrigo de passageiros'), ('6.4.2', 'Terminal rodoviário'), ('6.4.3', 'Parque de estacionamento em edifício')
+, ('6.5', 'Elevador ou ascensor'), ('6.6', 'Outro - Transportes')
+, ('7', 'Serviços'), ('7.1', 'Serviços da Administração Pública'), ('7.2', 'Serviços de utilização coletiva'), ('7.3', 'Outros - Serviços')
+, ('8', 'Serviços coletivos sociais e pessoais'), ('8.1', 'Atividades associativas'), ('8.2', 'Culto e inumação'), ('8.3', 'Atividades recreativas e culturais'), ('8.4', 'Atividades desportivas e de lazer')
+, ('9', 'Organismos internacionais');
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_adm_publica_edificio (

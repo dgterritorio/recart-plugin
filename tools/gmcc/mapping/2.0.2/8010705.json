@@ -42,7 +42,7 @@
                     "src": "",
                     "dst": "valor_utilizacao_atual",
                     "op": "set",
-                    "value": "888"
+                    "value": "6.6"
                 }
             ],
             "references": [

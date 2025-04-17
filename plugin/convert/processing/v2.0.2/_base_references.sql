@@ -85,7 +85,8 @@ CREATE TABLE IF NOT EXISTS {schema}.adm_publica (
     fim_objeto timestamp without time zone,
     nome character varying(255) NOT NULL,
     ponto_de_contacto character varying(255),
-    valor_tipo_adm_publica character varying(10) NOT NULL
+    valor_tipo_adm_publica character varying(10) NOT NULL,
+    CONSTRAINT adm_publica_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -102,7 +103,8 @@ CREATE TABLE IF NOT EXISTS {schema}.agua_lentica (
     id_hidrografico character varying(255),
     valor_agua_lentica character varying(10) NOT NULL,
     valor_persistencia_hidrologica character varying(10),
-    geometria public.geometry(PolygonZ,3763) NOT NULL
+    geometria public.geometry(PolygonZ,3763) NOT NULL,
+    CONSTRAINT agua_lentica_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -112,7 +114,8 @@ CREATE TABLE IF NOT EXISTS {schema}.area_agricola_florestal_mato (
     fim_objeto timestamp without time zone,
     valor_areas_agricolas_florestais_matos character varying(10) NOT NULL,
     nome character varying(255),
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT area_agricola_florestal_mato_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -121,7 +124,8 @@ CREATE TABLE IF NOT EXISTS {schema}.area_infra_trans_aereo (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_tipo_area_infra_trans_aereo character varying(10) NOT NULL,
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT area_infra_trans_aereo_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -129,7 +133,8 @@ CREATE TABLE IF NOT EXISTS {schema}.area_infra_trans_cabo (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT area_infra_trans_cabo_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -138,7 +143,8 @@ CREATE TABLE IF NOT EXISTS {schema}.area_infra_trans_ferrov (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     infra_trans_ferrov_id uuid NOT NULL,
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT area_infra_trans_ferrov_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -147,7 +153,8 @@ CREATE TABLE IF NOT EXISTS {schema}.area_infra_trans_rodov (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     infra_trans_rodov_id uuid NOT NULL,
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT area_infra_trans_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -156,7 +163,8 @@ CREATE TABLE IF NOT EXISTS {schema}.area_infra_trans_via_navegavel (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_tipo_area_infra_trans_via_navegavel character varying(10) NOT NULL,
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT area_infra_trans_via_navegavel_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -170,7 +178,8 @@ CREATE TABLE IF NOT EXISTS {schema}.area_trabalho (
     nome_proprietario character varying(255) NOT NULL,
     nome_produtor character varying(255) NOT NULL,
     valor_nivel_de_detalhe character varying(10) NOT NULL,
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT area_trabalho_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -183,7 +192,8 @@ CREATE TABLE IF NOT EXISTS {schema}.areas_artificializadas (
     equip_util_coletiva_id uuid,
     valor_areas_artificializadas character varying(10) NOT NULL,
     nome character varying(255),
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT areas_artificializadas_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -195,7 +205,8 @@ CREATE TABLE IF NOT EXISTS {schema}.barreira (
     id_hidrografico character varying(255),
     valor_barreira character varying(10) NOT NULL,
     valor_estado_instalacao character varying(10),
-    geometria public.geometry(Geometry,3763) NOT NULL
+    geometria public.geometry(Geometry,3763) NOT NULL,
+    CONSTRAINT barreira_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -206,7 +217,8 @@ CREATE TABLE IF NOT EXISTS {schema}.cabo_electrico (
     tensao_nominal real,
     valor_designacao_tensao character varying(10) NOT NULL,
     valor_posicao_vertical character varying(10) NOT NULL,
-    geometria public.geometry(LineString,3763) NOT NULL
+    geometria public.geometry(LineString,3763) NOT NULL,
+    CONSTRAINT cabo_electrico_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -217,7 +229,8 @@ CREATE TABLE IF NOT EXISTS {schema}.conduta_de_agua (
     diametro real,
     valor_conduta_agua character varying(10) NOT NULL,
     valor_posicao_vertical character varying(10) NOT NULL,
-    geometria public.geometry(LineString,3763) NOT NULL
+    geometria public.geometry(LineString,3763) NOT NULL,
+    CONSTRAINT conduta_de_agua_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -229,7 +242,8 @@ CREATE TABLE IF NOT EXISTS {schema}.constru_linear (
     suporte boolean NOT NULL,
     valor_construcao_linear character varying(10) NOT NULL,
     largura real,
-    geometria public.geometry(LineString,3763) NOT NULL
+    geometria public.geometry(LineString,3763) NOT NULL,
+    CONSTRAINT constru_linear_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -240,7 +254,8 @@ CREATE TABLE IF NOT EXISTS {schema}.constru_na_margem (
     nome character varying(255),
     valor_tipo_const_margem character varying(10) NOT NULL,
     valor_estado_instalacao character varying(10),
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT constru_na_margem_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -250,7 +265,8 @@ CREATE TABLE IF NOT EXISTS {schema}.constru_polig (
     fim_objeto timestamp without time zone,
     nome character varying(255),
     valor_tipo_construcao character varying(10) NOT NULL,
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT constru_polig_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -259,7 +275,8 @@ CREATE TABLE IF NOT EXISTS {schema}.curso_de_agua_area (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     delimitacao_conhecida boolean NOT NULL,
-    geometria public.geometry(PolygonZ,3763) NOT NULL
+    geometria public.geometry(PolygonZ,3763) NOT NULL,
+    CONSTRAINT curso_de_agua_area_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -285,7 +302,8 @@ CREATE TABLE IF NOT EXISTS {schema}.curso_de_agua_eixo (
     valor_estado_instalacao character varying(10),
     valor_ficticio character varying(10),
     valor_natureza character varying(10) NOT NULL,
-    geometria public.geometry(LineStringZ,3763) NOT NULL
+    geometria public.geometry(LineStringZ,3763) NOT NULL,
+    CONSTRAINT curso_de_agua_eixo_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -294,7 +312,8 @@ CREATE TABLE IF NOT EXISTS {schema}.curva_de_nivel (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_tipo_curva character varying(10) NOT NULL,
-    geometria public.geometry(LineStringZ,3763) NOT NULL
+    geometria public.geometry(LineStringZ,3763) NOT NULL,
+    CONSTRAINT curva_de_nivel_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -304,7 +323,8 @@ CREATE TABLE IF NOT EXISTS {schema}.designacao_local (
     fim_objeto timestamp without time zone,
     valor_local_nomeado character varying(10) NOT NULL,
     nome character varying(255) NOT NULL,
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT designacao_local_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -315,7 +335,8 @@ CREATE TABLE IF NOT EXISTS {schema}.distrito (
     data_publicacao date NOT NULL,
     codigo character varying(255) NOT NULL,
     nome character varying(255) NOT NULL,
-    geometria public.geometry(MultiPolygon,3763) NOT NULL
+    geometria public.geometry(MultiPolygon,3763) NOT NULL,
+    CONSTRAINT distrito_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -332,7 +353,8 @@ CREATE TABLE IF NOT EXISTS {schema}.edificio (
     valor_elemento_edificio_xy character varying(10) NOT NULL,
     valor_elemento_edificio_z character varying(10) NOT NULL,
     valor_forma_edificio character varying(10),
-    geometria public.geometry(Geometry,3763) NOT NULL
+    geometria public.geometry(Geometry,3763) NOT NULL,
+    CONSTRAINT edificio_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -342,7 +364,8 @@ CREATE TABLE IF NOT EXISTS {schema}.elem_assoc_agua (
     fim_objeto timestamp without time zone,
     valor_elemento_associado_agua character varying(10) NOT NULL,
     nome character varying(255),
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT elem_assoc_agua_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -352,7 +375,8 @@ CREATE TABLE IF NOT EXISTS {schema}.elem_assoc_eletricidade (
     fim_objeto timestamp without time zone,
     valor_elemento_associado_electricidade character varying(10) NOT NULL,
     nome character varying(255),
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT elem_assoc_eletricidade_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -362,7 +386,8 @@ CREATE TABLE IF NOT EXISTS {schema}.elem_assoc_pgq (
     fim_objeto timestamp without time zone,
     valor_elemento_associado_pgq character varying(10) NOT NULL,
     nome character varying(255),
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT elem_assoc_pgq_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -371,7 +396,8 @@ CREATE TABLE IF NOT EXISTS {schema}.elem_assoc_telecomunicacoes (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_elemento_associado_telecomunicacoes character varying(10) NOT NULL,
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT elem_assoc_telecomunicacoes_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -380,7 +406,8 @@ CREATE TABLE IF NOT EXISTS {schema}.equip_util_coletiva (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     nome character varying(255) NOT NULL,
-    ponto_de_contacto character varying(255)
+    ponto_de_contacto character varying(255),
+    CONSTRAINT equip_util_coletiva_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -391,7 +418,8 @@ CREATE TABLE IF NOT EXISTS {schema}.freguesia (
     data_publicacao date NOT NULL,
     codigo character varying(255) NOT NULL,
     nome character varying(255) NOT NULL,
-    geometria public.geometry(MultiPolygon,3763) NOT NULL
+    geometria public.geometry(MultiPolygon,3763) NOT NULL,
+    CONSTRAINT freguesia_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -401,7 +429,8 @@ CREATE TABLE IF NOT EXISTS {schema}.fronteira (
     fim_objeto timestamp without time zone,
     valor_estado_fronteira character varying(10) NOT NULL,
     data_publicacao date NOT NULL,
-    geometria public.geometry(LineString,3763) NOT NULL
+    geometria public.geometry(LineString,3763) NOT NULL,
+    CONSTRAINT fronteira_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -414,7 +443,8 @@ CREATE TABLE IF NOT EXISTS {schema}.fronteira_terra_agua (
     ilha boolean NOT NULL,
     origem_natural boolean,
     valor_tipo_fronteira_terra_agua character varying(10) NOT NULL,
-    geometria public.geometry(LineStringZ,3763) NOT NULL
+    geometria public.geometry(LineStringZ,3763) NOT NULL,
+    CONSTRAINT fronteira_terra_agua_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -428,7 +458,8 @@ CREATE TABLE IF NOT EXISTS {schema}.infra_trans_aereo (
     valor_categoria_infra_trans_aereo character varying(10) NOT NULL,
     valor_restricao_infra_trans_aereo character varying(10),
     valor_tipo_infra_trans_aereo character varying(10) NOT NULL,
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT infra_trans_aereo_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -441,7 +472,8 @@ CREATE TABLE IF NOT EXISTS {schema}.infra_trans_ferrov (
     nplataformas integer,
     valor_tipo_uso_infra_trans_ferrov character varying(10),
     valor_tipo_infra_trans_ferrov character varying(10) NOT NULL,
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT infra_trans_ferrov_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -451,7 +483,8 @@ CREATE TABLE IF NOT EXISTS {schema}.infra_trans_rodov (
     fim_objeto timestamp without time zone,
     nome character varying(255),
     valor_tipo_infra_trans_rodov character varying(10) NOT NULL,
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT infra_trans_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -462,7 +495,8 @@ CREATE TABLE IF NOT EXISTS {schema}.infra_trans_via_navegavel (
     nome character varying(255) NOT NULL,
     codigo_via_navegavel character varying(255),
     valor_tipo_infra_trans_via_navegavel character varying(10) NOT NULL,
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT infra_trans_via_navegavel_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -471,7 +505,8 @@ CREATE TABLE IF NOT EXISTS {schema}.inst_gestao_ambiental (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     nome character varying(255) NOT NULL,
-    valor_instalacao_gestao_ambiental character varying(10) NOT NULL
+    valor_instalacao_gestao_ambiental character varying(10) NOT NULL,
+    CONSTRAINT inst_gestao_ambiental_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -481,84 +516,96 @@ CREATE TABLE IF NOT EXISTS {schema}.inst_producao (
     fim_objeto timestamp without time zone,
     nome character varying(255) NOT NULL,
     descricao_da_funcao character varying(255),
-    valor_instalacao_producao character varying(10) NOT NULL
+    valor_instalacao_producao character varying(10) NOT NULL,
+    CONSTRAINT inst_producao_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_adm_publica_edificio (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     adm_publica_id uuid NOT NULL,
-    edificio_id uuid NOT NULL
+    edificio_id uuid NOT NULL,
+    CONSTRAINT lig_adm_publica_edificio_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_equip_util_coletiva_edificio (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     equip_util_coletiva_id uuid NOT NULL,
-    edificio_id uuid NOT NULL
+    edificio_id uuid NOT NULL,
+    CONSTRAINT lig_equip_util_coletiva_edificio_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_infratransferrov_notransferrov (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     infra_trans_ferrov_id uuid NOT NULL,
-    no_trans_ferrov_id uuid NOT NULL
+    no_trans_ferrov_id uuid NOT NULL,
+    CONSTRAINT lig_infratransferrov_notransferrov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_infratransrodov_notransrodov (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     infra_trans_rodov_id uuid NOT NULL,
-    no_trans_rodov_id uuid NOT NULL
+    no_trans_rodov_id uuid NOT NULL,
+    CONSTRAINT lig_infratransrodov_notransrodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_segviaferrea_linhaferrea (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     seg_via_ferrea_id uuid NOT NULL,
-    linha_ferrea_id uuid NOT NULL
+    linha_ferrea_id uuid NOT NULL,
+    CONSTRAINT lig_segviaferrea_linhaferrea_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_segviarodov_viarodov (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     seg_via_rodov_id uuid NOT NULL,
-    via_rodov_id uuid NOT NULL
+    via_rodov_id uuid NOT NULL,
+    CONSTRAINT lig_segviarodov_viarodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_segviarodov_viarodovlimite (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     seg_via_rodov_id uuid NOT NULL,
-    via_rodov_limite_id uuid NOT NULL
+    via_rodov_limite_id uuid NOT NULL,
+    CONSTRAINT lig_segviarodov_viarodovlimite_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_valor_tipo_circulacao_seg_via_rodov (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     seg_via_rodov_id uuid NOT NULL,
-    valor_tipo_circulacao_id character varying(10) NOT NULL
+    valor_tipo_circulacao_id character varying(10) NOT NULL,
+    CONSTRAINT lig_valor_tipo_circulacao_seg_via_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_valor_tipo_equipamento_coletivo_equip_util_coletiva (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     equip_util_coletiva_id uuid NOT NULL,
-    valor_tipo_equipamento_coletivo_id character varying(10) NOT NULL
+    valor_tipo_equipamento_coletivo_id character varying(10) NOT NULL,
+    CONSTRAINT lig_valor_tipo_equipamento_coletivo_equip_util_coletiva_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_valor_tipo_servico_infra_trans_rodov (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     infra_trans_rodov_id uuid NOT NULL,
-    valor_tipo_servico_id character varying(10) NOT NULL
+    valor_tipo_servico_id character varying(10) NOT NULL,
+    CONSTRAINT lig_valor_tipo_servico_infra_trans_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.lig_valor_utilizacao_atual_edificio (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     edificio_id uuid NOT NULL,
-    valor_utilizacao_atual_id character varying(10) NOT NULL
+    valor_utilizacao_atual_id character varying(10) NOT NULL,
+    CONSTRAINT lig_valor_utilizacao_atual_edificio_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -569,7 +616,8 @@ CREATE TABLE IF NOT EXISTS {schema}.linha_de_quebra (
     valor_classifica character varying(10) NOT NULL,
     valor_natureza_linha character varying(10) NOT NULL,
     artificial boolean,
-    geometria public.geometry(LineStringZ,3763) NOT NULL
+    geometria public.geometry(LineStringZ,3763) NOT NULL,
+    CONSTRAINT linha_de_quebra_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -578,7 +626,8 @@ CREATE TABLE IF NOT EXISTS {schema}.linha_ferrea (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     codigo_linha_ferrea character varying(255) NOT NULL,
-    nome character varying(255) NOT NULL
+    nome character varying(255) NOT NULL,
+    CONSTRAINT linha_ferrea_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -587,7 +636,8 @@ CREATE TABLE IF NOT EXISTS {schema}.mob_urbano_sinal (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_tipo_de_mob_urbano_sinal character varying(10) NOT NULL,
-    geometria public.geometry(Geometry,3763) NOT NULL
+    geometria public.geometry(Geometry,3763) NOT NULL,
+    CONSTRAINT mob_urbano_sinal_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -598,7 +648,8 @@ CREATE TABLE IF NOT EXISTS {schema}.municipio (
     data_publicacao date NOT NULL,
     codigo character varying(255) NOT NULL,
     nome character varying(255) NOT NULL,
-    geometria public.geometry(MultiPolygon,3763) NOT NULL
+    geometria public.geometry(MultiPolygon,3763) NOT NULL,
+    CONSTRAINT municipio_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -610,7 +661,8 @@ CREATE TABLE IF NOT EXISTS {schema}.nascente (
     id_hidrografico character varying(255),
     valor_persistencia_hidrologica character varying(10),
     valor_tipo_nascente character varying(10),
-    geometria public.geometry(PointZ,3763) NOT NULL
+    geometria public.geometry(PointZ,3763) NOT NULL,
+    CONSTRAINT nascente_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -620,7 +672,8 @@ CREATE TABLE IF NOT EXISTS {schema}.no_hidrografico (
     fim_objeto timestamp without time zone,
     id_hidrografico character varying(255),
     valor_tipo_no_hidrografico character varying(10) NOT NULL,
-    geometria public.geometry(PointZ,3763) NOT NULL
+    geometria public.geometry(PointZ,3763) NOT NULL,
+    CONSTRAINT no_hidrografico_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -629,7 +682,8 @@ CREATE TABLE IF NOT EXISTS {schema}.no_trans_ferrov (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_tipo_no_trans_ferrov character varying(10) NOT NULL,
-    geometria public.geometry(PointZ,3763) NOT NULL
+    geometria public.geometry(PointZ,3763) NOT NULL,
+    CONSTRAINT no_trans_ferrov_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -638,14 +692,16 @@ CREATE TABLE IF NOT EXISTS {schema}.no_trans_rodov (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_tipo_no_trans_rodov character varying(10) NOT NULL,
-    geometria public.geometry(PointZ,3763) NOT NULL
+    geometria public.geometry(PointZ,3763) NOT NULL,
+    CONSTRAINT no_trans_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.nome_edificio (
     identificador uuid DEFAULT public.uuid_generate_v1mc() NOT NULL,
     edificio_id uuid NOT NULL,
-    nome character varying(255) NOT NULL
+    nome character varying(255) NOT NULL,
+    CONSTRAINT nome_edificio_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -656,7 +712,8 @@ CREATE TABLE IF NOT EXISTS {schema}.numero_policia (
     edificio_id uuid,
     seg_via_rodov_id uuid NOT NULL,
     numero character varying(255) NOT NULL,
-    geometria public.geometry(Point,3763) NOT NULL
+    geometria public.geometry(Point,3763) NOT NULL,
+    CONSTRAINT numero_policia_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -666,7 +723,8 @@ CREATE TABLE IF NOT EXISTS {schema}.obra_arte (
     fim_objeto timestamp without time zone,
     nome character varying(255),
     valor_tipo_obra_arte character varying(10) NOT NULL,
-    geometria public.geometry(PolygonZ,3763) NOT NULL
+    geometria public.geometry(PolygonZ,3763) NOT NULL,
+    CONSTRAINT obra_arte_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -677,7 +735,8 @@ CREATE TABLE IF NOT EXISTS {schema}.oleoduto_gasoduto_subtancias_quimicas (
     diametro real,
     valor_gasoduto_oleoduto_sub_quimicas character varying(10) NOT NULL,
     valor_posicao_vertical character varying(10) NOT NULL,
-    geometria public.geometry(LineString,3763) NOT NULL
+    geometria public.geometry(LineString,3763) NOT NULL,
+    CONSTRAINT oleoduto_gasoduto_subtancias_quimicas_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -686,7 +745,8 @@ CREATE TABLE IF NOT EXISTS {schema}.ponto_cotado (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_classifica_las character varying(10) NOT NULL,
-    geometria public.geometry(PointZ,3763) NOT NULL
+    geometria public.geometry(PointZ,3763) NOT NULL,
+    CONSTRAINT ponto_cotado_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -696,7 +756,8 @@ CREATE TABLE IF NOT EXISTS {schema}.ponto_interesse (
     fim_objeto timestamp without time zone,
     nome character varying(255),
     valor_tipo_ponto_interesse character varying(10) NOT NULL,
-    geometria public.geometry(Geometry,3763) NOT NULL
+    geometria public.geometry(Geometry,3763) NOT NULL,
+    CONSTRAINT ponto_interesse_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -707,7 +768,8 @@ CREATE TABLE IF NOT EXISTS {schema}.queda_de_agua (
     nome character varying(255),
     altura real,
     id_hidrografico character varying(255),
-    geometria public.geometry(PointZ,3763) NOT NULL
+    geometria public.geometry(PointZ,3763) NOT NULL,
+    CONSTRAINT queda_de_agua_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -717,7 +779,8 @@ CREATE TABLE IF NOT EXISTS {schema}.seg_via_cabo (
     fim_objeto timestamp without time zone,
     nome character varying(255),
     valor_tipo_via_cabo character varying(10),
-    geometria public.geometry(LineString,3763) NOT NULL
+    geometria public.geometry(LineString,3763) NOT NULL,
+    CONSTRAINT seg_via_cabo_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -735,7 +798,8 @@ CREATE TABLE IF NOT EXISTS {schema}.seg_via_ferrea (
     valor_tipo_troco_via_ferrea character varying(10) NOT NULL,
     valor_via_ferrea character varying(10),
     jurisdicao character varying(255),
-    geometria public.geometry(LineStringZ,3763) NOT NULL
+    geometria public.geometry(LineStringZ,3763) NOT NULL,
+    CONSTRAINT seg_via_ferrea_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -756,7 +820,8 @@ CREATE TABLE IF NOT EXISTS {schema}.seg_via_rodov (
     valor_restricao_acesso character varying(10),
     valor_sentido character varying(10) NOT NULL,
     valor_tipo_troco_rodoviario character varying(10) NOT NULL,
-    geometria public.geometry(LineStringZ,3763) NOT NULL
+    geometria public.geometry(LineStringZ,3763) NOT NULL,
+    CONSTRAINT seg_via_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -768,7 +833,8 @@ CREATE TABLE IF NOT EXISTS {schema}.sinal_geodesico (
     nome character varying(255),
     valor_categoria character varying(10) NOT NULL,
     valor_tipo_sinal_geodesico character varying(10) NOT NULL,
-    geometria public.geometry(PointZ,3763) NOT NULL
+    geometria public.geometry(PointZ,3763) NOT NULL,
+    CONSTRAINT sinal_geodesico_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -779,439 +845,512 @@ CREATE TABLE IF NOT EXISTS {schema}.terreno_marginal (
     nome character varying(255),
     id_hidrografico character varying(255),
     valor_tipo_terreno_marginal character varying(10) NOT NULL,
-    geometria public.geometry(Polygon,3763) NOT NULL
+    geometria public.geometry(Polygon,3763) NOT NULL,
+    CONSTRAINT terreno_marginal_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_agua_lentica (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_agua_lentica_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_areas_agricolas_florestais_matos (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_areas_agricolas_florestais_matos_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_areas_artificializadas (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_areas_artificializadas_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_barreira (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_barreira_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_caract_fisica_rodov (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_caract_fisica_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_categoria (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_categoria_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_categoria_bitola (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_categoria_bitola_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_categoria_infra_trans_aereo (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_categoria_infra_trans_aereo_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_classifica (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_classifica_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_classifica_las (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_classifica_las_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_condicao_const (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_condicao_const_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_conduta_agua (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_conduta_agua_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_construcao_linear (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_construcao_linear_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_curso_de_agua (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_curso_de_agua_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_designacao_tensao (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_designacao_tensao_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_elemento_associado_agua (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_elemento_associado_agua_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_elemento_associado_electricidade (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_elemento_associado_electricidade_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_elemento_associado_pgq (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_elemento_associado_pgq_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_elemento_associado_telecomunicacoes (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_elemento_associado_telecomunicacoes_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_elemento_edificio_xy (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_elemento_edificio_xy_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_elemento_edificio_z (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_elemento_edificio_z_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_estado_fronteira (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_estado_fronteira_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_estado_instalacao (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_estado_instalacao_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_estado_linha_ferrea (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_estado_linha_ferrea_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_estado_via_rodov (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_estado_via_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_ficticio (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_ficticio_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_forma_edificio (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_forma_edificio_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_gasoduto_oleoduto_sub_quimicas (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_gasoduto_oleoduto_sub_quimicas_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_instalacao_gestao_ambiental (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_instalacao_gestao_ambiental_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_instalacao_producao (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_instalacao_producao_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_local_nomeado (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_local_nomeado_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_natureza (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_natureza_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_natureza_linha (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_natureza_linha_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_nivel_de_detalhe (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_nivel_de_detalhe_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_persistencia_hidrologica (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_persistencia_hidrologica_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_posicao_vertical (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_posicao_vertical_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_posicao_vertical_transportes (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_posicao_vertical_transportes_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_restricao_acesso (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_restricao_acesso_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_restricao_infra_trans_aereo (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_restricao_infra_trans_aereo_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_sentido (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_sentido_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_adm_publica (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_adm_publica_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_area_infra_trans_aereo (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_area_infra_trans_aereo_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_area_infra_trans_via_navegavel (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_area_infra_trans_via_navegavel_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_circulacao (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_circulacao_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_const_margem (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_const_margem_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_construcao (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_construcao_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_curva (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_curva_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_de_mob_urbano_sinal (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_de_mob_urbano_sinal_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_equipamento_coletivo (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_equipamento_coletivo_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_fronteira_terra_agua (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_fronteira_terra_agua_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_infra_trans_aereo (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_infra_trans_aereo_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_infra_trans_ferrov (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_infra_trans_ferrov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_infra_trans_rodov (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_infra_trans_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_infra_trans_via_navegavel (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_infra_trans_via_navegavel_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_limite (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_limite_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_linha_ferrea (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_linha_ferrea_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_nascente (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_nascente_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_no_hidrografico (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_no_hidrografico_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_no_trans_ferrov (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_no_trans_ferrov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_no_trans_rodov (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_no_trans_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_obra_arte (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_obra_arte_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_ponto_interesse (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_ponto_interesse_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_servico (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_servico_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_sinal_geodesico (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_sinal_geodesico_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_terreno_marginal (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_terreno_marginal_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_troco_rodoviario (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_troco_rodoviario_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_troco_via_ferrea (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_troco_via_ferrea_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_uso_infra_trans_ferrov (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_uso_infra_trans_ferrov_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_tipo_via_cabo (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_tipo_via_cabo_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_utilizacao_atual (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_utilizacao_atual_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_via_ferrea (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_via_ferrea_pkey PRIMARY KEY (identificador)
 );
 
 
 CREATE TABLE IF NOT EXISTS {schema}.valor_zona_humida (
     identificador character varying(10) NOT NULL,
-    descricao character varying(255) NOT NULL
+    descricao character varying(255) NOT NULL,
+    CONSTRAINT valor_zona_humida_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -1226,7 +1365,8 @@ CREATE TABLE IF NOT EXISTS {schema}.via_rodov (
     nome_alternativo character varying(255),
     tipo_via_rodov_abv character varying(255) NOT NULL,
     tipo_via_rodov_c character varying(255) NOT NULL,
-    tipo_via_rodov_d character varying(255) NOT NULL
+    tipo_via_rodov_d character varying(255) NOT NULL,
+    CONSTRAINT via_rodov_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -1235,7 +1375,8 @@ CREATE TABLE IF NOT EXISTS {schema}.via_rodov_limite (
     inicio_objeto timestamp without time zone NOT NULL,
     fim_objeto timestamp without time zone,
     valor_tipo_limite character varying(10) NOT NULL,
-    geometria public.geometry(LineStringZ,3763) NOT NULL
+    geometria public.geometry(LineStringZ,3763) NOT NULL,
+    CONSTRAINT via_rodov_limite_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -1247,7 +1388,8 @@ CREATE TABLE IF NOT EXISTS {schema}.zona_humida (
     mare boolean NOT NULL,
     id_hidrografico character varying(255),
     valor_zona_humida character varying(10) NOT NULL,
-    geometria public.geometry(PolygonZ,3763) NOT NULL
+    geometria public.geometry(PolygonZ,3763) NOT NULL,
+    CONSTRAINT zona_humida_pkey PRIMARY KEY (identificador)
 );
 
 
@@ -1902,112 +2044,8 @@ ALTER TABLE ONLY {schema}.lig_adm_publica_edificio
     ADD CONSTRAINT adm_publica_id_edificio_id_uk UNIQUE (adm_publica_id, edificio_id);
 
 
-ALTER TABLE ONLY {schema}.adm_publica
-    ADD CONSTRAINT adm_publica_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.agua_lentica
-    ADD CONSTRAINT agua_lentica_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.area_agricola_florestal_mato
-    ADD CONSTRAINT area_agricola_florestal_mato_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.area_infra_trans_aereo
-    ADD CONSTRAINT area_infra_trans_aereo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.area_infra_trans_cabo
-    ADD CONSTRAINT area_infra_trans_cabo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.area_infra_trans_ferrov
-    ADD CONSTRAINT area_infra_trans_ferrov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.area_infra_trans_rodov
-    ADD CONSTRAINT area_infra_trans_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.area_infra_trans_via_navegavel
-    ADD CONSTRAINT area_infra_trans_via_navegavel_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.area_trabalho
-    ADD CONSTRAINT area_trabalho_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.areas_artificializadas
-    ADD CONSTRAINT areas_artificializadas_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.barreira
-    ADD CONSTRAINT barreira_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.cabo_electrico
-    ADD CONSTRAINT cabo_electrico_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.conduta_de_agua
-    ADD CONSTRAINT conduta_de_agua_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.constru_linear
-    ADD CONSTRAINT constru_linear_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.constru_na_margem
-    ADD CONSTRAINT constru_na_margem_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.constru_polig
-    ADD CONSTRAINT constru_polig_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.curso_de_agua_area
-    ADD CONSTRAINT curso_de_agua_area_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.curso_de_agua_eixo
-    ADD CONSTRAINT curso_de_agua_eixo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.curva_de_nivel
-    ADD CONSTRAINT curva_de_nivel_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.designacao_local
-    ADD CONSTRAINT designacao_local_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.distrito
-    ADD CONSTRAINT distrito_pkey PRIMARY KEY (identificador);
-
-
 ALTER TABLE ONLY {schema}.lig_valor_utilizacao_atual_edificio
     ADD CONSTRAINT edificio_id_valor_utilizacao_atual_id_uk UNIQUE (edificio_id, valor_utilizacao_atual_id);
-
-
-ALTER TABLE ONLY {schema}.edificio
-    ADD CONSTRAINT edificio_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.elem_assoc_agua
-    ADD CONSTRAINT elem_assoc_agua_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.elem_assoc_eletricidade
-    ADD CONSTRAINT elem_assoc_eletricidade_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.elem_assoc_pgq
-    ADD CONSTRAINT elem_assoc_pgq_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.elem_assoc_telecomunicacoes
-    ADD CONSTRAINT elem_assoc_telecomunicacoes_pkey PRIMARY KEY (identificador);
 
 
 ALTER TABLE ONLY {schema}.lig_equip_util_coletiva_edificio
@@ -2018,32 +2056,8 @@ ALTER TABLE ONLY {schema}.lig_valor_tipo_equipamento_coletivo_equip_util_coletiv
     ADD CONSTRAINT equip_util_coletiva_id_valor_tipo_equipamento_coletivo_id_uk UNIQUE (equip_util_coletiva_id, valor_tipo_equipamento_coletivo_id);
 
 
-ALTER TABLE ONLY {schema}.equip_util_coletiva
-    ADD CONSTRAINT equip_util_coletiva_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.freguesia
-    ADD CONSTRAINT freguesia_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.fronteira
-    ADD CONSTRAINT fronteira_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.fronteira_terra_agua
-    ADD CONSTRAINT fronteira_terra_agua_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.infra_trans_aereo
-    ADD CONSTRAINT infra_trans_aereo_pkey PRIMARY KEY (identificador);
-
-
 ALTER TABLE ONLY {schema}.lig_infratransferrov_notransferrov
     ADD CONSTRAINT infra_trans_ferrov_id_no_trans_ferrov_id_uk UNIQUE (infra_trans_ferrov_id, no_trans_ferrov_id);
-
-
-ALTER TABLE ONLY {schema}.infra_trans_ferrov
-    ADD CONSTRAINT infra_trans_ferrov_pkey PRIMARY KEY (identificador);
 
 
 ALTER TABLE ONLY {schema}.lig_infratransrodov_notransrodov
@@ -2054,136 +2068,8 @@ ALTER TABLE ONLY {schema}.lig_valor_tipo_servico_infra_trans_rodov
     ADD CONSTRAINT infra_trans_rodov_id_valor_tipo_servico_id_uk UNIQUE (infra_trans_rodov_id, valor_tipo_servico_id);
 
 
-ALTER TABLE ONLY {schema}.infra_trans_rodov
-    ADD CONSTRAINT infra_trans_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.infra_trans_via_navegavel
-    ADD CONSTRAINT infra_trans_via_navegavel_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.inst_gestao_ambiental
-    ADD CONSTRAINT inst_gestao_ambiental_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.inst_producao
-    ADD CONSTRAINT inst_producao_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_adm_publica_edificio
-    ADD CONSTRAINT lig_adm_publica_edificio_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_equip_util_coletiva_edificio
-    ADD CONSTRAINT lig_equip_util_coletiva_edificio_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_infratransferrov_notransferrov
-    ADD CONSTRAINT lig_infratransferrov_notransferrov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_infratransrodov_notransrodov
-    ADD CONSTRAINT lig_infratransrodov_notransrodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_segviaferrea_linhaferrea
-    ADD CONSTRAINT lig_segviaferrea_linhaferrea_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_segviarodov_viarodov
-    ADD CONSTRAINT lig_segviarodov_viarodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_segviarodov_viarodovlimite
-    ADD CONSTRAINT lig_segviarodov_viarodovlimite_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_valor_tipo_circulacao_seg_via_rodov
-    ADD CONSTRAINT lig_valor_tipo_circulacao_seg_via_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_valor_tipo_equipamento_coletivo_equip_util_coletiva
-    ADD CONSTRAINT lig_valor_tipo_equipamento_coletivo_equip_util_coletiva_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_valor_tipo_servico_infra_trans_rodov
-    ADD CONSTRAINT lig_valor_tipo_servico_infra_trans_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.lig_valor_utilizacao_atual_edificio
-    ADD CONSTRAINT lig_valor_utilizacao_atual_edificio_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.linha_de_quebra
-    ADD CONSTRAINT linha_de_quebra_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.linha_ferrea
-    ADD CONSTRAINT linha_ferrea_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.mob_urbano_sinal
-    ADD CONSTRAINT mob_urbano_sinal_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.municipio
-    ADD CONSTRAINT municipio_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.nascente
-    ADD CONSTRAINT nascente_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.no_hidrografico
-    ADD CONSTRAINT no_hidrografico_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.no_trans_ferrov
-    ADD CONSTRAINT no_trans_ferrov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.no_trans_rodov
-    ADD CONSTRAINT no_trans_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.nome_edificio
-    ADD CONSTRAINT nome_edificio_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.numero_policia
-    ADD CONSTRAINT numero_policia_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.obra_arte
-    ADD CONSTRAINT obra_arte_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.oleoduto_gasoduto_subtancias_quimicas
-    ADD CONSTRAINT oleoduto_gasoduto_subtancias_quimicas_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.ponto_cotado
-    ADD CONSTRAINT ponto_cotado_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.ponto_interesse
-    ADD CONSTRAINT ponto_interesse_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.queda_de_agua
-    ADD CONSTRAINT queda_de_agua_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.seg_via_cabo
-    ADD CONSTRAINT seg_via_cabo_pkey PRIMARY KEY (identificador);
-
-
 ALTER TABLE ONLY {schema}.lig_segviaferrea_linhaferrea
     ADD CONSTRAINT seg_via_ferrea_id_linha_ferrea_id_uk UNIQUE (seg_via_ferrea_id, linha_ferrea_id);
-
-
-ALTER TABLE ONLY {schema}.seg_via_ferrea
-    ADD CONSTRAINT seg_via_ferrea_pkey PRIMARY KEY (identificador);
 
 
 ALTER TABLE ONLY {schema}.lig_valor_tipo_circulacao_seg_via_rodov
@@ -2196,318 +2082,6 @@ ALTER TABLE ONLY {schema}.lig_segviarodov_viarodov
 
 ALTER TABLE ONLY {schema}.lig_segviarodov_viarodovlimite
     ADD CONSTRAINT seg_via_rodov_id_via_rodov_limite_id_uk UNIQUE (seg_via_rodov_id, via_rodov_limite_id);
-
-
-ALTER TABLE ONLY {schema}.seg_via_rodov
-    ADD CONSTRAINT seg_via_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.sinal_geodesico
-    ADD CONSTRAINT sinal_geodesico_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.terreno_marginal
-    ADD CONSTRAINT terreno_marginal_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_agua_lentica
-    ADD CONSTRAINT valor_agua_lentica_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_areas_agricolas_florestais_matos
-    ADD CONSTRAINT valor_areas_agricolas_florestais_matos_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_areas_artificializadas
-    ADD CONSTRAINT valor_areas_artificializadas_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_barreira
-    ADD CONSTRAINT valor_barreira_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_caract_fisica_rodov
-    ADD CONSTRAINT valor_caract_fisica_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_categoria_bitola
-    ADD CONSTRAINT valor_categoria_bitola_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_categoria_infra_trans_aereo
-    ADD CONSTRAINT valor_categoria_infra_trans_aereo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_categoria
-    ADD CONSTRAINT valor_categoria_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_classifica_las
-    ADD CONSTRAINT valor_classifica_las_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_classifica
-    ADD CONSTRAINT valor_classifica_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_condicao_const
-    ADD CONSTRAINT valor_condicao_const_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_conduta_agua
-    ADD CONSTRAINT valor_conduta_agua_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_construcao_linear
-    ADD CONSTRAINT valor_construcao_linear_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_curso_de_agua
-    ADD CONSTRAINT valor_curso_de_agua_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_designacao_tensao
-    ADD CONSTRAINT valor_designacao_tensao_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_elemento_associado_agua
-    ADD CONSTRAINT valor_elemento_associado_agua_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_elemento_associado_electricidade
-    ADD CONSTRAINT valor_elemento_associado_electricidade_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_elemento_associado_pgq
-    ADD CONSTRAINT valor_elemento_associado_pgq_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_elemento_associado_telecomunicacoes
-    ADD CONSTRAINT valor_elemento_associado_telecomunicacoes_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_elemento_edificio_xy
-    ADD CONSTRAINT valor_elemento_edificio_xy_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_elemento_edificio_z
-    ADD CONSTRAINT valor_elemento_edificio_z_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_estado_fronteira
-    ADD CONSTRAINT valor_estado_fronteira_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_estado_instalacao
-    ADD CONSTRAINT valor_estado_instalacao_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_estado_linha_ferrea
-    ADD CONSTRAINT valor_estado_linha_ferrea_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_estado_via_rodov
-    ADD CONSTRAINT valor_estado_via_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_ficticio
-    ADD CONSTRAINT valor_ficticio_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_forma_edificio
-    ADD CONSTRAINT valor_forma_edificio_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_gasoduto_oleoduto_sub_quimicas
-    ADD CONSTRAINT valor_gasoduto_oleoduto_sub_quimicas_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_instalacao_gestao_ambiental
-    ADD CONSTRAINT valor_instalacao_gestao_ambiental_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_instalacao_producao
-    ADD CONSTRAINT valor_instalacao_producao_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_local_nomeado
-    ADD CONSTRAINT valor_local_nomeado_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_natureza_linha
-    ADD CONSTRAINT valor_natureza_linha_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_natureza
-    ADD CONSTRAINT valor_natureza_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_nivel_de_detalhe
-    ADD CONSTRAINT valor_nivel_de_detalhe_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_persistencia_hidrologica
-    ADD CONSTRAINT valor_persistencia_hidrologica_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_posicao_vertical
-    ADD CONSTRAINT valor_posicao_vertical_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_posicao_vertical_transportes
-    ADD CONSTRAINT valor_posicao_vertical_transportes_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_restricao_acesso
-    ADD CONSTRAINT valor_restricao_acesso_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_restricao_infra_trans_aereo
-    ADD CONSTRAINT valor_restricao_infra_trans_aereo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_sentido
-    ADD CONSTRAINT valor_sentido_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_adm_publica
-    ADD CONSTRAINT valor_tipo_adm_publica_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_area_infra_trans_aereo
-    ADD CONSTRAINT valor_tipo_area_infra_trans_aereo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_area_infra_trans_via_navegavel
-    ADD CONSTRAINT valor_tipo_area_infra_trans_via_navegavel_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_circulacao
-    ADD CONSTRAINT valor_tipo_circulacao_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_const_margem
-    ADD CONSTRAINT valor_tipo_const_margem_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_construcao
-    ADD CONSTRAINT valor_tipo_construcao_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_curva
-    ADD CONSTRAINT valor_tipo_curva_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_de_mob_urbano_sinal
-    ADD CONSTRAINT valor_tipo_de_mob_urbano_sinal_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_equipamento_coletivo
-    ADD CONSTRAINT valor_tipo_equipamento_coletivo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_fronteira_terra_agua
-    ADD CONSTRAINT valor_tipo_fronteira_terra_agua_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_infra_trans_aereo
-    ADD CONSTRAINT valor_tipo_infra_trans_aereo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_infra_trans_ferrov
-    ADD CONSTRAINT valor_tipo_infra_trans_ferrov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_infra_trans_rodov
-    ADD CONSTRAINT valor_tipo_infra_trans_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_infra_trans_via_navegavel
-    ADD CONSTRAINT valor_tipo_infra_trans_via_navegavel_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_limite
-    ADD CONSTRAINT valor_tipo_limite_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_linha_ferrea
-    ADD CONSTRAINT valor_tipo_linha_ferrea_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_nascente
-    ADD CONSTRAINT valor_tipo_nascente_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_no_hidrografico
-    ADD CONSTRAINT valor_tipo_no_hidrografico_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_no_trans_ferrov
-    ADD CONSTRAINT valor_tipo_no_trans_ferrov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_no_trans_rodov
-    ADD CONSTRAINT valor_tipo_no_trans_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_obra_arte
-    ADD CONSTRAINT valor_tipo_obra_arte_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_ponto_interesse
-    ADD CONSTRAINT valor_tipo_ponto_interesse_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_servico
-    ADD CONSTRAINT valor_tipo_servico_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_sinal_geodesico
-    ADD CONSTRAINT valor_tipo_sinal_geodesico_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_terreno_marginal
-    ADD CONSTRAINT valor_tipo_terreno_marginal_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_troco_rodoviario
-    ADD CONSTRAINT valor_tipo_troco_rodoviario_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_troco_via_ferrea
-    ADD CONSTRAINT valor_tipo_troco_via_ferrea_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_uso_infra_trans_ferrov
-    ADD CONSTRAINT valor_tipo_uso_infra_trans_ferrov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_tipo_via_cabo
-    ADD CONSTRAINT valor_tipo_via_cabo_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_utilizacao_atual
-    ADD CONSTRAINT valor_utilizacao_atual_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_via_ferrea
-    ADD CONSTRAINT valor_via_ferrea_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.valor_zona_humida
-    ADD CONSTRAINT valor_zona_humida_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.via_rodov_limite
-    ADD CONSTRAINT via_rodov_limite_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.via_rodov
-    ADD CONSTRAINT via_rodov_pkey PRIMARY KEY (identificador);
-
-
-ALTER TABLE ONLY {schema}.zona_humida
-    ADD CONSTRAINT zona_humida_pkey PRIMARY KEY (identificador);
 
 
 CREATE TRIGGER barreira_geometry_check BEFORE INSERT ON {schema}.barreira FOR EACH ROW EXECUTE FUNCTION {schema}.trigger_linestring_polygon_validation();

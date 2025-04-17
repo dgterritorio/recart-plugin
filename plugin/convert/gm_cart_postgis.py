@@ -144,7 +144,7 @@ class PostgisImporter:
                 {
                     "op": "polygonize",
                     "type": "sql",
-                    "path": "processing/polygonize.sql",
+                    "path": "polygonize.sql",
                     "input_types": ["line"],
                     "output_type": "polygon",
                     "output_dim": "any"

@@ -80,7 +80,7 @@ class CartImporter:
                                 if 'op' in pp:
                                     if pp['op'] == 'polygonize':
                                         pp["type"] = "sql"
-                                        pp["path"] = "processing/polygonize.sql"
+                                        pp["path"] = "polygonize.sql"
                                         pp["input_types"] = ["line"]
                                         pp["output_type"] = "polygon"
                                         pp["output_dim"] = "any"
@@ -198,8 +198,8 @@ class CartImporter:
                     return
         else:
             try:
-                self.mapping = cmap112 if self.vrs == '1.1.2'\
-                    else cmap201 if self.vrs == '2.0.1' else cmap202
+                self.mapping = cmap112 if self.vrs == 'v1.1.2'\
+                    else cmap201 if self.vrs == 'v2.0.1' else cmap202
             except Exception as e:
                 self.writer("Falhou leitura de ficheiro configuração")
                 return

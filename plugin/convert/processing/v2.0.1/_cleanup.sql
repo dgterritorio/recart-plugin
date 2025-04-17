@@ -63,7 +63,7 @@ alter table {schema}.fronteira alter column valor_estado_fronteira type varchar(
 alter table {schema}.fronteira add constraint valor_estado_fronteira_id foreign key (valor_estado_fronteira) references {schema}.valor_estado_fronteira(identificador);
 
 create index distrito_geom_idx ON {schema}.distrito using gist(geometria);
-create index concelho_geom_idx ON {schema}.concelho using gist(geometria);
+create index municipio_geom_idx ON {schema}.municipio using gist(geometria);
 create index freguesia_geom_idx ON {schema}.freguesia using gist(geometria);
 create index fronteira_geom_idx ON {schema}.fronteira using gist(geometria);
 
@@ -135,7 +135,7 @@ create index cabo_electrico_geom_idx ON {schema}.cabo_electrico using gist(geome
 -- Construcoes
 alter table {schema}.sinal_geodesico drop constraint if exists valor_categoria_id;
 alter table {schema}.sinal_geodesico alter column valor_categoria type varchar(10) using valor_categoria::varchar(10);
-alter table {schema}.sinal_geodesico add constraint valor_categoria_id foreign key (valor_categoria) references {schema}.valor_ordem(identificador);
+alter table {schema}.sinal_geodesico add constraint valor_categoria_id foreign key (valor_categoria) references {schema}.valor_categoria(identificador);
 
 alter table {schema}.sinal_geodesico drop constraint if exists valor_tipo_sinal_geodesico_id;
 alter table {schema}.sinal_geodesico alter column valor_tipo_sinal_geodesico type varchar(10) using valor_tipo_sinal_geodesico::varchar(10);
@@ -371,7 +371,7 @@ alter table {schema}.barreira add constraint valor_barreira_id foreign key (valo
 
 create index nascente_geom_idx ON {schema}.nascente using gist(geometria);
 create index agua_lentica_geom_idx ON {schema}.agua_lentica using gist(geometria);
-create index margem_geom_idx ON {schema}.margem using gist(geometria);
+create index terreno_marginal_geom_idx ON {schema}.terreno_marginal using gist(geometria);
 create index curso_de_agua_eixo_geom_idx ON {schema}.curso_de_agua_eixo using gist(geometria);
 create index curso_de_agua_area_geom_idx ON {schema}.curso_de_agua_area using gist(geometria);
 create index queda_de_agua_geom_idx ON {schema}.queda_de_agua using gist(geometria);

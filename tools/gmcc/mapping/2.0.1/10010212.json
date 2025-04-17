@@ -45,7 +45,7 @@
                     "src": "",
                     "dst": "valor_sentido",
                     "op": "set",
-                    "value": "888"
+                    "value": "1"
                 },
                 {
                     "src": "",
