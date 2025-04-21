@@ -1,0 +1,28 @@
+{
+    "tema": "ALTIMETRIA 3D E 2D",
+    "camada": "Altimetria_CurvasDeNivel_3D",
+    "nome": "CurvaDeNívelMestra_3D",
+    "map": [
+        {
+            "table": "curva_de_nivel",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_curva",
+                    "op": "set",
+                    "value": "1"
+                }
+            ]
+        }
+    ]
+}

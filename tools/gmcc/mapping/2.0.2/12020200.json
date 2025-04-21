@@ -1,0 +1,18 @@
+{
+    "dominio": "Hidrografia",
+    "subdominio": "ESTRUTURAS",
+    "familia": "ACUDES/REPRESAS",
+    "objeto": "AÇUDES/REPRESAS",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

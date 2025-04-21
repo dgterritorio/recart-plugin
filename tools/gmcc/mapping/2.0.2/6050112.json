@@ -1,0 +1,18 @@
+{
+    "dominio": "Construções",
+    "subdominio": "EDIFÍCIOS INDUSTRIAIS",
+    "familia": "PRODUÇÃO / TRANSFORMAÇÃO",
+    "objeto": "BALANÇA PARA ANIMAIS VIVOS",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

@@ -8,7 +8,7 @@ from . import gm_cart_aux as aux
 class PostgisImporter:
     """Importador de cartografia"""
 
-    def __init__(self, schema, base, mapping, cod_field, ndd, forceGeom, forcePolygon, forceClose, cellHeaderOrigin, use_layerName, save_src, writer, srsid):
+    def __init__(self, schema, base, mapping, cod_field, ndd, forceGeom, forcePolygon, forceClose, cellHeaderOrigin, use_layerName, save_src, writer, srsid, vrs):
         self.schema = schema
         self.base = base
         self.mapping = mapping
@@ -22,6 +22,8 @@ class PostgisImporter:
 
         self.use_layerName = use_layerName
         self.srsid = srsid
+        
+        self.vrs = vrs
 
         self.save_src = save_src
         self.errors_processing = {
@@ -142,7 +144,7 @@ class PostgisImporter:
                 {
                     "op": "polygonize",
                     "type": "sql",
-                    "path": "processing/polygonize.sql",
+                    "path": "polygonize.sql",
                     "input_types": ["line"],
                     "output_type": "polygon",
                     "output_dim": "any"
@@ -399,7 +401,7 @@ class PostgisImporter:
                             self.create_table(
                                 base_sql_file, self.base[layer].atable, self.base[layer], True)
 
-                with open(bp + '/' + '/processing/_base_references.sql', encoding='utf-8') as pp_file:
+                with open(bp + '/' + '/processing/' + self.vrs + '/_base_references.sql', encoding='utf-8') as pp_file:
                     pp_src = pp_file.read()
                     aux = re.sub(r"{schema}", self.schema, pp_src)
                     aux = re.sub(r", 3763", ', ' + str(srsid), aux)
@@ -482,7 +484,7 @@ class PostgisImporter:
                                 feat_sql_file.write('\n\n')
                                 feat_sql_file.write(pp['src'])
 
-                with open(bp + '/' + '/processing/_cleanup.sql', encoding='utf-8') as pp_file:
+                with open(bp + '/' + '/processing/' + self.vrs + '/_cleanup.sql', encoding='utf-8') as pp_file:
                     pp_src = pp_file.read()
                     feat_sql_file.write( re.sub(r"{schema}", self.schema, pp_src) )
         except Exception as e:

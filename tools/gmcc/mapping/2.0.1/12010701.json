@@ -1,0 +1,28 @@
+{
+    "tema": "NASCENTES E CURSOS DE ÁGUA",
+    "camada": "NascentesCursosDeAgua_Rios_2D/3D",
+    "nome": "Vala",
+    "map": [
+        {
+            "table": "curso_de_agua_area",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "delimitacao_conhecida",
+                    "op": "set",
+                    "value": "False"
+                }
+            ]
+        }
+    ]
+}

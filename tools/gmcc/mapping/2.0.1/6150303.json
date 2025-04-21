@@ -1,0 +1,18 @@
+{
+    "dominio": "Construções",
+    "subdominio": "EQUIPAMENTO URBANO",
+    "familia": "ÁREAS COMERCIAIS",
+    "objeto": "POSTO DE VENDA FIXO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

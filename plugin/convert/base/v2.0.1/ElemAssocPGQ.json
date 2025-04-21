@@ -1,0 +1,141 @@
+{
+	"objecto": {
+		"Tema": "INFRAESTRUTURAS E SERVIÇOS DE INTERESSE PÚBLICO",
+		"Característica geográfica": "Elemento associado de petróleo, gás e substâncias químicas",
+		"Objeto INSPIRE": "",
+		"objeto": "ElemAssocPGQ",
+		"Definição": "Infraestrutura de armazenamento ou distribuição de produtos petrolíferos, gás ou substâncias químicas.",
+		"Dim.": "2D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi inserida ou alterada na base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi substituída ou retirada da base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		},{
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (ponto)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "valorElementoAssociadoPGQ",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Classificação de elementos associados de redes de petróleo, gás, substâncias químicas."
+		}, {
+			"Atributo": "nome",
+			"Multip.": "[0..1]",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Topónimo utilizado para identificar o objeto no mundo real."
+		}],
+		"listas de códigos": [{
+			"nome": "valorElementoAssociadoPGQ",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Petróleo ou derivados",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Classificação de elementos associados de redes de petróleo ou derivados."
+			}, {
+				"Valores": "2",
+				"Descrição": "Gás",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Classificação de elementos associados de redes de gás."
+			}, {
+				"Valores": "2.1",
+				"Descrição": "Estação da RNTGN",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação de superfície destinada à manobra do fluxo de gás natural transportado na Rede Nacional de Transporte de Gás Natural (RNTGN)."
+			}, {
+				"Valores": "2.1.1",
+				"Descrição": "Estação de seccionamento",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Instalação de superfície destinada ao seccionamento da rede de transporte de gás natural em intervalos de segurança definidos ao abrigo da legislação em vigor."
+			}, {
+				"Valores": "2.1.2",
+				"Descrição": "Estação de derivação",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Instalação de superfície destinada à junção / derivação de duas ou mais linhas de gasodutos."
+			}, {
+				"Valores": "2.1.3",
+				"Descrição": "Estação de redução e medição de gás",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Instalação de superfície destinada à redução de pressão e medição de gás para ligação às redes de distribuição de gás natural."
+			}, {
+				"Valores": "2.1.4",
+				"Descrição": "Ponto de entrega",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Instalação de superfície destinada a interligar grandes consumidores de gás natural diretamente à RNTGN."
+			}, {
+				"Valores": "2.2",
+				"Descrição": "Instalação de armazenamento subterrâneo de gás natural",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação que inclui uma unidade de superfície para injeção e extração de gás natural."
+			}, {
+				"Valores": "2.3",
+				"Descrição": "Terminal de GNL",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação que inclui as unidades de Gás Natural Liquefeito (GNL) dos navios metaneiros, os depósitos de GNL e as unidades de regaseificação de gás natural."
+			}, {
+				"Valores": "2.4",
+				"Descrição": "Unidade autónoma de gás natural (UAG)",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação de superfície destinada ao armazenamento e regaseificação de Gás Natural Liquefeito (GNL) transportado por via terrestre, em regiões não servidas por rede de gasodutos de transporte."
+			}, {
+				"Valores": "2.100",
+				"Descrição": "Outra instalação de gás",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Outra instalação associada a qualquer outro tipo de gás."
+			}, {
+				"Valores": "3",
+				"Descrição": "Substâncias químicas",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Classificação de elementos associados de redes de substâncias químicas."
+			}]
+		}]
+	}
+}

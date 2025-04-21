@@ -1,0 +1,37 @@
+{
+    "dominio": "Limites",
+    "subdominio": "",
+    "familia": "PORTÕES",
+    "objeto": "PORTÃO DE AUTOESTRADA",
+    "map": [
+        {
+            "table": "constru_linear",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_construcao_linear",
+                    "op": "set",
+                    "value": {
+                      "ndd1": "6"
+                    }
+                },
+                {
+                    "src": "",
+                    "dst": "suporte",
+                    "op": "set",
+                    "value": "False"
+                }
+            ]
+        }
+    ]
+}

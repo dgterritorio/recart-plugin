@@ -1,0 +1,18 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "TRÁFEGO RODOVIÁRIO",
+    "familia": "REDE MUNICIPAL",
+    "objeto": "CÓDIGO ASSOCIADO AO EIXO DE VIA",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

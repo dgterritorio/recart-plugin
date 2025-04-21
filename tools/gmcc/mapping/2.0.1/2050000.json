@@ -1,0 +1,29 @@
+{
+    "dominio": "Limites",
+    "subdominio": "ÁREAS EM CONTRUÇÃO/ALTERAÇÃO",
+    "familia": "",
+    "objeto": "LIMITE DE ÁREA EM CONSTRUÇÃO/ALTERAÇÃO",
+    "map": [
+        {
+            "table": "areas_artificializadas",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_areas_artificializadas",
+                    "op": "set",
+                    "value": "6"
+                }
+            ]
+        }
+    ]
+}

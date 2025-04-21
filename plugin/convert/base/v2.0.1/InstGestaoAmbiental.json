@@ -1,0 +1,106 @@
+{
+	"objecto": {
+		"Tema": "INFRAESTRUTURAS E SERVIÇOS DE INTERESSE PÚBLICO",
+		"Característica geográfica": "Instalação de gestão ambiental",
+		"Objeto INSPIRE": "EnvironmentalManagementFacility",
+		"objeto": "InstGestaoAmbiental",
+		"Definição": "Uma estrutura física concebida, construída ou instalada para servir funções específicas relacionadas com fluxos de materiais ambientais, tais como fluxos de resíduos ou de águas residuais, ou uma área delimitada de terreno ou água utilizada para servir essas funções.",
+		"Dim.": "-",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi inserida ou alterada na base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi substituída ou retirada da base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "valorInstalacaoGestaoAmbiental",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Caracterização da instalação de gestão ambiental."
+		}, {
+			"Atributo": "nome",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Topónimo utilizado para identificar o objeto no mundo real."
+		}],
+		"listas de códigos": [{
+			"nome": "valorInstalacaoGestaoAmbiental",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Aterro",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Instalação para depósito de resíduos sólidos urbanos ou industriais."
+			}, {
+				"Valores": "1.1",
+				"Descrição": "Aterro urbano",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação de resíduos provenientes de habitações bem como outros resíduos que, pela sua natureza ou composição, sejam semelhantes aos resíduos provenientes de habitações."
+			}, {
+				"Valores": "1.2",
+				"Descrição": "Aterro industrial",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação de resíduos provenientes de indústria."
+			}, {
+				"Valores": "2",
+				"Descrição": "ETAR",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Instalação de Estação de Tratamento de Águas Residuais (ETAR) urbanas ou industriais."
+			}, {
+				"Valores": "2.1",
+				"Descrição": "ETAR urbana",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação de Estação de Tratamento de Águas Residuais (ETAR) urbanas."
+			}, {
+				"Valores": "2.2",
+				"Descrição": "ETAR industrial",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação de Estação de Tratamento de Águas Residuais (ETAR) industriais."
+			}, {
+				"Valores": "5",
+				"Descrição": "ETA",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Instalação de Estação de Tratamento de Água (ETA) para consumo ou rega."
+			}, {
+				"Valores": "6",
+				"Descrição": "Instalação de tratamento de resíduos",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Outra instalação de resíduos urbanos, industriais, perigosos ou não perigosos."
+			}]
+		}]
+	}
+}

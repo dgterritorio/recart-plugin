@@ -1,0 +1,18 @@
+{
+    "dominio": "Construções",
+    "subdominio": "",
+    "familia": "DETALHES",
+    "objeto": "CÓDIGO ASSOCIADO AO Nº DE POLÍCIA",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

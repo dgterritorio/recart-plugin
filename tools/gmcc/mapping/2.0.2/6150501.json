@@ -1,0 +1,29 @@
+{
+    "dominio": "Construções",
+    "subdominio": "EQUIPAMENTO URBANO",
+    "familia": "",
+    "objeto": "MARCO DO CORREIO",
+    "map": [
+        {
+            "table": "mob_urbano_sinal",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_de_mob_urbano_sinal",
+                    "op": "set",
+                    "value": "8"
+                }
+            ]
+        }
+    ]
+}

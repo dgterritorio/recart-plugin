@@ -1,0 +1,82 @@
+{
+	"objecto": {
+		"Tema": "AUXILIAR",
+		"Característica geográfica": "Área de trabalho",
+		"Objeto INSPIRE": "",
+		"objeto": "AreaTrabalho",
+		"Definição": "Perímetro correspondente ao âmbito territorial dos dados associados.",
+		"Dim.": "2D",
+		"Atributos": [{
+		   "Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi inserida ou alterada.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi substituída.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (polígono)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "data",
+			"Multip.": "1",
+			"Tipo": "Data",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Data de conclusão do trabalho."
+		}, {
+			"Atributo": "dataHomologacao",
+			"Multip.": "1",
+			"Tipo": "Data",
+			"D1": "",
+			"D2": "",
+			"Definição": "Data de homologação do trabalho (da responsabilidade da DGT)."
+		}, {
+			"Atributo": "nivelDeDetalhe",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Indicação do nível de detalhe dos dados (NdD1 ou NdD2)."
+		}, {
+			"Atributo": "nome",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Nome atribuído ao trabalho (de acordo com a nomenclatura)."
+		}, {
+			"Atributo": "nomeProdutor",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Nome do produtor do trabalho."
+		}, {
+			"Atributo": "nomeProprietario",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Nome do proprietário do trabalho."
+		}],
+		"listas de códigos": []
+	}
+}

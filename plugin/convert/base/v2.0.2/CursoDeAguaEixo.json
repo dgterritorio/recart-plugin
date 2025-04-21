@@ -1,0 +1,359 @@
+{
+	"objecto": {
+		"Tema": "HIDROGRAFIA",
+		"Característica geográfica": "Curso de água - eixo",
+		"Objeto INSPIRE": "Watercourse",
+		"objeto": "CursoDeAguaEixo",
+		"Definição": "Eixo das águas de um rio, ribeira ou outra corrente natural ou artificial.",
+		"Dim.": "3D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi inserida ou alterada na base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (até ao segundo) em que a versão em causa do objeto foi substituída ou retirada da base de dados.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (linha)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "valorCursoDeAgua",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Caracterização do curso de água pelas suas dimensões e pela sua designação toponímica."
+		}, {
+			"Atributo": "valorEstadoInstalacao",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "",
+			"D2": "",
+			"Definição": "O estado de uma instalação no que diz respeito à sua completude e utilização. Só pode ser especificado para cursos de água artificiais."
+		} , {
+			"Atributo": "valorFicticio",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "",
+			"D2": "",
+			"Definição": "Caracterização do curso de água pela sua delimitação real ou fictícia (virtual)."
+		} , {
+			"Atributo": "valorNatureza",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Define a natureza do troço do curso de água."
+		}, {
+			"Atributo": "valorPersistenciaHidrologica",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "",
+			"D2": "",
+			"Definição": "Categoria de persistência hidrológica de uma massa de água."
+		}, {
+			"Atributo": "valorPosicaoVertical",
+			"Multip.": "1",
+			"Tipo": "Lista de códigos",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "A posição vertical relativa da entidade (fenómeno no mundo real)."
+		}, {
+			"Atributo": "comprimento",
+			"Multip.": "1",
+			"Tipo": "Real",
+			"D1": "",
+			"D2": "",
+			"Definição": "Comprimento do curso de água. [unidade: metro]"
+		}, {
+			"Atributo": "delimitacaoConhecida",
+			"Multip.": "1",
+			"Tipo": "Booleano",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Indica que a delimitação da entidade (fenómeno no mundo real) é conhecida. A delimitação pode não ser conhecida quando se trata de um curso de água coberto (exemplo: troço subterrâneo) ou não visível porque encontra-se tapado pela vegetação."
+		}, {
+			"Atributo": "ficticio",
+			"Multip.": "1",
+			"Tipo": "Booleano",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Indica que o objeto corresponde à representação virtual do eixo com vista a assegurar a conetividade hidrográfica e aplica-se normalmente quando o eixo está localizado no interior do “Curso de água - área” ou “Água lêntica” ou em outros casos, como por exemplo quando um curso de água atravessa uma barragem."
+		}, {
+			"Atributo": "iDHidrografico",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "",
+			"D2": "",
+			"Definição": "Identificador do objeto no mundo real."
+		}, {
+			"Atributo": "id_curso_de_agua_area",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "id_agua_lentica",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "largura",
+			"Multip.": "1",
+			"Tipo": "Real",
+			"D1": "",
+			"D2": "",
+			"Definição": "Largura média do curso de água. [unidade: metro]"
+		} , {
+			"Atributo": "mare",
+			"Multip.": "1",
+			"Tipo": "Booleano",
+			"D1": "",
+			"D2": "",
+			"Definição": "Identifica se a água de superfície é afetada pela água da maré."
+		}, {
+			"Atributo": "navegavelOuFlutuavel",
+			"Multip.": "1",
+			"Tipo": "Booleano",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Identifica se a entidade é navegável ou flutuável."
+		}, {
+			"Atributo": "nome",
+			"Multip.": "[0..1]",
+			"Tipo": "Texto",
+			"D1": "x",
+			"D2": "x",
+			"Definição": "Topónimo da entidade no mundo real."
+		}, {
+			"Atributo": "ordemHidrologica",
+			"Multip.": "1",
+			"Tipo": "Texto",
+			"D1": "",
+			"D2": "",
+			"Definição": "Código que exprime o grau de ramificação num sistema hidrológico."
+		}, {
+			"Atributo": "origemNatural",
+			"Multip.": "1",
+			"Tipo": "Booleano",
+			"D1": "",
+			"D2": "",
+			"Definição": "Identifica se a entidade tem origem natural (e não artificial)."
+		}],
+		"listas de códigos": [{
+			"nome": "valorCursoDeAgua",
+			"valores": [{
+				"Valores": "3",
+				"Descrição": "Ribeira",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Pequeno curso de água de dimensões e caudal, permanente ou temporário, inferiores aos de um rio."
+			}, {
+				"Valores": "4",
+				"Descrição": "Linha de água",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Linha correspondente ao talvegue definido por duas ou mais vertentes, onde corre água com caudal permanente ou temporário."
+			}, {
+				"Valores": "5",
+				"Descrição": "Canal",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Passagem artificial de águas por vezes em forma de calha, para conduzir águas de caudal mais ou menos constante, para usos geralmente industriais ou agrícolas."
+			}, {
+				"Valores": "6",
+				"Descrição": "Vala",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Fosso longo, mais ou menos largo, para conduzir águas de caudal mais ou menos constante, para usos geralmente industriais ou agrícolas."
+			}, {
+				"Valores": "7",
+				"Descrição": "Rio",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Grande curso natural de água, geralmente de carácter permanente, que no seu trajeto recebe água de outros rios e ribeiras e que vai desaguar no mar, em outros cursos de água, numa lagoa ou albufeira."
+			}]
+		},{
+			"nome": "valorEstadoInstalacao",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Desmantelada",
+				"Valores INSPIRE": "decommissioned",
+				"D1": "",
+				"D2": "",
+				"Definição": "A instalação já não é utilizada e foi ou está a ser desmantelada."
+			}, {
+				"Valores": "2",
+				"Descrição": "Em construção",
+				"Valores INSPIRE": "underConstruction",
+				"D1": "",
+				"D2": "",
+				"Definição": "A instalação encontra-se em fase de construção e ainda não está funcional. Este valor aplica-se unicamente à construção inicial da instalação e não a trabalhos de manutenção."
+			}, {
+				"Valores": "3",
+				"Descrição": "Em desuso",
+				"Valores INSPIRE": "disused",
+				"D1": "",
+				"D2": "",
+				"Definição": "A instalação já não é utilizada, mas não está a ser ou não foi desmantelada."
+			}, {
+				"Valores": "4",
+				"Descrição": "Projetada",
+				"Valores INSPIRE": "projected",
+				"D1": "",
+				"D2": "",
+				"Definição": "A instalação encontra-se em fase de projeto. Os trabalhos de construção ainda não tiveram início."
+			}, {
+				"Valores": "5",
+				"Descrição": "Funcional",
+				"Valores INSPIRE": "functional",
+				"D1": "",
+				"D2": "",
+				"Definição": "A instalação está funcional."
+			}]
+		} ,{
+			"nome": "valorFicticio",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Real",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Eixo que corresponde ao percurso real do curso de água."
+			}, {
+				"Valores": "2",
+				"Descrição": "Fictício em curso de água - área",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Eixo que corresponde ao percurso fictício do curso de água em curso de água - área."
+			}, {
+				"Valores": "3",
+				"Descrição": "Fictício em água lêntica",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Eixo que corresponde ao percurso fictício do curso de água em água lêntica."
+			}, {
+				"Valores": "4",
+				"Descrição": "Fictício conexão tributária",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Eixo que contribui para a conexão de afluentes com um curso de água principal ou em água lêntica."
+			}, {
+				"Valores": "5",
+				"Descrição": "Fictício outra classificação",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Eixo que garante a continuidade da rede em outras situações, por exemplo quando um curso de água atravessa uma barragem."
+			}]
+		} ,{
+			"nome": "valorNatureza",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Genérico",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Troço ou percurso total de curso de água que não se encontra canalizado nem coberto."
+			}, {
+				"Valores": "2",
+				"Descrição": "Canalizado",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Troço ou percurso total de curso de água que tem um acondicionamento artificial."
+			}, {
+				"Valores": "3",
+				"Descrição": "Coberto",
+				"Valores INSPIRE": "",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "Troço ou percurso total de curso de água subterrâneo ou que se encontra coberto devido a obstáculo."
+			}]
+		}, {
+			"nome": "valorPersistenciaHidrologica",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Seco",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Cheio e/ou a correr raramente, de um modo geral, unicamente durante e/ou logo após forte precipitação."
+			}, {
+				"Valores": "2",
+				"Descrição": "Efémero",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Cheio e/ou a correr durante e logo após precipitações."
+			}, {
+				"Valores": "3",
+				"Descrição": "Intermitente",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Cheio e/ou a correr durante uma parte do ano."
+			}, {
+				"Valores": "4",
+				"Descrição": "Perene",
+				"Valores INSPIRE": "",
+				"D1": "",
+				"D2": "",
+				"Definição": "Cheio e/ou a correr continuamente ao longo do ano."
+			}]
+		}, {
+			"nome": "valorPosicaoVertical",
+			"valores": [{
+				"Valores": "1",
+				"Descrição": "Suspenso ou elevado",
+				"Valores INSPIRE": "suspendedOrElevated",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "A entidade geográfica está acima do solo."
+			}, {
+				"Valores": "0",
+				"Descrição": "Ao nível do solo",
+				"Valores INSPIRE": "onGroundSurface ",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "A entidade geográfica está assente diretamente no solo."
+			}, {
+				"Valores": "-1",
+				"Descrição": "No subsolo",
+				"Valores INSPIRE": "underground",
+				"D1": "x",
+				"D2": "x",
+				"Definição": "A entidade geográfica está assente abaixo do solo."
+			}]
+		}]
+	}
+}

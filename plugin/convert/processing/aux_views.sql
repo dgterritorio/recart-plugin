@@ -20,6 +20,8 @@ AS WITH euc AS (
             string_agg(euc_1.nome::text, ' | '::text) AS nome
            FROM {schema}.equip_util_coletiva euc_1
              JOIN {schema}.lig_equip_util_coletiva_edificio leuce ON leuce.equip_util_coletiva_id = euc_1.identificador
+         WHERE NOT (leuce.equip_util_coletiva_id IN ( SELECT areas_artificializadas.equip_util_coletiva_id
+                  FROM {schema}.areas_artificializadas))
           GROUP BY leuce.edificio_id
         ), ap AS (
          SELECT lap.edificio_id,

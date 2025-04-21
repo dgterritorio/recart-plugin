@@ -1,0 +1,18 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "ÁREAS DE APOIO AO TRÁFEGO TERRESTRE",
+    "familia": "TRÁFEGO RODOVIÁRIO",
+    "objeto": "ÁREAS DE SERVIÇO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

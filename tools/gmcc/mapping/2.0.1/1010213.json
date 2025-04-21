@@ -1,0 +1,47 @@
+{
+    "dominio": "Redes Geodésicas",
+    "subdominio": " REDE GEODÉSICA",
+    "familia": " SINAIS GEODÉSICOS",
+    "objeto": "VÉRTICE DE ADENSAMENTO DA REDE GEODÉSICA",
+    "map": [
+        {
+            "table": "sinal_geodesico",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "data_revisao",
+                    "op": "set",
+                    "value": "0001-01-01"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_local_geodesico",
+                    "op": "set",
+                    "value": "11"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_ordem",
+                    "op": "set",
+                    "value": "888"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_sinal_geodesico",
+                    "op": "set",
+                    "value": "2"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+{
+    "dominio": "Estruturas de Abastecimento e Transporte",
+    "subdominio": "ESTRUTURAS DE ABASTECIMENTO",
+    "familia": "APROVEITAMENTO DE ÁGUAS",
+    "objeto": "POÇO",
+    "map": [
+        {
+            "table": "elem_assoc_agua",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_associado_agua",
+                    "op": "set",
+                    "value": "5"
+                }
+            ]
+        }
+    ]
+}

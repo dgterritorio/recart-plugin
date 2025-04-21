@@ -1,0 +1,29 @@
+{
+    "dominio": "Estruturas de Abastecimento e Transporte",
+    "subdominio": "ESTRUTURAS DE ABASTECIMENTO",
+    "familia": "",
+    "objeto": "ANTENA  DE EMISSÃO / RECEPÇÃO com representação à escala",
+    "map": [
+        {
+            "table": "elem_assoc_telecomunicacoes",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_associado_telecomunicacoes",
+                    "op": "set",
+                    "value": "3"
+                }
+            ]
+        }
+    ]
+}

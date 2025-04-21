@@ -1,0 +1,18 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "LOCAIS DE PARAGEM",
+    "familia": "TRÁFEGO FERROVIÁRIO  ( METRO )",
+    "objeto": "TRÁFEGO FERROVIÁRIO (METRO)",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

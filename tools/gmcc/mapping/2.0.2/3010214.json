@@ -1,0 +1,18 @@
+{
+    "dominio": "Altimetria",
+    "subdominio": "ALTIMETRIA",
+    "familia": "PONTOS COTADOS",
+    "objeto": "PONTO DE COTA EM TABULEIRO DE PONTE E OUTRAS VIAS ELEVADAS",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

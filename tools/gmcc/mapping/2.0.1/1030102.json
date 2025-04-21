@@ -1,0 +1,18 @@
+{
+    "dominio": "Redes Geodésicas",
+    "subdominio": "REDE FOTOGRAMÉTRICA",
+    "familia": "PONTOS FOTOGRAMÉTRICOS",
+    "objeto": "PONTO FOTOGRAMÉTRICO PLANIMÉTRCO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

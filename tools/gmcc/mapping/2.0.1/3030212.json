@@ -1,0 +1,18 @@
+{
+    "dominio": "Altimetria",
+    "subdominio": "ACIDENTES TOPOGRÁFICOS (ORIGEM ARTIFICIAL)",
+    "familia": "ATERROS/ DESATERROS/SOCALCOS",
+    "objeto": "LIMITE INFERIOR INDIFERENCIADO",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

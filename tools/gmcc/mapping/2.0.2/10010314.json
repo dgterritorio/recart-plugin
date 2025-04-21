@@ -1,0 +1,65 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "TRÁFEGO RODOVIÁRIO",
+    "familia": "REDE MUNICIPAL",
+    "objeto": "EIXO DAS ESCADARIAS",
+    "map": [
+        {
+            "table": "seg_via_rodov",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "num_vias_transito",
+                    "op": "set",
+                    "value": "-99999"
+                },
+                {
+                    "src": "",
+                    "dst": "pavimentado",
+                    "op": "set",
+                    "value": "true"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_caract_fisica_rodov",
+                    "op": "set",
+                    "value": "3"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_posicao_vertical_transportes",
+                    "op": "set",
+                    "value": "0"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_sentido",
+                    "op": "set",
+                    "value": "1"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_circulacao",
+                    "op": "set",
+                    "value": "4"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_troco_rodoviario",
+                    "op": "set",
+                    "value": "5"
+                }
+            ]
+        }
+    ]
+}

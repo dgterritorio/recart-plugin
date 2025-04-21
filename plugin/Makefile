@@ -47,31 +47,14 @@ UI_FILES = \
 
 CONV_DIR = convert
 CONV_FILES = \
-	$(CONV_DIR)/conf.py $(CONV_DIR)/mapping.py\
+	$(CONV_DIR)/conf.py $(CONV_DIR)/mapping_112.py\
+	$(CONV_DIR)/mapping_201.py $(CONV_DIR)/mapping_202.py\
 	$(CONV_DIR)/gm_cart_aux.py $(CONV_DIR)/gm_cart_postgis.py\
 	$(CONV_DIR)/gm_cart_import.py
 
-BASE_DIR = convert/base
-BASE_FILES = \
-	$(BASE_DIR)/AdmPublica.json $(BASE_DIR)/Barreira.json $(BASE_DIR)/Distrito.json\
-	$(BASE_DIR)/InfraTransAereo.json $(BASE_DIR)/Nascente.json $(BASE_DIR)/SegViaCabo.json\
-	$(BASE_DIR)/AguaLentica.json $(BASE_DIR)/CaboEletrico.json $(BASE_DIR)/Edificio.json\
-	$(BASE_DIR)/InfraTransFerrov.json $(BASE_DIR)/NoHidrografico.json $(BASE_DIR)/SegViaFerrea.json\
-	$(BASE_DIR)/AreaAgricolaFlorestalMato.json $(BASE_DIR)/Concelho.json $(BASE_DIR)/ElemAssocAgua.json\
-	$(BASE_DIR)/InfraTransRodov.json $(BASE_DIR)/NoTransFerrov.json $(BASE_DIR)/SegViaRodov.json\
-	$(BASE_DIR)/AreaInfraTransAereo.json $(BASE_DIR)/CondutaDeAgua.json $(BASE_DIR)/ElemAssocEletricidade.json\
-	$(BASE_DIR)/InfraTransViaNavegavel.json $(BASE_DIR)/NoTransRodov.json $(BASE_DIR)/SinalGeodesico.json\
-	$(BASE_DIR)/AreaInfraTransCabo.json $(BASE_DIR)/ConstruLinear.json $(BASE_DIR)/ElemAssocPGQ.json\
-	$(BASE_DIR)/InstGestaoAmbiental.json $(BASE_DIR)/ObraArte.json $(BASE_DIR)/ViaRodov.json\
-	$(BASE_DIR)/AreaInfraTransFerrov.json $(BASE_DIR)/ConstruPolig.json $(BASE_DIR)/ElemAssocTelecomunicacoes.json\
-	$(BASE_DIR)/InstProducao.json $(BASE_DIR)/OleodutoGasodutoSubtanciasQuimicas.json $(BASE_DIR)/ViaRodovLimite.json\
-	$(BASE_DIR)/AreaInfraTransRodov.json $(BASE_DIR)/CursoDeAguaArea.json $(BASE_DIR)/EquipUtilColetiva.json\
-	$(BASE_DIR)/LinhaDeQuebra.json $(BASE_DIR)/PontoCotado.json $(BASE_DIR)/ZonaHumida.json\
-	$(BASE_DIR)/AreaInfraTransViaNavegavel.json $(BASE_DIR)/CursoDeAguaEixo.json $(BASE_DIR)/Freguesia.json\
-	$(BASE_DIR)/LinhaFerrea.json $(BASE_DIR)/PontoInteresse.json $(BASE_DIR)/AreasArtificializadas.json\
-	$(BASE_DIR)/CurvaDeNivel.json $(BASE_DIR)/Fronteira.json $(BASE_DIR)/Margem.json\
-	$(BASE_DIR)/QuedaDeAgua.json $(BASE_DIR)/AreaTrabalho.json $(BASE_DIR)/DesignacaoLocal.json\
-	$(BASE_DIR)/FronteiraTerraAgua.json $(BASE_DIR)/MobUrbanoSinal.json
+BASE_DIR_V112 = $(CONV_DIR)/base/v1.1.2
+BASE_DIR_V201 = $(CONV_DIR)/base/v2.0.1
+BASE_DIR_V202 = $(CONV_DIR)/base/v2.0.2
 
 SCM_DIR = convert/schemas
 SCM_FILES = \
@@ -79,11 +62,12 @@ SCM_FILES = \
 
 PROC_DIR = convert/processing
 PROC_FILES = \
-	$(PROC_DIR)/_base_references.sql $(PROC_DIR)/_cleanup.sql\
-	$(PROC_DIR)/polygonize.sql $(PROC_DIR)/edificio_references.sql\
-	$(PROC_DIR)/area_infra_trans_rodov_references.sql $(PROC_DIR)/infra_trans_rodov_references.sql\
-	$(PROC_DIR)/seg_via_rodov_references.sql $(PROC_DIR)/equip_util_coletiva_references.sql\
-	$(PROC_DIR)/to2D.py $(PROC_DIR)/to3D.py $(PROC_DIR)/to2D.py $(PROC_DIR)/layer_styles.sql $(PROC_DIR)/aux_views.sql
+	$(PROC_DIR)/polygonize.sql $(PROC_DIR)/to2D.py $(PROC_DIR)/to3D.py\
+	$(PROC_DIR)/layer_styles.sql $(PROC_DIR)/aux_views.sql
+
+PROC_DIR_V112 = $(PROC_DIR)/v1.1.2
+PROC_DIR_V201 = $(PROC_DIR)/v2.0.1
+PROC_DIR_V202 = $(PROC_DIR)/v2.0.2
 
 EXTRAS = metadata.txt icon.png carttop.xml validation_rules.sql validation_setup.sql validation_reset.sql validation_setup_no3d.sql
 
@@ -148,15 +132,25 @@ deploy: compile
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(UI_DIR)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(CONV_DIR)
-	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V112)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V201)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V202)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(SCM_DIR)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V112)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V201)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V202)
 	cp -vf $(PY_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(UI_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(UI_DIR)/
 	cp -vf $(CONV_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(CONV_DIR)/
-	cp -vf $(BASE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR)/
+	cp -vrf $(BASE_DIR_V112)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V112)/
+	cp -vrf $(BASE_DIR_V201)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V201)/
+	cp -vrf $(BASE_DIR_V202)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V202)/
 	cp -vf $(SCM_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(SCM_DIR)/
 	cp -vf $(PROC_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR)/
+	cp -vrf $(PROC_DIR_V112)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V112)/
+	cp -vrf $(PROC_DIR_V201)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V201)/
+	cp -vrf $(PROC_DIR_V202)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V202)/
 	cp -vf $(COMPILED_RESOURCE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(EXTRAS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	# cp -vfr i18n $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)

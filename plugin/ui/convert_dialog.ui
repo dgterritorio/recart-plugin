@@ -60,30 +60,6 @@
          <string>Entrada</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Pasta temporária</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="7">
-          <widget class="QComboBox" name="nddCombo"/>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>Destino</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="4">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Esquema</string>
-           </property>
-          </widget>
-         </item>
          <item row="5" column="0" colspan="8">
           <widget class="QGroupBox" name="groupBox">
            <property name="title">
@@ -175,17 +151,30 @@
            </layout>
           </widget>
          </item>
-         <item row="2" column="6">
-          <widget class="QLabel" name="label_13">
+         <item row="2" column="1" colspan="3">
+          <widget class="QComboBox" name="connCombo"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_11">
            <property name="text">
-            <string>NdD</string>
+            <string>Destino</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_3">
+         <item row="3" column="6">
+          <widget class="QLabel" name="label_14">
            <property name="text">
-            <string>Ficheiro(s)</string>
+            <string>Versão</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" colspan="5">
+          <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
           </widget>
          </item>
@@ -193,13 +182,6 @@
           <widget class="QgsFileWidget" name="inputQgsFileWidget">
            <property name="storageMode">
             <enum>QgsFileWidget::GetMultipleFiles</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" colspan="7">
-          <widget class="QgsFileWidget" name="configQgsFileWidget">
-           <property name="storageMode">
-            <enum>QgsFileWidget::GetDirectory</enum>
            </property>
           </widget>
          </item>
@@ -215,9 +197,6 @@
             </size>
            </property>
           </spacer>
-         </item>
-         <item row="2" column="1" colspan="3">
-          <widget class="QComboBox" name="connCombo"/>
          </item>
          <item row="2" column="5">
           <widget class="QLineEdit" name="lineEdit">
@@ -236,15 +215,46 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1" colspan="7">
-          <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Pasta temporária</string>
            </property>
           </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Ficheiro(s)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="7">
+          <widget class="QgsFileWidget" name="configQgsFileWidget">
+           <property name="storageMode">
+            <enum>QgsFileWidget::GetDirectory</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="4">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Esquema</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="6">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>NdD</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="7">
+          <widget class="QComboBox" name="nddCombo"/>
+         </item>
+         <item row="3" column="7">
+          <widget class="QComboBox" name="vrsCombo"/>
          </item>
         </layout>
        </widget>

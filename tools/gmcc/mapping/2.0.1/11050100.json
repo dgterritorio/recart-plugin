@@ -1,0 +1,29 @@
+{
+    "dominio": "Áreas Agrícolas e Florestais",
+    "subdominio": "ÁREAS DE PASTAGEM",
+    "familia": "",
+    "objeto": "PASTAGENS",
+    "map": [
+        {
+            "table": "area_agricola_florestal_mato",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_areas_agricolas_florestais_matos",
+                    "op": "set",
+                    "value": "2.1"
+                }
+            ]
+        }
+    ]
+}

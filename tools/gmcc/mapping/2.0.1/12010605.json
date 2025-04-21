@@ -1,0 +1,46 @@
+{
+    "tema": "NASCENTES E CURSOS DE ÁGUA",
+    "camada": "NascentesCursosDeAgua_Rios_2D/3D",
+    "nome": "Linha_Água_Encoberta",
+    "map": [
+        {
+            "table": "curso_de_agua_eixo",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_curso_de_agua",
+                    "op": "set",
+                    "value": "4"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_posicao_vertical",
+                    "op": "set",
+                    "value": "0"
+                },
+                {
+                    "src": "",
+                    "dst": "delimitacao_conhecida",
+                    "op": "set",
+                    "value": "False"
+                },
+                {
+                    "src": "",
+                    "dst": "ficticio",
+                    "op": "set",
+                    "value": "False"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+{
+    "dominio": "Vias de Comunicação",
+    "subdominio": "ÁREAS  DE APOIO AO TRÁFEGO MARÍTIMO|ÁREAS DE APOIO AO TRÁFEGO MARÍTIMO",
+    "familia": "ESTRUTURAS DE APOIO Á NAVEGAÇÃO",
+    "objeto": "MOLHE",
+    "map": [
+        {
+            "table": "constru_polig",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_tipo_construcao",
+                    "op": "set",
+                    "value": "1"
+                }
+            ]
+        }
+    ]
+}

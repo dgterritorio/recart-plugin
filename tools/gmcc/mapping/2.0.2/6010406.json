@@ -1,0 +1,75 @@
+{
+    "dominio": "Construções",
+    "subdominio": "EDIFÍCIOS PÚBLICOS E OFICIAIS",
+    "familia": "SAÚDE/HIGIENE",
+    "objeto": "CENTRO DE RECUPERAÇÃO E REABILITAÇÃO",
+    "map": [
+        {
+            "table": "edificio",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "altura_edificio",
+                    "op": "set",
+                    "value": "-99999"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_edificio_xy",
+                    "op": "set",
+                    "value": {
+                      "ndd1": "4",
+                      "ndd2": "6"
+                    }
+                },
+                {
+                    "src": "",
+                    "dst": "valor_elemento_edificio_z",
+                    "op": "set",
+                    "value": "14"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_utilizacao_atual",
+                    "op": "set",
+                    "value": "7.2"
+                }
+            ],
+            "references": [
+                {
+                    "table": "equip_util_coletiva",
+                    "fields": [
+                        {
+                            "src": "",
+                            "dst": "inicio_objeto",
+                            "op": "dnow"
+                        },
+                        {
+                            "src": "",
+                            "dst": "nome",
+                            "op": "set",
+                            "value": "SEM DADOS"
+                        },
+                        {
+                            "src": "",
+                            "dst": "valor_tipo_equipamento_coletivo",
+                            "op": "set",
+                            "value": ["2.3"]
+                        }
+                    ],
+                    "connection": "lig_equip_util_coletiva_edificio"
+                }
+            ]
+        }
+    ]
+}

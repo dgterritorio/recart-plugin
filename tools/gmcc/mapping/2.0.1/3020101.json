@@ -1,0 +1,18 @@
+{
+    "dominio": "Altimetria",
+    "subdominio": "ACIDENTES TOPOGRÁFICOS (ORIGEM NATURAL)",
+    "familia": " ROCHAS E AREIAS",
+    "objeto": "ROCHAS",
+    "map": [
+        {
+            "table": "",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                }
+            ]
+        }
+    ]
+}

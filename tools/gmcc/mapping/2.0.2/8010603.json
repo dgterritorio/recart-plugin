@@ -1,0 +1,35 @@
+{
+    "dominio": "Estruturas de Abastecimento e Transporte",
+    "subdominio": "ESTRUTURAS DE ABASTECIMENTO",
+    "familia": "GÁS, PETRÓLEO E PRODUTOS QUÍMICOS",
+    "objeto": "OUTROS PRODUTOS  ?????????????????????????",
+    "map": [
+        {
+            "table": "oleoduto_gasoduto_subtancias_quimicas",
+            "fields": [
+                {
+                    "src": "1_geom",
+                    "dst": "geometria",
+                    "op": "eq"
+                },
+                {
+                    "src": "",
+                    "dst": "inicio_objeto",
+                    "op": "dnow"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_gasoduto_oleoduto_sub_quimicas",
+                    "op": "set",
+                    "value": "3"
+                },
+                {
+                    "src": "",
+                    "dst": "valor_posicao_vertical",
+                    "op": "set",
+                    "value": "888"
+                }
+            ]
+        }
+    ]
+}

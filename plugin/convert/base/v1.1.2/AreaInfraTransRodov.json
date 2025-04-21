@@ -1,0 +1,47 @@
+{
+	"objecto": {
+		"Tema": "TRANSPORTES (Transporte rodoviário)",
+		"Característica geográfica": "Área da infraestrutura de transporte rodoviário",
+		"Objeto INSPIRE": "roadServiceArea",
+		"objeto": "AreaInfraTransRodov",
+		"Definição": "Área que dispõe de instalações, equipamentos e serviços destinados ao tráfego rodoviário.",
+		"Dim.": "2D",
+		"Atributos": [{
+			"Atributo": "identificador",
+			"Multip.": "1",
+			"Definição": "Identificador unívoco - Universal Unique Identifier gerado através da função uuid_generate_v1mc().",
+			"Tipo": "UUID",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "inicioObjeto",
+			"Multip.": "1",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi inserida ou alterada.",
+			"Tipo": "DataTempo",
+			"D1": "x",
+			"D2": "x"
+		}, {
+			"Atributo": "fimObjeto",
+			"Multip.": "[0..1]",
+			"Definição": "Data e hora (hora:minuto:segundo) em que a versão em causa do “objeto” foi substituída.",
+			"Tipo": "DataTempo",
+			"D1": "",
+			"D2": ""
+		}, {
+			"Atributo": "geometria",
+			"Multip.": "1",
+			"Tipo": "Geometria (polígono)",
+			"D1": "x",
+			"D2": "x",
+			"Definição": ""
+		}, {
+			"Atributo": "infra_trans_rodov_id",
+			"Multip.": "1",
+			"Definição": "",
+			"Tipo": "ID",
+			"D1": "x",
+			"D2": "x"
+		}],
+		"listas de códigos": []
+	}
+}

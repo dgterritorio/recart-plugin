@@ -8,7 +8,9 @@ import argparse
 from . import gm_cart_aux as aux
 from .gm_cart_postgis import PostgisImporter
 
-from .mapping import cmap
+from .mapping_112 import cmap as cmap112
+from .mapping_201 import cmap as cmap201
+from .mapping_202 import cmap as cmap202
 
 from osgeo import gdal
 from osgeo import ogr
@@ -21,8 +23,9 @@ class CartImporter:
         self.map_dir = map_dir
         self.srsid = srsid
 
+        self.vrs = kwargs.get('vrs', 'v2.0.2')
         self.base_dir = kwargs.get('base_dir', os.path.dirname(
-            os.path.realpath(__file__))+'/base')
+            os.path.realpath(__file__))+'/base/'+self.vrs)
         self.input_dir = kwargs.get('input_dir', './input')
         self.ulink_type = kwargs.get('ulink_type', '6549')
         self.cod_field = kwargs.get('cod_field', 'ulink')
@@ -77,7 +80,7 @@ class CartImporter:
                                 if 'op' in pp:
                                     if pp['op'] == 'polygonize':
                                         pp["type"] = "sql"
-                                        pp["path"] = "processing/polygonize.sql"
+                                        pp["path"] = "polygonize.sql"
                                         pp["input_types"] = ["line"]
                                         pp["output_type"] = "polygon"
                                         pp["output_dim"] = "any"
@@ -94,11 +97,11 @@ class CartImporter:
                                         pp["output_type"] = "any"
                                         pp["output_dim"] = "2D"
                                 aux.read_post_process(
-                                    self.base, lyr, self.schema, self.save_src, pp, False)
+                                    self.base, lyr, self.schema, self.save_src, pp, False, self.vrs)
             for lyr, pp_cfg in self.base_pp:
                 if lyr in self.base or lyr == '_base':
                     aux.read_post_process(
-                        self.base, lyr, self.schema, self.save_src, pp_cfg, False)
+                        self.base, lyr, self.schema, self.save_src, pp_cfg, False, self.vrs)
         except Exception as e:
             self.writer(
                 "Falhou leitura do ficheiro de configuração.\n\t" + str(e))
@@ -108,7 +111,7 @@ class CartImporter:
         for lyr, pp_cfg in self.base_pp:
             if lyr in self.base or lyr == '_base':
                 aux.read_post_process(
-                    self.base, lyr, self.schema, self.save_src, pp_cfg, False)
+                    self.base, lyr, self.schema, self.save_src, pp_cfg, False, self.vrs)
 
     def build_base(self):
         """Carregar ficheiros base"""
@@ -195,7 +198,8 @@ class CartImporter:
                     return
         else:
             try:
-                self.mapping = cmap
+                self.mapping = cmap112 if self.vrs == 'v1.1.2'\
+                    else cmap201 if self.vrs == 'v2.0.1' else cmap202
             except Exception as e:
                 self.writer("Falhou leitura de ficheiro configuração")
                 return
@@ -436,7 +440,7 @@ class CartImporter:
         )
 
         prst_handler = PostgisImporter(
-            self.schema, self.base, self.mapping, self.cod_field, self.ndd, self.force_geom, self.force_polygon, self.cell_headers_origin, self.force_close, self.use_layerName, self.save_src, self.writer, self.srsid)
+            self.schema, self.base, self.mapping, self.cod_field, self.ndd, self.force_geom, self.force_polygon, self.cell_headers_origin, self.force_close, self.use_layerName, self.save_src, self.writer, self.srsid, self.vrs)
 
         prst_handler.save_styles(os.path.join(bp, pf + '_layer_styles.sql'))
         prst_handler.save_datasource(os.path.join(bp, pf + '_features.sql'))
