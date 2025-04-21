@@ -184,6 +184,7 @@ class MainDialog(QDialog, FORM_CLASS):
     def finishedLoadLayers(self):
         try:
             self.dataSource = self.loadLayersProcess.dataSource
+            self.vrs = self.loadLayersProcess.vrs
             self.fillLayerList(self.dataSource)
 
             crs = QgsCoordinateReferenceSystem("EPSG:" + self.srs)
@@ -257,7 +258,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.exportLayersProcess = ExportLayersProcess(
             self.loadLayersProcess.conString, self.loadLayersProcess.schema,
             self.dataSource, layerList, outFormat, outEncoding, self.mQgsFileWidget.filePath(), self.aliasCheckBox.isChecked(), 
-            srsid.postgisSrid() )
+            srsid.postgisSrid(), self.vrs)
 
         self.exportLayersProcess.signal.connect(self.writeText)
         self.exportLayersProcess.addLayer.connect(self.addLayer)
@@ -367,18 +368,44 @@ class LoadLayersProcess(QThread):
             if self.dataSource is None:
                 raise ValueError('Não foi possível carregar a fonte de dados')
 
+            self.findVersion()
+
             self.write('[Sucesso] Camadas carregadas')
         except Exception as e:
             self.write("[Erro -1]")
             self.write(("\tException: {}".format(e)))
 
+    def findVersion(self):
+        self.vrs = ''
+
+        if self.dataSource is None:
+            raise ValueError('Erro a obter a versão da base de dados')
+        else:
+            mun = self.dataSource.GetLayerByName('concelho')
+            if mun is not None:
+                self.vrs = 'v1.1.2'
+                self.write('Versão da base de dados: {}'.format(self.vrs))
+            else:
+                cl = self.dataSource.GetLayerByName('valor_construcao_linear')
+                feat = cl.GetNextFeature()
+                while feat:
+                    if feat['identificador'] == '1':
+                        self.vrs = 'v2.0.1'
+                        self.write('Versão da base de dados: {}'.format(self.vrs))
+                        break
+
+                    feat = cl.GetNextFeature()
+
+                if not self.vrs:
+                    self.vrs = 'v2.0.2'
+                    self.write('Versão da base de dados: {}'.format(self.vrs))
 
 class ExportLayersProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
     addLayer = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject',
                           'PyQt_PyObject', 'PyQt_PyObject')
 
-    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid):
+    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid, vrs):
         QThread.__init__(self)
 
         self.conn = connection
@@ -390,11 +417,12 @@ class ExportLayersProcess(QThread):
         self.outDir = outDir
         self.exportAlias = exportAlias
         self.exportSrsId = srsid
+        self.vrs = vrs
 
         if not self.outDir:
             self.outDir = str(Path.home())
 
-        self.flatLayers = recartStructure
+        self.flatLayers = recartStructure[self.vrs]
         self.fieldMap = fieldNameMap
 
     def write(self, text):
