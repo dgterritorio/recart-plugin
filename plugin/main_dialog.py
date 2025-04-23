@@ -472,7 +472,7 @@ class ExportLayersProcess(QThread):
         bp = os.path.dirname(os.path.realpath(__file__))
         utils = PostgisUtils(self, self.conn)
         try:
-            with open(bp + '/convert/processing/layer_styles.sql', encoding='utf-8') as pp_file:
+            with open(bp + '/convert/processing/{0}/layer_styles.sql'.format(self.vrs), encoding='utf-8') as pp_file:
                 pp_src = pp_file.read()
                 styles = re.sub(r"{schema}", self.schema, pp_src)
                 utils.run_query(styles)
@@ -722,6 +722,9 @@ class ExportLayersProcess(QThread):
                 self.write(str(e))
                 continue
 
+            if datas is None:
+                continue
+
             if not isinstance(datas, ogr.Layer):
                 self.write(
                     '[Erro]: Estrutura de dados inesperada ao exportar camada \'' + slayer + '\'')
@@ -743,6 +746,7 @@ class ExportLayersProcess(QThread):
             err = outLayer.CreateField(ofield_defn)
             # print('err' + str(err))
 
+    # check
     def copy_feature_fields(self, datasrs, srsLayer, outLayer, feat):
         ofeat_defn = datasrs.GetLayerDefn()
         outFeature = ogr.Feature(outLayer.GetLayerDefn())

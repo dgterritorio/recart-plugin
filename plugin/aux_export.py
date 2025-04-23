@@ -15,7 +15,7 @@ displayList = {
     'fronteira_terra_agua': {'index': 450, 'alias': 'Fronteira terra-água', 'name': '[04] HIDROGRAFIA', 'geom': ['LINESTRINGZ']},
     'margem': {'index': 460, 'alias': 'Margem', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGON']},
     'terreno_marginal': {'index': 461, 'alias': 'Terreno marginal', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGON']},
-    'constru_na_margem': {'index': 461, 'alias': 'Construção na margem', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGON']},
+    'constru_na_margem': {'index': 462, 'alias': 'Construção na margem', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGON']},
     'nascente': {'index': 470, 'alias': 'Nascente', 'name': '[04] HIDROGRAFIA', 'geom': ['POINTZ']},
     'no_hidrografico': {'index': 480, 'alias': 'Nó hidrográfico', 'name': '[04] HIDROGRAFIA', 'geom': ['POINTZ']},
     'queda_de_agua': {'index': 490, 'alias': 'Queda de água', 'name': '[04] HIDROGRAFIA', 'geom': ['POINTZ']},
@@ -313,15 +313,15 @@ recartStructure = {
     },
     'v2.0.1': {
         'freguesia': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'dicofre', 'nome', 'geometria'],
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
             'ligs': [],
             'refs': []},
-        'concelho': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'dico', 'nome', 'geometria'],
+        'municipio': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
             'ligs': [],
             'refs': []},
         'distrito': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'di', 'nome', 'geometria'],
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
             'ligs': [],
             'refs': []},
         'fronteira': {
@@ -364,10 +364,6 @@ recartStructure = {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_fonte_dados', 'ilha', 'geometria'],
             'ligs': [],
             'refs': []},
-        'margem': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
-            'ligs': [],
-            'refs': ['valor_tipo_margem']},
         'nascente': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
             'ligs': [],
@@ -562,15 +558,15 @@ recartStructure = {
     },
     'v2.0.2': {
         'freguesia': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'dicofre', 'nome', 'geometria'],
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
             'ligs': [],
             'refs': []},
-        'concelho': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'dico', 'nome', 'geometria'],
+        'municipio': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
             'ligs': [],
             'refs': []},
         'distrito': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'di', 'nome', 'geometria'],
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
             'ligs': [],
             'refs': []},
         'fronteira': {
@@ -613,10 +609,6 @@ recartStructure = {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_fonte_dados', 'ilha', 'geometria'],
             'ligs': [],
             'refs': []},
-        'margem': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
-            'ligs': [],
-            'refs': ['valor_tipo_margem']},
         'nascente': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
             'ligs': [],
