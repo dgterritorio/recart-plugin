@@ -351,7 +351,7 @@ recartStructure = {
         'barreira': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
             'ligs': [],
-            'refs': ['valor_barreira']},
+            'refs': ['valor_barreira', 'valor_estado_instalacao']},
         'curso_de_agua_area': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'delimitacao_conhecida', 'geometria'],
             'ligs': [],
@@ -359,17 +359,21 @@ recartStructure = {
         'curso_de_agua_eixo': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'comprimento', 'delimitacao_conhecida', 'ficticio', 'largura', 'id_hidrografico', 'id_curso_de_agua_area', 'ordem_hidrologica', 'origem_natural', 'geometria'],
             'ligs': [],
-            'refs': ['valor_posicao_vertical', 'valor_persistencia_hidrologica', 'valor_curso_de_agua']},
+            'refs': ['valor_ficticio', 'valor_natureza', 'valor_estado_instalacao', 'valor_posicao_vertical', 'valor_persistencia_hidrologica', 'valor_curso_de_agua']},
         'fronteira_terra_agua': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_fonte_dados', 'ilha', 'geometria'],
             'ligs': [],
-            'refs': []},
+            'refs': ['valor_tipo_fronteira_terra_agua']},
+        'terreno_marginal': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_terreno_marginal']},
         'nascente': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
             'ligs': [],
             'refs': ['valor_tipo_nascente', 'valor_persistencia_hidrologica']},
         'no_hidrografico': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'id_hidrografico', 'geometria'],
             'ligs': [],
             'refs': ['valor_tipo_no_hidrografico']},
         'queda_de_agua': {
@@ -469,6 +473,10 @@ recartStructure = {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
             'ligs': [],
             'refs': ['valor_tipo_construcao']},
+        'constru_na_margem': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_estado_instalacao', 'valor_tipo_const_margem']},
         'edificio': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'altura_edificio', 'data_const', 'geometria'],
             'ligs': [('lig_valor_utilizacao_atual_edificio', 'valor_utilizacao_atual', True, []),
@@ -490,7 +498,7 @@ recartStructure = {
         'sinal_geodesico': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_revisao', 'nome', 'geometria'],
             'ligs': [],
-            'refs': ['valor_local_geodesico', 'valor_ordem', 'valor_tipo_sinal_geodesico']},
+            'refs': ['valor_categoria', 'valor_tipo_sinal_geodesico']},
         'area_agricola_florestal_mato': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
             'ligs': [],
@@ -552,9 +560,9 @@ recartStructure = {
             'ligs': [],
             'refs': ['valor_tipo_de_mob_urbano_sinal']},
         'area_trabalho': {
-            'fields': ['identificador', '"data"', 'nivel_de_detalhe', 'nome', 'nome_proprietario', 'nome_produtor', 'data_homologacao', 'geometria'],
+            'fields': ['identificador', '"data"', 'nome', 'nome_proprietario', 'nome_produtor', 'data_homologacao', 'geometria'],
             'ligs': [],
-            'refs': []}
+            'refs': ['valor_nivel_de_detalhe']}
     },
     'v2.0.2': {
         'freguesia': {
@@ -596,7 +604,7 @@ recartStructure = {
         'barreira': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
             'ligs': [],
-            'refs': ['valor_barreira']},
+            'refs': ['valor_barreira', 'valor_estado_instalacao']},
         'curso_de_agua_area': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'delimitacao_conhecida', 'geometria'],
             'ligs': [],
@@ -604,17 +612,21 @@ recartStructure = {
         'curso_de_agua_eixo': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'comprimento', 'delimitacao_conhecida', 'ficticio', 'largura', 'id_hidrografico', 'id_curso_de_agua_area', 'ordem_hidrologica', 'origem_natural', 'geometria'],
             'ligs': [],
-            'refs': ['valor_posicao_vertical', 'valor_persistencia_hidrologica', 'valor_curso_de_agua']},
+            'refs': ['valor_ficticio', 'valor_natureza', 'valor_estado_instalacao', 'valor_posicao_vertical', 'valor_persistencia_hidrologica', 'valor_curso_de_agua']},
         'fronteira_terra_agua': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_fonte_dados', 'ilha', 'geometria'],
             'ligs': [],
-            'refs': []},
+            'refs': ['valor_tipo_fronteira_terra_agua']},
+        'terreno_marginal': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_terreno_marginal']},
         'nascente': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
             'ligs': [],
             'refs': ['valor_tipo_nascente', 'valor_persistencia_hidrologica']},
         'no_hidrografico': {
-            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'id_hidrografico', 'geometria'],
             'ligs': [],
             'refs': ['valor_tipo_no_hidrografico']},
         'queda_de_agua': {
@@ -714,6 +726,10 @@ recartStructure = {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
             'ligs': [],
             'refs': ['valor_tipo_construcao']},
+        'constru_na_margem': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_estado_instalacao', 'valor_tipo_const_margem']},
         'edificio': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'altura_edificio', 'data_const', 'geometria'],
             'ligs': [('lig_valor_utilizacao_atual_edificio', 'valor_utilizacao_atual', True, []),
@@ -735,7 +751,7 @@ recartStructure = {
         'sinal_geodesico': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_revisao', 'nome', 'geometria'],
             'ligs': [],
-            'refs': ['valor_local_geodesico', 'valor_ordem', 'valor_tipo_sinal_geodesico']},
+            'refs': ['valor_categoria', 'valor_tipo_sinal_geodesico']},
         'area_agricola_florestal_mato': {
             'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
             'ligs': [],
@@ -797,9 +813,9 @@ recartStructure = {
             'ligs': [],
             'refs': ['valor_tipo_de_mob_urbano_sinal']},
         'area_trabalho': {
-            'fields': ['identificador', '"data"', 'nivel_de_detalhe', 'nome', 'nome_proprietario', 'nome_produtor', 'data_homologacao', 'geometria'],
+            'fields': ['identificador', '"data"', 'nome', 'nome_proprietario', 'nome_produtor', 'data_homologacao', 'geometria'],
             'ligs': [],
-            'refs': []}
+            'refs': ['valor_nivel_de_detalhe']}
     }
 }
 
@@ -873,6 +889,11 @@ fieldNameMap = {
         'inicio_objeto': 'ini_obj',
         'data_publicacao': 'dt_pub'
     },
+    'municipio': {
+        'identificador': 'identifica',
+        'inicio_objeto': 'ini_obj',
+        'data_publicacao': 'dt_pub'
+    },
     'distrito': {
         'identificador': 'identifica',
         'inicio_objeto': 'ini_obj',
@@ -920,7 +941,14 @@ fieldNameMap = {
         'identificador': 'identifica',
         'inicio_objeto': 'ini_obj',
         'id_hidrografico': 'id_hidr',
-        'valor_barreira': 'val_barr'
+        'valor_barreira': 'val_barr',
+        'valor_estado_instalacao': 'val_e_inst'
+    },
+    'constru_na_margem': {
+        'identificador': 'identifica',
+        'inicio_objeto': 'ini_obj',
+        'valor_tipo_const_margem': 'val_tipo',
+        'valor_estado_instalacao': 'val_e_inst'
     },
     'curso_de_agua_area': {
         'identificador': 'identifica',
@@ -938,18 +966,28 @@ fieldNameMap = {
         'origem_natural': 'orig_nat',
         'valor_posicao_vertical': 'val_pos_vt',
         'valor_persistencia_hidrologica': 'val_ps_hdr',
-        'valor_curso_de_agua': 'val_crs_ag'
+        'valor_curso_de_agua': 'val_crs_ag',
+        'valor_estado_instalacao': 'val_e_inst',
+        'valor_ficticio': 'val_fict',
+        'valor_natureza': 'val_natur',
     },
     'fronteira_terra_agua': {
         'identificador': 'identifica',
         'inicio_objeto': 'ini_obj',
-        'data_fonte_dados': 'dt_fnt_dad'
+        'data_fonte_dados': 'dt_fnt_dad',
+        'valor_tipo_fronteira_terra_agua': 'val_tipo'
     },
     'margem': {
         'identificador': 'identifica',
         'inicio_objeto': 'ini_obj',
         'id_hidrografico': 'id_hidr',
         'valor_tipo_margem': 'val_tipo'
+    },
+    'terreno_marginal': {
+        'identificador': 'identifica',
+        'inicio_objeto': 'ini_obj',
+        'id_hidrografico': 'id_hidr',
+        'valor_tipo_terreno_marginal': 'val_tipo'
     },
     'nascente': {
         'identificador': 'identifica',
@@ -1154,7 +1192,8 @@ fieldNameMap = {
         'data_revisao': 'dt_revisao',
         'valor_local_geodesico': 'val_lc_geo',
         'valor_ordem': 'val_ordem',
-        'valor_tipo_sinal_geodesico': 'val_tipo'
+        'valor_tipo_sinal_geodesico': 'val_tipo',
+        'valor_categoria': 'val_cat'
     },
     'area_agricola_florestal_mato': {
         'identificador': 'identifica',
@@ -1260,5 +1299,6 @@ fieldNameMap = {
         'nome_proprietario': 'nm_propr',
         'nome_produtor': 'nm_produt',
         'data_homologacao': 'dt_homlg',
+        'valor_nivel_de_detalhe': 'val_ndd'
     }
 }

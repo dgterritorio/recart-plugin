@@ -621,8 +621,13 @@ class ExportLayersProcess(QThread):
             for l in self.flatLayers[layer]['ligs']:
                 if l[0] is not None:
                     aux.append(l[0])
-                    if l[1] is not None:
+                    if l[1] is not None and l[1] not in self.flatLayers:
                         aux.append(l[1])
+                    for ll in l[3]:
+                        if ll[0] is not None:
+                            aux.append(ll[0])
+                            if ll[1] is not None and ll[1] not in self.flatLayers and '.' not in ll[1]:
+                                aux.append(ll[1])
                 else:
                     aux.append(l[1][:-3])
 
