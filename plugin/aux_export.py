@@ -1,6 +1,7 @@
 displayList = {
     'freguesia': {'index': 110, 'alias': 'Freguesia', 'name': '[01] UNIDADES ADMINISTRATIVAS', 'geom': ['MULTIPOLYGON']},
     'concelho': {'index': 120, 'alias': 'Concelho', 'name': '[01] UNIDADES ADMINISTRATIVAS', 'geom': ['MULTIPOLYGON']},
+    'municipio': {'index': 121, 'alias': 'Município', 'name': '[01] UNIDADES ADMINISTRATIVAS', 'geom': ['MULTIPOLYGON']},
     'distrito': {'index': 130, 'alias': 'Distrito', 'name': '[01] UNIDADES ADMINISTRATIVAS', 'geom': ['MULTIPOLYGON']},
     'fronteira': {'index': 140, 'alias': 'Fronteira', 'name': '[01] UNIDADES ADMINISTRATIVAS', 'geom': ['LINESTRING']},
     'designacao_local': {'index': 210, 'alias': 'Designação local', 'name': '[02] TOPONÍMIA', 'geom': ['POINT']},
@@ -13,6 +14,8 @@ displayList = {
     'curso_de_agua_eixo': {'index': 440, 'alias': 'Curso de água - eixo', 'name': '[04] HIDROGRAFIA', 'geom': ['LINESTRINGZ']},
     'fronteira_terra_agua': {'index': 450, 'alias': 'Fronteira terra-água', 'name': '[04] HIDROGRAFIA', 'geom': ['LINESTRINGZ']},
     'margem': {'index': 460, 'alias': 'Margem', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGON']},
+    'terreno_marginal': {'index': 461, 'alias': 'Terreno marginal', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGON']},
+    'constru_na_margem': {'index': 462, 'alias': 'Construção na margem', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGON']},
     'nascente': {'index': 470, 'alias': 'Nascente', 'name': '[04] HIDROGRAFIA', 'geom': ['POINTZ']},
     'no_hidrografico': {'index': 480, 'alias': 'Nó hidrográfico', 'name': '[04] HIDROGRAFIA', 'geom': ['POINTZ']},
     'queda_de_agua': {'index': 490, 'alias': 'Queda de água', 'name': '[04] HIDROGRAFIA', 'geom': ['POINTZ']},
@@ -59,253 +62,761 @@ displayList = {
 }
 
 recartStructure = {
-    'freguesia': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'dicofre', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': []},
-    'concelho': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'dico', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': []},
-    'distrito': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'di', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': []},
-    'fronteira': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_estado_fronteira']},
-    'designacao_local': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_local_nomeado']},
-    'curva_de_nivel': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_curva']},
-    'linha_de_quebra': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'artificial', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_classifica', 'valor_natureza_linha']},
-    'ponto_cotado': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_classifica_las']},
-    'agua_lentica': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'cota_plena_armazenamento', 'data_fonte_dados', 'mare', 'origem_natural', 'profundidade_media', 'id_hidrografico', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_agua_lentica', 'valor_persistencia_hidrologica']},
-    'barreira': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_barreira']},
-    'curso_de_agua_area': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'delimitacao_conhecida', 'geometria'],
-        'ligs': [],
-        'refs': []},
-    'curso_de_agua_eixo': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'comprimento', 'delimitacao_conhecida', 'ficticio', 'largura', 'id_hidrografico', 'id_curso_de_agua_area', 'ordem_hidrologica', 'origem_natural', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_posicao_vertical', 'valor_persistencia_hidrologica', 'valor_curso_de_agua']},
-    'fronteira_terra_agua': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_fonte_dados', 'ilha', 'geometria'],
-        'ligs': [],
-        'refs': []},
-    'margem': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_margem']},
-    'nascente': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_nascente', 'valor_persistencia_hidrologica']},
-    'no_hidrografico': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_no_hidrografico']},
-    'queda_de_agua': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'altura', 'id_hidrografico', 'geometria'],
-        'ligs': [],
-        'refs': []},
-    'zona_humida': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'mare', 'id_hidrografico', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_zona_humida']},
-    'area_infra_trans_aereo': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_area_infra_trans_aereo']},
-    'infra_trans_aereo': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_iata', 'codigo_icao', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_categoria_infra_trans_aereo', 'valor_restricao_infra_trans_aereo', 'valor_tipo_infra_trans_aereo']},
-    'area_infra_trans_ferrov': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [(None, 'infra_trans_ferrov_id', True, [('valor_tipo_uso_infra_trans_ferrov', 'itf.v_tp_u'), ('valor_tipo_infra_trans_ferrov', 'itf.val_tp')])],
-        'refs': []},
-    'infra_trans_ferrov': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_infra_ferrov', 'nome', 'nplataformas', 'geometria'],
-        'ligs': [('lig_infratransferrov_notransferrov', 'no_trans_ferrov',
-                  False, [('valor_tipo_no_trans_ferrov', 'nf.val_tip')])],
-        'refs': ['valor_tipo_uso_infra_trans_ferrov', 'valor_tipo_infra_trans_ferrov']},
-    'linha_ferrea': {
-        'fields': ['identificador', 'codigo_linha_ferrea', 'nome'],
-        'ligs': [],
-        'refs': []},
-    'no_trans_ferrov': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_no_trans_ferrov']},
-    'seg_via_ferrea': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'eletrific', 'gestao', 'velocidade_max', 'jurisdicao', 'geometria'],
-        'ligs': [('lig_segviaferrea_linhaferrea', 'linha_ferrea', False, [])],
-        'refs': ['valor_categoria_bitola', 'valor_estado_linha_ferrea', 'valor_posicao_vertical_transportes', 'valor_tipo_linha_ferrea', 'valor_tipo_troco_via_ferrea', 'valor_via_ferrea']},
-    'area_infra_trans_cabo': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': []},
-    'seg_via_cabo': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_via_cabo']},
-    'area_infra_trans_via_navegavel': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_area_infra_trans_via_navegavel']},
-    'infra_trans_via_navegavel': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'codigo_via_navegavel', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_infra_trans_via_navegavel']},
-    'area_infra_trans_rodov': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [(None, 'infra_trans_rodov_id', True, [('valor_tipo_infra_trans_rodov', 'itr.v_tip')])],
-        'refs': []},
-    'infra_trans_rodov': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
-        'ligs': [('lig_valor_tipo_servico_infra_trans_rodov', 'valor_tipo_servico',
-                  True, []),
-                 ('lig_infratransrodov_notransrodov', 'no_trans_rodov',
-                  False, [('valor_tipo_no_trans_rodov', 'nr.val_tip')])],
-        'refs': ['valor_tipo_infra_trans_rodov']},
-    'no_trans_rodov': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_no_trans_rodov']},
-    'seg_via_rodov': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'gestao', 'largura_via_rodov', 'multipla_faixa_rodagem', 'num_vias_transito', 'pavimentado', 'velocidade_max', 'jurisdicao', 'geometria'],
-        'ligs': [('lig_valor_tipo_circulacao_seg_via_rodov', 'valor_tipo_circulacao',
-                  True, []),
-                 ('lig_segviarodov_viarodov', 'via_rodov',
-                  False, []),
-                 ('lig_segviarodov_viarodovlimite', 'via_rodov_limite',
-                  False, [('valor_tipo_limite', 'vrl.val_tp')])],
-        'refs': ['valor_caract_fisica_rodov', 'valor_estado_via_rodov', 'valor_posicao_vertical_transportes', 'valor_restricao_acesso', 'valor_sentido', 'valor_tipo_troco_rodoviario']},
-    'via_rodov': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_via_rodov', 'data_cat', 'fonte_aquisicao_dados', 'nome', 'nome_alternativo', 'tipo_via_rodov_abv', 'tipo_via_rodov_c', 'tipo_via_rodov_d'],
-        'ligs': [],
-        'refs': []},
-    'via_rodov_limite': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_limite']},
-    'obra_arte': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_obra_arte']},
-    'constru_linear': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'suporte', 'largura', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_construcao_linear']},
-    'constru_polig': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_construcao']},
-    'edificio': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'altura_edificio', 'data_const', 'geometria'],
-        'ligs': [('lig_valor_utilizacao_atual_edificio', 'valor_utilizacao_atual', True, []),
-                 ('nome_edificio', None, True, []),
-                 ('numero_policia_edificio', None, True, []),
-                 (None, 'inst_producao_id', True, [
-                     ('valor_instalacao_producao', 'ip.v_inst')]),
-                 (None, 'inst_gestao_ambiental_id', True, [
-                     ('valor_instalacao_gestao_ambiental', 'ga.v_inst')]),
-                 ('lig_adm_publica_edificio', 'adm_publica',
-                  False, [('valor_tipo_adm_publica', 'ap.val_tip')]),
-                 ('lig_equip_util_coletiva_edificio', 'equip_util_coletiva', False, [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', 'uc.val_tp')])],
-        'refs': ['valor_condicao_const', 'valor_elemento_edificio_xy', 'valor_elemento_edificio_z', 'valor_forma_edificio']
+    'v1.1.2': {
+        'freguesia': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'dicofre', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'concelho': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'dico', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'distrito': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'di', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'fronteira': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_estado_fronteira']},
+        'designacao_local': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_local_nomeado']},
+        'curva_de_nivel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_curva']},
+        'linha_de_quebra': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'artificial', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_classifica', 'valor_natureza_linha']},
+        'ponto_cotado': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_classifica_las']},
+        'agua_lentica': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'cota_plena_armazenamento', 'data_fonte_dados', 'mare', 'origem_natural', 'profundidade_media', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_agua_lentica', 'valor_persistencia_hidrologica']},
+        'barreira': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_barreira']},
+        'curso_de_agua_area': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'delimitacao_conhecida', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'curso_de_agua_eixo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'comprimento', 'delimitacao_conhecida', 'ficticio', 'largura', 'id_hidrografico', 'id_curso_de_agua_area', 'ordem_hidrologica', 'origem_natural', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_posicao_vertical', 'valor_persistencia_hidrologica', 'valor_curso_de_agua']},
+        'fronteira_terra_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_fonte_dados', 'ilha', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'margem': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_margem']},
+        'nascente': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_nascente', 'valor_persistencia_hidrologica']},
+        'no_hidrografico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_hidrografico']},
+        'queda_de_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'altura', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'zona_humida': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'mare', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_zona_humida']},
+        'area_infra_trans_aereo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_area_infra_trans_aereo']},
+        'infra_trans_aereo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_iata', 'codigo_icao', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_categoria_infra_trans_aereo', 'valor_restricao_infra_trans_aereo', 'valor_tipo_infra_trans_aereo']},
+        'area_infra_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [(None, 'infra_trans_ferrov_id', True, [('valor_tipo_uso_infra_trans_ferrov', 'itf.v_tp_u'), ('valor_tipo_infra_trans_ferrov', 'itf.val_tp')])],
+            'refs': []},
+        'infra_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_infra_ferrov', 'nome', 'nplataformas', 'geometria'],
+            'ligs': [('lig_infratransferrov_notransferrov', 'no_trans_ferrov',
+                    False, [('valor_tipo_no_trans_ferrov', 'nf.val_tip')])],
+            'refs': ['valor_tipo_uso_infra_trans_ferrov', 'valor_tipo_infra_trans_ferrov']},
+        'linha_ferrea': {
+            'fields': ['identificador', 'codigo_linha_ferrea', 'nome'],
+            'ligs': [],
+            'refs': []},
+        'no_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_trans_ferrov']},
+        'seg_via_ferrea': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'eletrific', 'gestao', 'velocidade_max', 'jurisdicao', 'geometria'],
+            'ligs': [('lig_segviaferrea_linhaferrea', 'linha_ferrea', False, [])],
+            'refs': ['valor_categoria_bitola', 'valor_estado_linha_ferrea', 'valor_posicao_vertical_transportes', 'valor_tipo_linha_ferrea', 'valor_tipo_troco_via_ferrea', 'valor_via_ferrea']},
+        'area_infra_trans_cabo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'seg_via_cabo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_via_cabo']},
+        'area_infra_trans_via_navegavel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_area_infra_trans_via_navegavel']},
+        'infra_trans_via_navegavel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'codigo_via_navegavel', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_infra_trans_via_navegavel']},
+        'area_infra_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [(None, 'infra_trans_rodov_id', True, [('valor_tipo_infra_trans_rodov', 'itr.v_tip')])],
+            'refs': []},
+        'infra_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [('lig_valor_tipo_servico_infra_trans_rodov', 'valor_tipo_servico',
+                    True, []),
+                    ('lig_infratransrodov_notransrodov', 'no_trans_rodov',
+                    False, [('valor_tipo_no_trans_rodov', 'nr.val_tip')])],
+            'refs': ['valor_tipo_infra_trans_rodov']},
+        'no_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_trans_rodov']},
+        'seg_via_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'gestao', 'largura_via_rodov', 'multipla_faixa_rodagem', 'num_vias_transito', 'pavimentado', 'velocidade_max', 'jurisdicao', 'geometria'],
+            'ligs': [('lig_valor_tipo_circulacao_seg_via_rodov', 'valor_tipo_circulacao',
+                    True, []),
+                    ('lig_segviarodov_viarodov', 'via_rodov',
+                    False, []),
+                    ('lig_segviarodov_viarodovlimite', 'via_rodov_limite',
+                    False, [('valor_tipo_limite', 'vrl.val_tp')])],
+            'refs': ['valor_caract_fisica_rodov', 'valor_estado_via_rodov', 'valor_posicao_vertical_transportes', 'valor_restricao_acesso', 'valor_sentido', 'valor_tipo_troco_rodoviario']},
+        'via_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_via_rodov', 'data_cat', 'fonte_aquisicao_dados', 'nome', 'nome_alternativo', 'tipo_via_rodov_abv', 'tipo_via_rodov_c', 'tipo_via_rodov_d'],
+            'ligs': [],
+            'refs': []},
+        'via_rodov_limite': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_limite']},
+        'obra_arte': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_obra_arte']},
+        'constru_linear': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'suporte', 'largura', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_construcao_linear']},
+        'constru_polig': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_construcao']},
+        'edificio': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'altura_edificio', 'data_const', 'geometria'],
+            'ligs': [('lig_valor_utilizacao_atual_edificio', 'valor_utilizacao_atual', True, []),
+                    ('nome_edificio', None, True, []),
+                    ('numero_policia_edificio', None, True, []),
+                    (None, 'inst_producao_id', True, [
+                        ('valor_instalacao_producao', 'ip.v_inst')]),
+                    (None, 'inst_gestao_ambiental_id', True, [
+                        ('valor_instalacao_gestao_ambiental', 'ga.v_inst')]),
+                    ('lig_adm_publica_edificio', 'adm_publica',
+                    False, [('valor_tipo_adm_publica', 'ap.val_tip')]),
+                    ('lig_equip_util_coletiva_edificio', 'equip_util_coletiva', False, [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', 'uc.val_tp')])],
+            'refs': ['valor_condicao_const', 'valor_elemento_edificio_xy', 'valor_elemento_edificio_z', 'valor_forma_edificio']
+        },
+        'ponto_interesse': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_ponto_interesse']},
+        'sinal_geodesico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_revisao', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_local_geodesico', 'valor_ordem', 'valor_tipo_sinal_geodesico']},
+        'area_agricola_florestal_mato': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_areas_agricolas_florestais_matos']},
+        'areas_artificializadas': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [(None, 'inst_producao_id', True, [
+                    ('valor_instalacao_producao', 'ip.v_inst')]),
+                    (None, 'inst_gestao_ambiental_id', True, [
+                        ('valor_instalacao_gestao_ambiental', 'ga.v_inst')]),
+                    (None, 'equip_util_coletiva_id', True, [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', 'uc.val_tp')])],
+            'refs': ['valor_areas_artificializadas']},
+        'adm_publica': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'ponto_de_contacto'],
+            'ligs': [],
+            'refs': ['valor_tipo_adm_publica']},
+        'cabo_electrico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'tensao_nominal', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_designacao_tensao', 'valor_posicao_vertical']},
+        'conduta_de_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'diametro', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_conduta_agua', 'valor_posicao_vertical']},
+        'elem_assoc_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_agua']},
+        'elem_assoc_eletricidade': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_electricidade']},
+        'elem_assoc_pgq': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_pgq']},
+        'elem_assoc_telecomunicacoes': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_telecomunicacoes']},
+        'equip_util_coletiva': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'ponto_de_contacto'],
+            'ligs': [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', True, [])],
+            'refs': []},
+        'inst_gestao_ambiental': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome'],
+            'ligs': [],
+            'refs': ['valor_instalacao_gestao_ambiental']},
+        'inst_producao': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'descricao_da_funcao'],
+            'ligs': [],
+            'refs': ['valor_instalacao_producao']},
+        'oleoduto_gasoduto_subtancias_quimicas': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'diametro', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_gasoduto_oleoduto_sub_quimicas', 'valor_posicao_vertical']},
+        'mob_urbano_sinal': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_de_mob_urbano_sinal']},
+        'area_trabalho': {
+            'fields': ['identificador', '"data"', 'nivel_de_detalhe', 'nome', 'nome_proprietario', 'nome_produtor', 'data_homologacao', 'geometria'],
+            'ligs': [],
+            'refs': []}
     },
-    'ponto_interesse': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_ponto_interesse']},
-    'sinal_geodesico': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_revisao', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_local_geodesico', 'valor_ordem', 'valor_tipo_sinal_geodesico']},
-    'area_agricola_florestal_mato': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_areas_agricolas_florestais_matos']},
-    'areas_artificializadas': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
-        'ligs': [(None, 'inst_producao_id', True, [
-                 ('valor_instalacao_producao', 'ip.v_inst')]),
-                 (None, 'inst_gestao_ambiental_id', True, [
-                     ('valor_instalacao_gestao_ambiental', 'ga.v_inst')]),
-                 (None, 'equip_util_coletiva_id', True, [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', 'uc.val_tp')])],
-        'refs': ['valor_areas_artificializadas']},
-    'adm_publica': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'ponto_de_contacto'],
-        'ligs': [],
-        'refs': ['valor_tipo_adm_publica']},
-    'cabo_electrico': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'tensao_nominal', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_designacao_tensao', 'valor_posicao_vertical']},
-    'conduta_de_agua': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'diametro', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_conduta_agua', 'valor_posicao_vertical']},
-    'elem_assoc_agua': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_elemento_associado_agua']},
-    'elem_assoc_eletricidade': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_elemento_associado_electricidade']},
-    'elem_assoc_pgq': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_elemento_associado_pgq']},
-    'elem_assoc_telecomunicacoes': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_elemento_associado_telecomunicacoes']},
-    'equip_util_coletiva': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'ponto_de_contacto'],
-        'ligs': [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', True, [])],
-        'refs': []},
-    'inst_gestao_ambiental': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome'],
-        'ligs': [],
-        'refs': ['valor_instalacao_gestao_ambiental']},
-    'inst_producao': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'descricao_da_funcao'],
-        'ligs': [],
-        'refs': ['valor_instalacao_producao']},
-    'oleoduto_gasoduto_subtancias_quimicas': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'diametro', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_gasoduto_oleoduto_sub_quimicas', 'valor_posicao_vertical']},
-    'mob_urbano_sinal': {
-        'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
-        'ligs': [],
-        'refs': ['valor_tipo_de_mob_urbano_sinal']},
-    'area_trabalho': {
-        'fields': ['identificador', '"data"', 'nivel_de_detalhe', 'nome', 'nome_proprietario', 'nome_produtor', 'data_homologacao', 'geometria'],
-        'ligs': [],
-        'refs': []}
+    'v2.0.1': {
+        'freguesia': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'municipio': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'distrito': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'fronteira': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_estado_fronteira']},
+        'designacao_local': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_local_nomeado']},
+        'curva_de_nivel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_curva']},
+        'linha_de_quebra': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'artificial', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_classifica', 'valor_natureza_linha']},
+        'ponto_cotado': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_classifica_las']},
+        'agua_lentica': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'cota_plena_armazenamento', 'data_fonte_dados', 'mare', 'origem_natural', 'profundidade_media', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_agua_lentica', 'valor_persistencia_hidrologica']},
+        'barreira': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_barreira', 'valor_estado_instalacao']},
+        'curso_de_agua_area': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'delimitacao_conhecida', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'curso_de_agua_eixo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'comprimento', 'delimitacao_conhecida', 'ficticio', 'largura', 'id_hidrografico', 'id_curso_de_agua_area', 'ordem_hidrologica', 'origem_natural', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_ficticio', 'valor_natureza', 'valor_estado_instalacao', 'valor_posicao_vertical', 'valor_persistencia_hidrologica', 'valor_curso_de_agua']},
+        'fronteira_terra_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_fonte_dados', 'ilha', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_fronteira_terra_agua']},
+        'terreno_marginal': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_terreno_marginal']},
+        'nascente': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_nascente', 'valor_persistencia_hidrologica']},
+        'no_hidrografico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_hidrografico']},
+        'queda_de_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'altura', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'zona_humida': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'mare', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_zona_humida']},
+        'area_infra_trans_aereo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_area_infra_trans_aereo']},
+        'infra_trans_aereo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_iata', 'codigo_icao', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_categoria_infra_trans_aereo', 'valor_restricao_infra_trans_aereo', 'valor_tipo_infra_trans_aereo']},
+        'area_infra_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [(None, 'infra_trans_ferrov_id', True, [('valor_tipo_uso_infra_trans_ferrov', 'itf.v_tp_u'), ('valor_tipo_infra_trans_ferrov', 'itf.val_tp')])],
+            'refs': []},
+        'infra_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_infra_ferrov', 'nome', 'nplataformas', 'geometria'],
+            'ligs': [('lig_infratransferrov_notransferrov', 'no_trans_ferrov',
+                    False, [('valor_tipo_no_trans_ferrov', 'nf.val_tip')])],
+            'refs': ['valor_tipo_uso_infra_trans_ferrov', 'valor_tipo_infra_trans_ferrov']},
+        'linha_ferrea': {
+            'fields': ['identificador', 'codigo_linha_ferrea', 'nome'],
+            'ligs': [],
+            'refs': []},
+        'no_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_trans_ferrov']},
+        'seg_via_ferrea': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'eletrific', 'gestao', 'velocidade_max', 'jurisdicao', 'geometria'],
+            'ligs': [('lig_segviaferrea_linhaferrea', 'linha_ferrea', False, [])],
+            'refs': ['valor_categoria_bitola', 'valor_estado_linha_ferrea', 'valor_posicao_vertical_transportes', 'valor_tipo_linha_ferrea', 'valor_tipo_troco_via_ferrea', 'valor_via_ferrea']},
+        'area_infra_trans_cabo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'seg_via_cabo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_via_cabo']},
+        'area_infra_trans_via_navegavel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_area_infra_trans_via_navegavel']},
+        'infra_trans_via_navegavel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'codigo_via_navegavel', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_infra_trans_via_navegavel']},
+        'area_infra_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [(None, 'infra_trans_rodov_id', True, [('valor_tipo_infra_trans_rodov', 'itr.v_tip')])],
+            'refs': []},
+        'infra_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [('lig_valor_tipo_servico_infra_trans_rodov', 'valor_tipo_servico',
+                    True, []),
+                    ('lig_infratransrodov_notransrodov', 'no_trans_rodov',
+                    False, [('valor_tipo_no_trans_rodov', 'nr.val_tip')])],
+            'refs': ['valor_tipo_infra_trans_rodov']},
+        'no_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_trans_rodov']},
+        'seg_via_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'gestao', 'largura_via_rodov', 'multipla_faixa_rodagem', 'num_vias_transito', 'pavimentado', 'velocidade_max', 'jurisdicao', 'geometria'],
+            'ligs': [('lig_valor_tipo_circulacao_seg_via_rodov', 'valor_tipo_circulacao',
+                    True, []),
+                    ('lig_segviarodov_viarodov', 'via_rodov',
+                    False, []),
+                    ('lig_segviarodov_viarodovlimite', 'via_rodov_limite',
+                    False, [('valor_tipo_limite', 'vrl.val_tp')])],
+            'refs': ['valor_caract_fisica_rodov', 'valor_estado_via_rodov', 'valor_posicao_vertical_transportes', 'valor_restricao_acesso', 'valor_sentido', 'valor_tipo_troco_rodoviario']},
+        'via_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_via_rodov', 'data_cat', 'fonte_aquisicao_dados', 'nome', 'nome_alternativo', 'tipo_via_rodov_abv', 'tipo_via_rodov_c', 'tipo_via_rodov_d'],
+            'ligs': [],
+            'refs': []},
+        'via_rodov_limite': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_limite']},
+        'obra_arte': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_obra_arte']},
+        'constru_linear': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'suporte', 'largura', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_construcao_linear']},
+        'constru_polig': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_construcao']},
+        'constru_na_margem': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_estado_instalacao', 'valor_tipo_const_margem']},
+        'edificio': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'altura_edificio', 'data_const', 'geometria'],
+            'ligs': [('lig_valor_utilizacao_atual_edificio', 'valor_utilizacao_atual', True, []),
+                    ('nome_edificio', None, True, []),
+                    ('numero_policia', None, True, []),
+                    (None, 'inst_producao_id', True, [
+                        ('valor_instalacao_producao', 'ip.v_inst')]),
+                    (None, 'inst_gestao_ambiental_id', True, [
+                        ('valor_instalacao_gestao_ambiental', 'ga.v_inst')]),
+                    ('lig_adm_publica_edificio', 'adm_publica',
+                    False, [('valor_tipo_adm_publica', 'ap.val_tip')]),
+                    ('lig_equip_util_coletiva_edificio', 'equip_util_coletiva', False, [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', 'uc.val_tp')])],
+            'refs': ['valor_condicao_const', 'valor_elemento_edificio_xy', 'valor_elemento_edificio_z', 'valor_forma_edificio']
+        },
+        'ponto_interesse': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_ponto_interesse']},
+        'sinal_geodesico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_revisao', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_categoria', 'valor_tipo_sinal_geodesico']},
+        'area_agricola_florestal_mato': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_areas_agricolas_florestais_matos']},
+        'areas_artificializadas': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [(None, 'inst_producao_id', True, [
+                    ('valor_instalacao_producao', 'ip.v_inst')]),
+                    (None, 'inst_gestao_ambiental_id', True, [
+                        ('valor_instalacao_gestao_ambiental', 'ga.v_inst')]),
+                    (None, 'equip_util_coletiva_id', True, [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', 'uc.val_tp')])],
+            'refs': ['valor_areas_artificializadas']},
+        'adm_publica': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'ponto_de_contacto'],
+            'ligs': [],
+            'refs': ['valor_tipo_adm_publica']},
+        'cabo_electrico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'tensao_nominal', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_designacao_tensao', 'valor_posicao_vertical']},
+        'conduta_de_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'diametro', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_conduta_agua', 'valor_posicao_vertical']},
+        'elem_assoc_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_agua']},
+        'elem_assoc_eletricidade': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_electricidade']},
+        'elem_assoc_pgq': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_pgq']},
+        'elem_assoc_telecomunicacoes': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_telecomunicacoes']},
+        'equip_util_coletiva': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'ponto_de_contacto'],
+            'ligs': [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', True, [])],
+            'refs': []},
+        'inst_gestao_ambiental': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome'],
+            'ligs': [],
+            'refs': ['valor_instalacao_gestao_ambiental']},
+        'inst_producao': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'descricao_da_funcao'],
+            'ligs': [],
+            'refs': ['valor_instalacao_producao']},
+        'oleoduto_gasoduto_subtancias_quimicas': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'diametro', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_gasoduto_oleoduto_sub_quimicas', 'valor_posicao_vertical']},
+        'mob_urbano_sinal': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_de_mob_urbano_sinal']},
+        'area_trabalho': {
+            'fields': ['identificador', '"data"', 'nome', 'nome_proprietario', 'nome_produtor', 'data_homologacao', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_nivel_de_detalhe']}
+    },
+    'v2.0.2': {
+        'freguesia': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'municipio': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'distrito': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'codigo', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'fronteira': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_publicacao', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_estado_fronteira']},
+        'designacao_local': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_local_nomeado']},
+        'curva_de_nivel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_curva']},
+        'linha_de_quebra': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'artificial', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_classifica', 'valor_natureza_linha']},
+        'ponto_cotado': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_classifica_las']},
+        'agua_lentica': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'cota_plena_armazenamento', 'data_fonte_dados', 'mare', 'origem_natural', 'profundidade_media', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_agua_lentica', 'valor_persistencia_hidrologica']},
+        'barreira': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_barreira', 'valor_estado_instalacao']},
+        'curso_de_agua_area': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'delimitacao_conhecida', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'curso_de_agua_eixo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'comprimento', 'delimitacao_conhecida', 'ficticio', 'largura', 'id_hidrografico', 'id_curso_de_agua_area', 'ordem_hidrologica', 'origem_natural', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_ficticio', 'valor_natureza', 'valor_estado_instalacao', 'valor_posicao_vertical', 'valor_persistencia_hidrologica', 'valor_curso_de_agua']},
+        'fronteira_terra_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_fonte_dados', 'ilha', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_fronteira_terra_agua']},
+        'terreno_marginal': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_terreno_marginal']},
+        'nascente': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_nascente', 'valor_persistencia_hidrologica']},
+        'no_hidrografico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_hidrografico']},
+        'queda_de_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'altura', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'zona_humida': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'mare', 'id_hidrografico', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_zona_humida']},
+        'area_infra_trans_aereo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_area_infra_trans_aereo']},
+        'infra_trans_aereo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_iata', 'codigo_icao', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_categoria_infra_trans_aereo', 'valor_restricao_infra_trans_aereo', 'valor_tipo_infra_trans_aereo']},
+        'area_infra_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [(None, 'infra_trans_ferrov_id', True, [('valor_tipo_uso_infra_trans_ferrov', 'itf.v_tp_u'), ('valor_tipo_infra_trans_ferrov', 'itf.val_tp')])],
+            'refs': []},
+        'infra_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_infra_ferrov', 'nome', 'nplataformas', 'geometria'],
+            'ligs': [('lig_infratransferrov_notransferrov', 'no_trans_ferrov',
+                    False, [('valor_tipo_no_trans_ferrov', 'nf.val_tip')])],
+            'refs': ['valor_tipo_uso_infra_trans_ferrov', 'valor_tipo_infra_trans_ferrov']},
+        'linha_ferrea': {
+            'fields': ['identificador', 'codigo_linha_ferrea', 'nome'],
+            'ligs': [],
+            'refs': []},
+        'no_trans_ferrov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_trans_ferrov']},
+        'seg_via_ferrea': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'eletrific', 'gestao', 'velocidade_max', 'jurisdicao', 'geometria'],
+            'ligs': [('lig_segviaferrea_linhaferrea', 'linha_ferrea', False, [])],
+            'refs': ['valor_categoria_bitola', 'valor_estado_linha_ferrea', 'valor_posicao_vertical_transportes', 'valor_tipo_linha_ferrea', 'valor_tipo_troco_via_ferrea', 'valor_via_ferrea']},
+        'area_infra_trans_cabo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': []},
+        'seg_via_cabo': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_via_cabo']},
+        'area_infra_trans_via_navegavel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_area_infra_trans_via_navegavel']},
+        'infra_trans_via_navegavel': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'codigo_via_navegavel', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_infra_trans_via_navegavel']},
+        'area_infra_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [(None, 'infra_trans_rodov_id', True, [('valor_tipo_infra_trans_rodov', 'itr.v_tip')])],
+            'refs': []},
+        'infra_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [('lig_valor_tipo_servico_infra_trans_rodov', 'valor_tipo_servico',
+                    True, []),
+                    ('lig_infratransrodov_notransrodov', 'no_trans_rodov',
+                    False, [('valor_tipo_no_trans_rodov', 'nr.val_tip')])],
+            'refs': ['valor_tipo_infra_trans_rodov']},
+        'no_trans_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_no_trans_rodov']},
+        'seg_via_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'gestao', 'largura_via_rodov', 'multipla_faixa_rodagem', 'num_vias_transito', 'pavimentado', 'velocidade_max', 'jurisdicao', 'geometria'],
+            'ligs': [('lig_valor_tipo_circulacao_seg_via_rodov', 'valor_tipo_circulacao',
+                    True, []),
+                    ('lig_segviarodov_viarodov', 'via_rodov',
+                    False, []),
+                    ('lig_segviarodov_viarodovlimite', 'via_rodov_limite',
+                    False, [('valor_tipo_limite', 'vrl.val_tp')])],
+            'refs': ['valor_caract_fisica_rodov', 'valor_estado_via_rodov', 'valor_posicao_vertical_transportes', 'valor_restricao_acesso', 'valor_sentido', 'valor_tipo_troco_rodoviario']},
+        'via_rodov': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'codigo_via_rodov', 'data_cat', 'fonte_aquisicao_dados', 'nome', 'nome_alternativo', 'tipo_via_rodov_abv', 'tipo_via_rodov_c', 'tipo_via_rodov_d'],
+            'ligs': [],
+            'refs': []},
+        'via_rodov_limite': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_limite']},
+        'obra_arte': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_obra_arte']},
+        'constru_linear': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'suporte', 'largura', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_construcao_linear']},
+        'constru_polig': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_construcao']},
+        'constru_na_margem': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_estado_instalacao', 'valor_tipo_const_margem']},
+        'edificio': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'altura_edificio', 'data_const', 'geometria'],
+            'ligs': [('lig_valor_utilizacao_atual_edificio', 'valor_utilizacao_atual', True, []),
+                    ('nome_edificio', None, True, []),
+                    ('numero_policia', None, True, []),
+                    (None, 'inst_producao_id', True, [
+                        ('valor_instalacao_producao', 'ip.v_inst')]),
+                    (None, 'inst_gestao_ambiental_id', True, [
+                        ('valor_instalacao_gestao_ambiental', 'ga.v_inst')]),
+                    ('lig_adm_publica_edificio', 'adm_publica',
+                    False, [('valor_tipo_adm_publica', 'ap.val_tip')]),
+                    ('lig_equip_util_coletiva_edificio', 'equip_util_coletiva', False, [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', 'uc.val_tp')])],
+            'refs': ['valor_condicao_const', 'valor_elemento_edificio_xy', 'valor_elemento_edificio_z', 'valor_forma_edificio']
+        },
+        'ponto_interesse': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_ponto_interesse']},
+        'sinal_geodesico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'data_revisao', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_categoria', 'valor_tipo_sinal_geodesico']},
+        'area_agricola_florestal_mato': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_areas_agricolas_florestais_matos']},
+        'areas_artificializadas': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'geometria'],
+            'ligs': [(None, 'inst_producao_id', True, [
+                    ('valor_instalacao_producao', 'ip.v_inst')]),
+                    (None, 'inst_gestao_ambiental_id', True, [
+                        ('valor_instalacao_gestao_ambiental', 'ga.v_inst')]),
+                    (None, 'equip_util_coletiva_id', True, [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', 'uc.val_tp')])],
+            'refs': ['valor_areas_artificializadas']},
+        'adm_publica': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'ponto_de_contacto'],
+            'ligs': [],
+            'refs': ['valor_tipo_adm_publica']},
+        'cabo_electrico': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'tensao_nominal', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_designacao_tensao', 'valor_posicao_vertical']},
+        'conduta_de_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'diametro', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_conduta_agua', 'valor_posicao_vertical']},
+        'elem_assoc_agua': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_agua']},
+        'elem_assoc_eletricidade': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_electricidade']},
+        'elem_assoc_pgq': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_pgq']},
+        'elem_assoc_telecomunicacoes': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_elemento_associado_telecomunicacoes']},
+        'equip_util_coletiva': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'ponto_de_contacto'],
+            'ligs': [('lig_valor_tipo_equipamento_coletivo_equip_util_coletiva', 'valor_tipo_equipamento_coletivo', True, [])],
+            'refs': []},
+        'inst_gestao_ambiental': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome'],
+            'ligs': [],
+            'refs': ['valor_instalacao_gestao_ambiental']},
+        'inst_producao': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'nome', 'descricao_da_funcao'],
+            'ligs': [],
+            'refs': ['valor_instalacao_producao']},
+        'oleoduto_gasoduto_subtancias_quimicas': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'diametro', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_gasoduto_oleoduto_sub_quimicas', 'valor_posicao_vertical']},
+        'mob_urbano_sinal': {
+            'fields': ['identificador', 'inicio_objeto', 'fim_objeto', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_tipo_de_mob_urbano_sinal']},
+        'area_trabalho': {
+            'fields': ['identificador', '"data"', 'nome', 'nome_proprietario', 'nome_produtor', 'data_homologacao', 'geometria'],
+            'ligs': [],
+            'refs': ['valor_nivel_de_detalhe']}
+    }
 }
 
 joins = {
@@ -337,7 +848,7 @@ joins = {
         'join_table': 'ls_edificio_label_view',
         'join_field': 'edificio_id',
         'target_field': 'identificador',
-        'joined_fields': ['nome'],
+        'joined_fields': ['nome', 'valor_utilizacao_atual_id'],
         'memory_cache': True,
         'prefix': 'lbl_'
     },
@@ -374,6 +885,11 @@ fieldNameMap = {
         'data_publicacao': 'dt_pub'
     },
     'concelho': {
+        'identificador': 'identifica',
+        'inicio_objeto': 'ini_obj',
+        'data_publicacao': 'dt_pub'
+    },
+    'municipio': {
         'identificador': 'identifica',
         'inicio_objeto': 'ini_obj',
         'data_publicacao': 'dt_pub'
@@ -425,7 +941,14 @@ fieldNameMap = {
         'identificador': 'identifica',
         'inicio_objeto': 'ini_obj',
         'id_hidrografico': 'id_hidr',
-        'valor_barreira': 'val_barr'
+        'valor_barreira': 'val_barr',
+        'valor_estado_instalacao': 'val_e_inst'
+    },
+    'constru_na_margem': {
+        'identificador': 'identifica',
+        'inicio_objeto': 'ini_obj',
+        'valor_tipo_const_margem': 'val_tipo',
+        'valor_estado_instalacao': 'val_e_inst'
     },
     'curso_de_agua_area': {
         'identificador': 'identifica',
@@ -443,18 +966,28 @@ fieldNameMap = {
         'origem_natural': 'orig_nat',
         'valor_posicao_vertical': 'val_pos_vt',
         'valor_persistencia_hidrologica': 'val_ps_hdr',
-        'valor_curso_de_agua': 'val_crs_ag'
+        'valor_curso_de_agua': 'val_crs_ag',
+        'valor_estado_instalacao': 'val_e_inst',
+        'valor_ficticio': 'val_fict',
+        'valor_natureza': 'val_natur',
     },
     'fronteira_terra_agua': {
         'identificador': 'identifica',
         'inicio_objeto': 'ini_obj',
-        'data_fonte_dados': 'dt_fnt_dad'
+        'data_fonte_dados': 'dt_fnt_dad',
+        'valor_tipo_fronteira_terra_agua': 'val_tipo'
     },
     'margem': {
         'identificador': 'identifica',
         'inicio_objeto': 'ini_obj',
         'id_hidrografico': 'id_hidr',
         'valor_tipo_margem': 'val_tipo'
+    },
+    'terreno_marginal': {
+        'identificador': 'identifica',
+        'inicio_objeto': 'ini_obj',
+        'id_hidrografico': 'id_hidr',
+        'valor_tipo_terreno_marginal': 'val_tipo'
     },
     'nascente': {
         'identificador': 'identifica',
@@ -659,7 +1192,8 @@ fieldNameMap = {
         'data_revisao': 'dt_revisao',
         'valor_local_geodesico': 'val_lc_geo',
         'valor_ordem': 'val_ordem',
-        'valor_tipo_sinal_geodesico': 'val_tipo'
+        'valor_tipo_sinal_geodesico': 'val_tipo',
+        'valor_categoria': 'val_cat'
     },
     'area_agricola_florestal_mato': {
         'identificador': 'identifica',
@@ -765,5 +1299,6 @@ fieldNameMap = {
         'nome_proprietario': 'nm_propr',
         'nome_produtor': 'nm_produt',
         'data_homologacao': 'dt_homlg',
+        'valor_nivel_de_detalhe': 'val_ndd'
     }
 }

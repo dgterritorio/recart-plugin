@@ -63,7 +63,7 @@ SCM_FILES = \
 PROC_DIR = convert/processing
 PROC_FILES = \
 	$(PROC_DIR)/polygonize.sql $(PROC_DIR)/to2D.py $(PROC_DIR)/to3D.py\
-	$(PROC_DIR)/layer_styles.sql $(PROC_DIR)/aux_views.sql
+	$(PROC_DIR)/aux_views.sql
 
 PROC_DIR_V112 = $(PROC_DIR)/v1.1.2
 PROC_DIR_V201 = $(PROC_DIR)/v2.0.1
