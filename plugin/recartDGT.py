@@ -105,7 +105,7 @@ class recartDGT:
         action.setEnabled(True)
 
         iconC = QIcon(':/plugins/recartDGT/convert.svg')
-        actionC = QAction(iconC, self.tr(u'MNT (DGN/DWG) para CartTop'),
+        actionC = QAction(iconC, self.tr(u'MNT (DGN/DWG) para CartTop (preparação)'),
                           self.iface.mainWindow())
         actionC.triggered.connect(self.runC)
         actionC.setEnabled(True)

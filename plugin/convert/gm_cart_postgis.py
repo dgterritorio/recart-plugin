@@ -365,7 +365,7 @@ class PostgisImporter:
         bp = os.path.dirname(os.path.realpath(__file__))
         try:
             with open(path, "w", encoding='utf-8') as base_sql_file:
-                with open(bp + '/processing/layer_styles.sql', encoding='utf-8') as pp_file:
+                with open(bp + '/processing/{0}/layer_styles.sql'.format(self.vrs), encoding='utf-8') as pp_file:
                     pp_src = pp_file.read()
                     # base_sql_file.write(pp_src.format(schema=self.schema))
                     base_sql_file.write(
