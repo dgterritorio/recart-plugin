@@ -3,7 +3,7 @@
 		"Tema": "HIDROGRAFIA",
 		"Característica geográfica": "Terreno Marginal",
 		"Objeto INSPIRE": "Shore",
-		"objeto": "Terreno Marginal",
+		"objeto": "TerrenoMarginal",
 		"Definição": "Faixa de terra natural em contacto com qualquer massa de água.",
 		"Dim.": "2D",
 		"Atributos": [{

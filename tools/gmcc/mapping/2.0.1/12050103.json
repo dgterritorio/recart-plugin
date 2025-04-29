@@ -5,7 +5,7 @@
     "objeto": "MARGEM COM ESPORÕES",
     "map": [
         {
-            "table": "margem",
+            "table": "terreno_marginal",
             "fields": [
                 {
                     "src": "1_geom",
@@ -19,7 +19,7 @@
                 },
                 {
                     "src": "",
-                    "dst": "valor_tipo_margem",
+                    "dst": "valor_tipo_terreno_marginal",
                     "op": "set",
                     "value": "8"
                 }
