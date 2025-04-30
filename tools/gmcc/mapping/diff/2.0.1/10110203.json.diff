@@ -1,0 +1,34 @@
+--- ./tools/gmcc/mapping/1.1.2/10110203.json	2025-04-21 10:37:10.327544165 +0100
++++ ./tools/gmcc/mapping/2.0.1/10110203.json	2025-04-29 17:26:58.789998982 +0100
+@@ -1,29 +1,29 @@
+ {
+     "dominio": "Vias de Comunicação",
+     "subdominio": "OBRAS DE ARTE",
+     "familia": "OUTRAS PONTES",
+     "objeto": "PONTÃO",
+     "map": [
+         {
+-            "table": "constru_polig",
++            "table": "constru_na_margem",
+             "fields": [
+                 {
+                     "src": "1_geom",
+                     "dst": "geometria",
+                     "op": "eq"
+                 },
+                 {
+                     "src": "",
+                     "dst": "inicio_objeto",
+                     "op": "dnow"
+                 },
+                 {
+                     "src": "",
+-                    "dst": "valor_tipo_construcao",
++                    "dst": "valor_tipo_const_margem",
+                     "op": "set",
+                     "value": "2"
+                 }
+             ]
+         }
+     ]
+ }

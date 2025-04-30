@@ -1,0 +1,60 @@
+--- ./tools/gmcc/mapping/1.1.2/12020401.json	2025-04-21 10:37:10.328544148 +0100
++++ ./tools/gmcc/mapping/2.0.1/12020401.json	2025-04-21 10:37:10.345543865 +0100
+@@ -1,56 +1,56 @@
+ {
+     "dominio": "Hidrografia",
+     "subdominio": "ESTRUTURAS",
+     "familia": "ESTRUTURAS ASSOCIADAS E OUTRAS",
+     "objeto": "PAREDÃO DE BARRAGEM",
+     "map": [
+         {
+             "table": "edificio",
+             "fields": [
+                 {
+                     "src": "1_geom",
+                     "dst": "geometria",
+                     "op": "eq"
+                 },
+                 {
+                     "src": "",
+                     "dst": "inicio_objeto",
+                     "op": "dnow"
+                 },
+                 {
+                     "src": "",
+                     "dst": "altura_edificio",
+                     "op": "set",
+                     "value": "-99999"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_elemento_edificio_xy",
+                     "op": "set",
+                     "value": {
+                       "ndd1": "4",
+                       "ndd2": "6"
+                     }
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_elemento_edificio_z",
+                     "op": "set",
+                     "value": "14"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_forma_edificio",
+                     "op": "set",
+                     "value": "5"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_utilizacao_atual",
+                     "op": "set",
+-                    "value": "888"
++                    "value": "7"
+                 }
+             ]
+         }
+     ]
+ }

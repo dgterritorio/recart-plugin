@@ -1,0 +1,39 @@
+--- ./tools/gmcc/mapping/2.0.1/2030304.json	2025-04-21 10:37:10.346543849 +0100
++++ ./tools/gmcc/mapping/2.0.2/2030304.json	2025-04-21 10:37:10.364543549 +0100
+@@ -1,35 +1,35 @@
+ {
+     "dominio": "Limites",
+     "subdominio": "OUTROS LIMITES",
+     "familia": "VEDAÇÕES",
+     "objeto": "VEDAÇÃO DE ARAME (AE)",
+     "map": [
+         {
+             "table": "constru_linear",
+             "fields": [
+                 {
+                     "src": "1_geom",
+                     "dst": "geometria",
+                     "op": "eq"
+                 },
+                 {
+                     "src": "",
+                     "dst": "inicio_objeto",
+                     "op": "dnow"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_construcao_linear",
+                     "op": "set",
+-                    "value": "4"
++                    "value": "14"
+                 },
+                 {
+                     "src": "",
+                     "dst": "suporte",
+                     "op": "set",
+                     "value": "False"
+                 }
+             ]
+         }
+     ]
+ }

@@ -1,0 +1,35 @@
+--- ./tools/gmcc/mapping/1.1.2/3020103.json	2025-04-21 10:37:10.330544115 +0100
++++ ./tools/gmcc/mapping/2.0.1/3020103.json	2025-04-29 17:26:58.789998982 +0100
+@@ -1,29 +1,29 @@
+ {
+     "dominio": "Altimetria",
+     "subdominio": "ACIDENTES TOPOGRÁFICOS (ORIGEM NATURAL)",
+     "familia": " ROCHAS E AREIAS",
+     "objeto": "AREIAS    ?????????????????????????",
+     "map": [
+         {
+-            "table": "margem",
++            "table": "terreno_marginal",
+             "fields": [
+                 {
+                     "src": "1_geom",
+                     "dst": "geometria",
+                     "op": "eq"
+                 },
+                 {
+                     "src": "",
+                     "dst": "inicio_objeto",
+                     "op": "dnow"
+                 },
+                 {
+                     "src": "",
+-                    "dst": "valor_tipo_margem",
++                    "dst": "valor_tipo_terreno_marginal",
+                     "op": "set",
+                     "value": "6"
+                 }
+             ]
+         }
+     ]
+ }
+\ No newline at end of file
