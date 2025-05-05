@@ -208,7 +208,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -273,7 +273,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -541,7 +541,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -635,7 +635,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -729,7 +729,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -823,7 +823,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -917,7 +917,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -1011,7 +1011,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -1105,7 +1105,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -1486,7 +1486,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "7"
                     },
                     {
                         "src": "",
@@ -1510,7 +1510,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "6"
                     }
                 ]
             }
@@ -1661,7 +1661,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -1726,7 +1726,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -1791,7 +1791,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -1855,7 +1855,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -1896,7 +1896,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "2"
                     },
                     {
                         "src": "",
@@ -1920,7 +1920,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2086,7 +2086,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "6"
                     }
                 ]
             }
@@ -2260,7 +2260,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "2"
                     },
                     {
                         "src": "",
@@ -2284,7 +2284,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2325,7 +2325,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "2"
                     },
                     {
                         "src": "",
@@ -2349,7 +2349,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2390,7 +2390,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "2"
                     },
                     {
                         "src": "",
@@ -2414,7 +2414,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2455,7 +2455,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "2"
                     },
                     {
                         "src": "",
@@ -2479,7 +2479,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2607,7 +2607,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "4"
                     },
                     {
                         "src": "",
@@ -2631,7 +2631,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2672,7 +2672,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "4"
                     },
                     {
                         "src": "",
@@ -2696,7 +2696,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2761,7 +2761,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2859,7 +2859,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "2"
                     },
                     {
                         "src": "",
@@ -2883,7 +2883,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -2924,7 +2924,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "2"
                     },
                     {
                         "src": "",
@@ -2948,7 +2948,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -3018,7 +3018,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_caract_fisica_rodov",
                         "op": "set",
-                        "value": "888"
+                        "value": "7"
                     },
                     {
                         "src": "",
@@ -3525,7 +3525,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -3578,7 +3578,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -3631,7 +3631,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -3720,7 +3720,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -3773,7 +3773,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -3826,7 +3826,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -3879,7 +3879,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -3986,7 +3986,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -4039,7 +4039,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -4098,7 +4098,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -4151,7 +4151,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_categoria_bitola",
                         "op": "set",
-                        "value": "888"
+                        "value": "995"
                     },
                     {
                         "src": "",
@@ -4369,7 +4369,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -4452,7 +4452,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_tipo_troco_rodoviario",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -6394,7 +6394,7 @@ cmap = {
         "objeto": "PONTÃO",
         "map": [
             {
-                "table": "constru_polig",
+                "table": "constru_na_margem",
                 "fields": [
                     {
                         "src": "1_geom",
@@ -6408,7 +6408,7 @@ cmap = {
                     },
                     {
                         "src": "",
-                        "dst": "valor_tipo_construcao",
+                        "dst": "valor_tipo_const_margem",
                         "op": "set",
                         "value": "2"
                     }
@@ -8298,7 +8298,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_curso_de_agua",
                         "op": "set",
-                        "value": "1"
+                        "value": "7"
                     },
                     {
                         "src": "",
@@ -8345,7 +8345,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_curso_de_agua",
                         "op": "set",
-                        "value": "2"
+                        "value": "7"
                     },
                     {
                         "src": "",
@@ -9708,7 +9708,7 @@ cmap = {
         "objeto": "VERTICAL (PAREDÃO, MURO CAIS)",
         "map": [
             {
-                "table": "margem",
+                "table": "terreno_marginal",
                 "fields": [
                     {
                         "src": "1_geom",
@@ -9722,7 +9722,7 @@ cmap = {
                     },
                     {
                         "src": "",
-                        "dst": "valor_tipo_margem",
+                        "dst": "valor_tipo_terreno_marginal",
                         "op": "set",
                         "value": "888"
                     }
@@ -9737,7 +9737,7 @@ cmap = {
         "objeto": "OBLÍQUA (PAREDÃO)",
         "map": [
             {
-                "table": "margem",
+                "table": "terreno_marginal",
                 "fields": [
                     {
                         "src": "1_geom",
@@ -9751,7 +9751,7 @@ cmap = {
                     },
                     {
                         "src": "",
-                        "dst": "valor_tipo_margem",
+                        "dst": "valor_tipo_terreno_marginal",
                         "op": "set",
                         "value": "888"
                     }
@@ -9766,7 +9766,7 @@ cmap = {
         "objeto": "MARGEM COM ESPORÕES",
         "map": [
             {
-                "table": "margem",
+                "table": "terreno_marginal",
                 "fields": [
                     {
                         "src": "1_geom",
@@ -9780,7 +9780,7 @@ cmap = {
                     },
                     {
                         "src": "",
-                        "dst": "valor_tipo_margem",
+                        "dst": "valor_tipo_terreno_marginal",
                         "op": "set",
                         "value": "8"
                     }
@@ -9795,7 +9795,7 @@ cmap = {
         "objeto": "MARGEM INSTÁVEL",
         "map": [
             {
-                "table": "margem",
+                "table": "terreno_marginal",
                 "fields": [
                     {
                         "src": "1_geom",
@@ -9809,7 +9809,7 @@ cmap = {
                     },
                     {
                         "src": "",
-                        "dst": "valor_tipo_margem",
+                        "dst": "valor_tipo_terreno_marginal",
                         "op": "set",
                         "value": "888"
                     }
@@ -9824,7 +9824,7 @@ cmap = {
         "objeto": "MARGEM FIRME/ROCHOSA",
         "map": [
             {
-                "table": "margem",
+                "table": "terreno_marginal",
                 "fields": [
                     {
                         "src": "1_geom",
@@ -9838,7 +9838,7 @@ cmap = {
                     },
                     {
                         "src": "",
-                        "dst": "valor_tipo_margem",
+                        "dst": "valor_tipo_terreno_marginal",
                         "op": "set",
                         "value": "5"
                     }
@@ -9853,7 +9853,7 @@ cmap = {
         "objeto": "MARGEM INDETERMINADA (ARENOSA)",
         "map": [
             {
-                "table": "margem",
+                "table": "terreno_marginal",
                 "fields": [
                     {
                         "src": "1_geom",
@@ -9867,7 +9867,7 @@ cmap = {
                     },
                     {
                         "src": "",
-                        "dst": "valor_tipo_margem",
+                        "dst": "valor_tipo_terreno_marginal",
                         "op": "set",
                         "value": "6"
                     }
@@ -11824,7 +11824,7 @@ cmap = {
         "objeto": "AREIAS    ?????????????????????????",
         "map": [
             {
-                "table": "margem",
+                "table": "terreno_marginal",
                 "fields": [
                     {
                         "src": "1_geom",
@@ -11838,7 +11838,7 @@ cmap = {
                     },
                     {
                         "src": "",
-                        "dst": "valor_tipo_margem",
+                        "dst": "valor_tipo_terreno_marginal",
                         "op": "set",
                         "value": "6"
                     }

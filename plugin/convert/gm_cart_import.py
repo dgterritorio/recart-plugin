@@ -256,7 +256,8 @@ class CartImporter:
                         'geometria': aux.OGRwkbGeomTypes[layer.GetGeomType()],
                         'campos': fields,
                         'elementos': layer.GetFeatureCount(),
-                        'data': layer
+                        'data': layer,
+                        'ficheiro': fp
                     }
                     self.layers.append(save_layer)
 
@@ -331,62 +332,68 @@ class CartImporter:
         self.writer("Processar Dataset")
         for layer in self.layers:
             layer['data'].ResetReading()
-            for feature in layer['data']:
-                if self.print_elems:
-                    self.writer(json.loads(
-                        feature.ExportToJson())['properties'])
+            for i in range(0, layer['data'].GetFeatureCount()):
+                try:
+                    feature = layer['data'].GetFeature(i)
+                    if self.print_elems:
+                        self.writer(json.loads(
+                            feature.ExportToJson())['properties'])
 
-                if feature.IsFieldSet(self.cod_field):
-                    clink = feature.GetFieldAsString(self.cod_field)
+                    if feature.IsFieldSet(self.cod_field):
+                        clink = feature.GetFieldAsString(self.cod_field)
 
-                    if self.use_layerName:
-                        clink = layer['nome']
+                        if self.use_layerName:
+                            clink = layer['nome']
 
-                    clinkj = clink
+                        clinkj = clink
 
-                    try:
-                        clinkj = json.loads(clink)
-                    except ValueError as e:
-                        pass
+                        try:
+                            clinkj = json.loads(clink)
+                        except ValueError as e:
+                            pass
 
-                    clinks = []
-                    if isinstance(clinkj, dict):
-                        if self.ulink_type in clinkj:
-                            for cl in clinkj[self.ulink_type]:
-                                clinks.append(cl["key"].lstrip("0"))
-                    else:
-                        if self.alias_file is not None:
-                            clinks.append(clinkj)
+                        clinks = []
+                        if isinstance(clinkj, dict):
+                            if self.ulink_type in clinkj:
+                                for cl in clinkj[self.ulink_type]:
+                                    clinks.append(cl["key"].lstrip("0"))
                         else:
-                            clinks.append(str(clinkj).lstrip("0"))
+                            if self.alias_file is not None:
+                                clinks.append(clinkj)
+                            else:
+                                clinks.append(str(clinkj).lstrip("0"))
 
-                    # if aux.isListType(feature.GetFieldType(self.cod_field)):
-                    #     clinks = aux.parse_ogr_list(clink)
-                    # else:
-                    #     clinks = [clink]
+                        # if aux.isListType(feature.GetFieldType(self.cod_field)):
+                        #     clinks = aux.parse_ogr_list(clink)
+                        # else:
+                        #     clinks = [clink]
 
-                    for cod in clinks:
-                        if self.alias_file is not None\
-                                and cod in self.alias and self.alias[cod]:
-                            cod = str(self.alias[cod]).lstrip("0")
-                        if cod in self.mapping and 'map' in self.mapping[cod]:
-                            dst_map = self.mapping[cod]['map']
-                            for map_op in dst_map:
-                                if 'table' in map_op and map_op['table']:
-                                    self.base[map_op['table']].add_element(
-                                        {'key': cod, 'data': feature, 'map_ops': map_op, 'src': layer['nome']})
-                                else:
-                                    self.base['restantes'].add_element(
-                                        {'data': feature, 'src': layer['nome']})
-                                    self.process_error(
-                                        cod, 'invalid', 'Encontrado código com mapeamento inválido', feature)
-                        else:
-                            self.base['restantes'].add_element(
-                                {'data': feature, 'src': layer['nome']})
-                            self.process_error(
-                                cod, 'missing_map', 'Encontrado código sem mapeamento', feature, True)
+                        for cod in clinks:
+                            if self.alias_file is not None\
+                                    and cod in self.alias and self.alias[cod]:
+                                cod = str(self.alias[cod]).lstrip("0")
+                            if cod in self.mapping and 'map' in self.mapping[cod]:
+                                dst_map = self.mapping[cod]['map']
+                                for map_op in dst_map:
+                                    if 'table' in map_op and map_op['table']:
+                                        self.base[map_op['table']].add_element(
+                                            {'key': cod, 'data': feature, 'map_ops': map_op, 'src': layer['nome']})
+                                    else:
+                                        self.base['restantes'].add_element(
+                                            {'data': feature, 'src': layer['nome']})
+                                        self.process_error(
+                                            cod, 'invalid', 'Encontrado código com mapeamento inválido', feature)
+                            else:
+                                self.base['restantes'].add_element(
+                                    {'data': feature, 'src': layer['nome']})
+                                self.process_error(
+                                    cod, 'missing_map', 'Encontrado código sem mapeamento', feature, True)
 
-                        self.feat_process += 1
+                            self.feat_process += 1
+                except Exception as e:
+                    self.writer("\t[Erro] Falhou processamento de feature {}.\
+                                \n\t\tVerifique que o ficheiro '{}' não está corrompido.".format(i, layer['ficheiro']))
+                    continue
 
         self.writer('Foram processadas ' +
                     str(self.feat_process) + ' features')

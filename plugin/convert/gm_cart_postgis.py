@@ -423,7 +423,7 @@ class PostgisImporter:
                                 for op in map_ops:
                                     cols = [f['dst'] for f in op['fields']]
                                     cols_string = ', '.join(cols)
-                                    if op['table'] in self.base:
+                                    if op['table'] in self.base and feature["data"].GetGeometryRef() is not None:
                                         geom_type = aux.FeatureTypes[aux.OGRwkbGeomTypes[
                                             feature["data"].GetGeometryRef().GetGeometryType()]]
                                         insert_key = op['table'] + \
@@ -528,7 +528,7 @@ class PostgisImporter:
                             # print(feature['data'].GetGeometryRef().GetGeometryType())
                             # print(aux.OGRwkbGeomTypes[feature['data'].GetGeometryRef().GetGeometryType()])
 
-                            if feature['data'].GetGeometryRef().IsEmpty():
+                            if feature['data'].GetGeometryRef() is None or feature['data'].GetGeometryRef().IsEmpty():
                                 continue
 
                             if not first:

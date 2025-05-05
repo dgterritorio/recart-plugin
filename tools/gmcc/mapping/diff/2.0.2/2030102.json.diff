@@ -1,0 +1,39 @@
+--- ./tools/gmcc/mapping/2.0.1/2030102.json	2025-04-21 10:37:10.346543849 +0100
++++ ./tools/gmcc/mapping/2.0.2/2030102.json	2025-04-21 10:37:10.362543582 +0100
+@@ -1,34 +1,34 @@
+ {
+     "tema": "OUTROS LIMITES",
+     "camada": "OutrosLimites_Muros",
+     "nome": "MuroDePedraSolta",
+     "map": [
+         {
+             "table": "constru_linear",
+             "fields": [
+                 {
+                     "src": "1_geom",
+                     "dst": "geometria",
+                     "op": "eq"
+                 },
+                 {
+                     "src": "",
+                     "dst": "inicio_objeto",
+                     "op": "dnow"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_construcao_linear",
+                     "op": "set",
+-                    "value": "2"
++                    "value": "12"
+                 },
+                 {
+                     "src": "",
+                     "dst": "suporte",
+                     "op": "set",
+                     "value": "false"
+                 }
+             ]
+         }
+     ]
+ }
+\ No newline at end of file

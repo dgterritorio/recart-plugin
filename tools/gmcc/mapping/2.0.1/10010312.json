@@ -56,7 +56,7 @@
                     "src": "",
                     "dst": "valor_tipo_troco_rodoviario",
                     "op": "set",
-                    "value": "888"
+                    "value": "1"
                 }
             ]
         }

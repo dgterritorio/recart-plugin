@@ -1,0 +1,57 @@
+--- ./tools/gmcc/mapping/1.1.2/10020401.json	2025-04-21 10:37:10.326544182 +0100
++++ ./tools/gmcc/mapping/2.0.1/10020401.json	2025-04-29 17:26:58.789998982 +0100
+@@ -1,53 +1,53 @@
+ {
+     "dominio": "Vias de Comunicação",
+     "subdominio": "TRÁFEGO FERROVIÁRIO",
+     "familia": "ELÉTRICOS",
+     "objeto": "LINHA DE ELÉTRICO",
+     "map": [
+         {
+             "table": "seg_via_ferrea",
+             "fields": [
+                 {
+                     "src": "1_geom",
+                     "dst": "geometria",
+                     "op": "eq"
+                 },
+                 {
+                     "src": "",
+                     "dst": "inicio_objeto",
+                     "op": "dnow"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_categoria_bitola",
+                     "op": "set",
+-                    "value": "888"
++                    "value": "995"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_posicao_vertical_transportes",
+                     "op": "set",
+                     "value": "0"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_tipo_linha_ferrea",
+                     "op": "set",
+                     "value": "8"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_tipo_troco_via_ferrea",
+                     "op": "set",
+                     "value": "888"
+                 },
+                 {
+                     "src": "",
+                     "dst": "eletrific",
+                     "op": "set",
+                     "value": "true"
+                 }
+             ]
+         }
+     ]
+ }

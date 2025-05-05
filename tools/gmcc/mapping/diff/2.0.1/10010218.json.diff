@@ -1,0 +1,71 @@
+--- ./tools/gmcc/mapping/1.1.2/10010218.json	2025-04-21 10:37:10.325544198 +0100
++++ ./tools/gmcc/mapping/2.0.1/10010218.json	2025-04-29 17:26:58.788998970 +0100
+@@ -1,65 +1,65 @@
+ {
+     "dominio": "Vias de Comunicação",
+     "subdominio": "TRÁFEGO RODOVIÁRIO",
+     "familia": "REDE COMPLEMENTAR",
+     "objeto": "EIXO DO IC/RADIAL",
+     "map": [
+         {
+             "table": "seg_via_rodov",
+             "fields": [
+                 {
+                     "src": "1_geom",
+                     "dst": "geometria",
+                     "op": "eq"
+                 },
+                 {
+                     "src": "",
+                     "dst": "inicio_objeto",
+                     "op": "dnow"
+                 },
+                 {
+                     "src": "",
+                     "dst": "num_vias_transito",
+                     "op": "set",
+                     "value": "-99999"
+                 },
+                 {
+                     "src": "",
+                     "dst": "pavimentado",
+                     "op": "set",
+                     "value": "true"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_caract_fisica_rodov",
+                     "op": "set",
+                     "value": "2"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_posicao_vertical_transportes",
+                     "op": "set",
+                     "value": "0"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_sentido",
+                     "op": "set",
+-                    "value": "888"
++                    "value": "1"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_tipo_circulacao",
+                     "op": "set",
+                     "value": "1"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_tipo_troco_rodoviario",
+                     "op": "set",
+-                    "value": "888"
++                    "value": "1"
+                 }
+             ]
+         }
+     ]
+ }
+\ No newline at end of file

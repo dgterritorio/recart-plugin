@@ -5,7 +5,7 @@
     "objeto": "PONTÃO",
     "map": [
         {
-            "table": "constru_polig",
+            "table": "constru_na_margem",
             "fields": [
                 {
                     "src": "1_geom",
@@ -19,7 +19,7 @@
                 },
                 {
                     "src": "",
-                    "dst": "valor_tipo_construcao",
+                    "dst": "valor_tipo_const_margem",
                     "op": "set",
                     "value": "2"
                 }

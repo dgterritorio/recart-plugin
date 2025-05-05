@@ -33,7 +33,7 @@
                     "src": "",
                     "dst": "valor_caract_fisica_rodov",
                     "op": "set",
-                    "value": "888"
+                    "value": "2"
                 },
                 {
                     "src": "",
@@ -57,7 +57,7 @@
                     "src": "",
                     "dst": "valor_tipo_troco_rodoviario",
                     "op": "set",
-                    "value": "888"
+                    "value": "1"
                 }
             ]
         }

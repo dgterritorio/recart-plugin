@@ -1,0 +1,39 @@
+--- ./tools/gmcc/mapping/2.0.1/2030111.json	2025-04-21 10:37:10.346543849 +0100
++++ ./tools/gmcc/mapping/2.0.2/2030111.json	2025-04-21 10:37:10.363543566 +0100
+@@ -1,35 +1,35 @@
+ {
+     "dominio": "Limites",
+     "subdominio": "OUTROS LIMITES",
+     "familia": "MUROS",
+     "objeto": "MURO DE SUPORTE DE TERRA ARMADA (AE)",
+     "map": [
+         {
+             "table": "constru_linear",
+             "fields": [
+                 {
+                     "src": "1_geom",
+                     "dst": "geometria",
+                     "op": "eq"
+                 },
+                 {
+                     "src": "",
+                     "dst": "inicio_objeto",
+                     "op": "dnow"
+                 },
+                 {
+                     "src": "",
+                     "dst": "valor_construcao_linear",
+                     "op": "set",
+-                    "value": "1"
++                    "value": "12"
+                 },
+                 {
+                     "src": "",
+                     "dst": "suporte",
+                     "op": "set",
+                     "value": "True"
+                 }
+             ]
+         }
+     ]
+ }
