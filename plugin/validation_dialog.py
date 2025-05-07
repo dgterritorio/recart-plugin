@@ -59,7 +59,6 @@ class ValidationDialog(QDialog, FORM_CLASS):
             QDialogButtonBox.StandardButton.Reset).clicked.connect(self.reset)
 
         self.comboBox.addItems(['NdD1', 'NdD2'])
-        self.versaocomboBox.addItems(['V 1.1', 'V 1.1.1', 'V 1.1.2'])
 
         self.validateProcess = None
         self.createProcess = None
@@ -68,6 +67,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.ruleSetup = False
 
         self.srsid = 0
+        self.vrs = None
 
     def showEvent(self, event):
         super(ValidationDialog, self).showEvent(event)
@@ -330,7 +330,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             times = datetime.now()
             footnote = times.strftime("%Y-%m-%d %H:%M:%S") +\
-                " | Recart " + self.versaocomboBox.currentText() + " | " + self.comboBox.currentText()
+                " | Recart " + self.vrs + " | " + self.comboBox.currentText()
 
             project = QgsProject.instance()
             layout = QgsPrintLayout(project)
@@ -537,6 +537,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         if self.createProcess is not None and not self.createProcess.cancel is True:
             conString = qgis_configs.getConnString(self, self.getConnection())
             schema = str(self.schemaName.currentText())
+            self.vrs = self.createProcess.vrs
 
             self.validateProcess = ValidateProcess(conString, schema, self.comboBox.currentText())
 
@@ -812,6 +813,7 @@ class CreateProcess(QThread):
         self.pgutils = PostgisUtils(self, conn)
 
         self.actconn = None
+        self.vrs = 'v2.0.2'
 
     def write(self, text):
         self.signal.emit(text)
@@ -829,6 +831,19 @@ class CreateProcess(QThread):
 
     def run(self):
         try:
+            self.actconn = self.pgutils.get_connection()
+
+            # test database version
+            finddbquery = 'select count(*) from {schema}.valor_construcao_linear;'
+            cnt = re.sub(r"{schema}", self.schema, finddbquery)
+            res = self.pgutils.run_query_with_conn(self.actconn, cnt, None, False)
+            if res and len(res) > 0 and res[0][0] == 9:
+                self.vrs = 'v1.1.2'
+            elif res and len(res) > 0 and res[0][0] == 11:
+                self.vrs = 'v2.0.1'
+
+            self.write("\tBase de dados com versão " + self.vrs)
+
             file = None
             if self.valid3d is True:
                 with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
@@ -836,7 +851,6 @@ class CreateProcess(QThread):
                 cnt = re.sub(r"{schema}", self.schema, cnt)
                 cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-                self.actconn = self.pgutils.get_connection()
                 self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
             else:
                 file = open(self.bp + '/validation_setup_no3d.sql', "r", encoding='utf-8')
@@ -844,7 +858,6 @@ class CreateProcess(QThread):
                 cnt = re.sub(r"{schema}", self.schema, cnt)
                 cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-                self.actconn = self.pgutils.get_connection()
                 self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
 
             if file is not None:
@@ -905,15 +918,15 @@ class ValidateProcess(QThread):
             if l > 0:
                 self.actconn = self.pgutils.get_connection()
 
-            for r in rules:
-                if self.cancel:
-                    break
+                for r in rules:
+                    if self.cancel:
+                        break
 
-                self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
-                self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + r[0] + "');")
-                i = i + 1
+                    self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
+                    self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + r[0] + "');")
+                    i = i + 1
 
-            self.actconn.close()
+                self.actconn.close()
             self.actconn = None
             if self.cancel:
                 self.write("\t [Aviso] Operação cancelada")
@@ -926,13 +939,14 @@ class ValidateProcess(QThread):
                         coalesce(((regexp_match(code, '[0-9]+_([0-9]+)_*'))[1])::integer, 0) asc,\
                         coalesce(((regexp_match(code, '[0-9]+_[0-9]+_([0-9])_*'))[1])::integer, 0) asc;")
 
-            self.write("\n\tSumário:")
-            for line in report:
-                text = "\tValidada a regra '" + \
-                    str(line[0]) + " - " + str(line[1]) + "'\t"
-                text = text + "\n\t\tSem erros detetados." if (
-                    line[2] == line[3]) else text + "\n\t\tDetetados " + str(line[4]) + " erros."
-                self.write(text)
+            if report:
+                self.write("\n\tSumário:")
+                for line in report:
+                    text = "\tValidada a regra '" + \
+                        str(line[0]) + " - " + str(line[1]) + "'\t"
+                    text = text + "\n\t\tSem erros detetados." if (
+                        line[2] == line[3]) else text + "\n\t\tDetetados " + str(line[4]) + " erros."
+                    self.write(text)
 
             # SELECT f_table_name, f_geometry_column, "type" FROM geometry_columns WHERE f_table_schema = 'errors';
             tables = self.pgutils.run_query(
