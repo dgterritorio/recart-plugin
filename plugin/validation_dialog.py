@@ -20,6 +20,7 @@
  ***************************************************************************/
 """
 import os, subprocess, platform
+import json
 import re
 
 from datetime import datetime
@@ -539,7 +540,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             schema = str(self.schemaName.currentText())
             self.vrs = self.createProcess.vrs
 
-            self.validateProcess = ValidateProcess(conString, schema, self.comboBox.currentText())
+            self.validateProcess = ValidateProcess(conString, schema, self.comboBox.currentText(), self.vrs)
 
             self.validateProcess.signal.connect(self.writeText)
             self.validateProcess.finished.connect(self.finishedValidate)
@@ -871,12 +872,13 @@ class CreateProcess(QThread):
 class ValidateProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, conn, schema, ndd1):
+    def __init__(self, conn, schema, ndd1, vrs):
         QThread.__init__(self)
 
         self.conn = conn
         self.schema = schema
         self.ndd1 = ndd1
+        self.vrs = vrs
 
         self.pgutils = PostgisUtils(self, conn)
 
@@ -900,6 +902,70 @@ class ValidateProcess(QThread):
 
     def run(self):
         try:
+            interrupt = False
+
+            # validate structure
+            base_dir = os.path.dirname(os.path.realpath(__file__))+'/convert/base/'+self.vrs
+            base_files = [os.path.join(base_dir, f) for f in os.listdir(base_dir) if os.path.isfile(
+                os.path.join(base_dir, f)) and f.lower().endswith('.json')]
+            for bfile in base_files:
+                try:
+                    if bfile.split('/')[-1] == 'relacoes.json':
+                        continue
+                    with open(bfile, encoding='utf-8') as base_file:
+                        bfp = json.load(base_file)
+
+                        objecto = bfp['objecto']
+                        ccname = re.sub(r'(?<!^)(?=[A-Z][a-z])|(?=[A-Z]{3,})',
+                                        '_', objecto['objeto']).lower()
+
+                        campos = []
+                        for attr in [r for r in objecto['Atributos'] if r['Multip.'] != '[1..*]' and r['Multip.'] != '[0..*]']:
+                            attr['Atributo'] = re.sub(
+                                r'iD', 'id', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'LAS', 'Las', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'valorElementoAssociadoPGQ', 'valor_elemento_associado_pgq', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'XY', 'Xy', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'datahomologacao', 'data_homologacao', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'nomeDoProdutor', 'nome_produtor', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'nomeDoProprietario', 'nome_proprietario', attr['Atributo'])
+                            campos.append({
+                                'nome': re.sub(r'(?<!^)(?=[A-Z])', '_', attr['Atributo']).lower(),
+                                'tipo': attr['Tipo']
+                            })
+
+                        camposFrmt = json.dumps([x['nome'] for x in campos])
+                        res = self.pgutils.run_query(
+                            'select validation.validate_table_columns(\'{}\', \'{}\');'.format(ccname, camposFrmt))
+                        if res and len(res) > 0 and res[0][0] == False:
+                            interrupt = True
+                            raise Exception(
+                                "A tabela {} não tem os campos esperados:\n\t{}".format(ccname, camposFrmt))
+
+                        for lista in objecto['listas de códigos']:
+                            ltnome = re.sub(r'(?<!^)(?=[A-Z])', '_', lista['nome']).lower()
+                            valores = json.dumps([{'identificador': val['Valores'], 'descricao': val['Descrição']} for val in lista['valores']], ensure_ascii=False)
+
+                            res = self.pgutils.run_query(
+                                'select validation.validate_table_rows(\'{}\', \'{}\');'.format(ltnome, valores))
+                            if res and len(res) > 0 and res[0][0] == False:
+                                interrupt = True
+                                raise Exception(
+                                    "A lista de valores {} não tem os valores esperados:\n\t{}".format(ltnome, valores))
+                except Exception as e:
+                    self.write(
+                        "Erro ao validar estrutura base.\n" + str(e))
+
+            if interrupt:
+                self.write("[Erro] Estrutura base inválida")
+                return
+
             self.pgutils.run_query(
                 'update validation.rules set total = 0, good = 0, bad = 0 where run=true;')
 
