@@ -45,12 +45,6 @@
          <string>Configuração</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <item row="6" column="1" colspan="2">
-          <widget class="QComboBox" name="versaocomboBox"/>
-         </item>
-         <item row="5" column="1" colspan="2">
-          <widget class="QComboBox" name="comboBox"/>
-         </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_4">
            <property name="text">
@@ -58,7 +52,14 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Título</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
           <widget class="QCheckBox" name="checkBox">
            <property name="enabled">
             <bool>false</bool>
@@ -74,10 +75,10 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label">
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_11">
            <property name="text">
-            <string>Versão</string>
+            <string>Ligação</string>
            </property>
           </widget>
          </item>
@@ -88,31 +89,14 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>Ligação</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1" colspan="2">
-          <widget class="QComboBox" name="schemaName"/>
-         </item>
-         <item row="0" column="1" colspan="2">
-          <widget class="QLineEdit" name="lineEdit"/>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Título</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1" colspan="2">
-          <widget class="QComboBox" name="connCombo"/>
+         <item row="5" column="1" colspan="2">
+          <widget class="QComboBox" name="comboBox"/>
          </item>
          <item row="4" column="1">
           <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget"/>
+         </item>
+         <item row="2" column="1" colspan="2">
+          <widget class="QComboBox" name="schemaName"/>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_2">
@@ -120,6 +104,12 @@
             <string>Coordenadas</string>
            </property>
           </widget>
+         </item>
+         <item row="0" column="1" colspan="2">
+          <widget class="QLineEdit" name="lineEdit"/>
+         </item>
+         <item row="1" column="1" colspan="2">
+          <widget class="QComboBox" name="connCombo"/>
          </item>
         </layout>
        </widget>

@@ -20,6 +20,7 @@
  ***************************************************************************/
 """
 import os, subprocess, platform
+import json
 import re
 
 from datetime import datetime
@@ -59,7 +60,6 @@ class ValidationDialog(QDialog, FORM_CLASS):
             QDialogButtonBox.StandardButton.Reset).clicked.connect(self.reset)
 
         self.comboBox.addItems(['NdD1', 'NdD2'])
-        self.versaocomboBox.addItems(['V 1.1', 'V 1.1.1', 'V 1.1.2'])
 
         self.validateProcess = None
         self.createProcess = None
@@ -68,6 +68,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.ruleSetup = False
 
         self.srsid = 0
+        self.vrs = None
 
     def showEvent(self, event):
         super(ValidationDialog, self).showEvent(event)
@@ -330,7 +331,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             times = datetime.now()
             footnote = times.strftime("%Y-%m-%d %H:%M:%S") +\
-                " | Recart " + self.versaocomboBox.currentText() + " | " + self.comboBox.currentText()
+                " | Recart " + self.vrs + " | " + self.comboBox.currentText()
 
             project = QgsProject.instance()
             layout = QgsPrintLayout(project)
@@ -537,8 +538,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
         if self.createProcess is not None and not self.createProcess.cancel is True:
             conString = qgis_configs.getConnString(self, self.getConnection())
             schema = str(self.schemaName.currentText())
+            self.vrs = self.createProcess.vrs
 
-            self.validateProcess = ValidateProcess(conString, schema, self.comboBox.currentText())
+            self.validateProcess = ValidateProcess(conString, schema, self.comboBox.currentText(), self.vrs)
 
             self.validateProcess.signal.connect(self.writeText)
             self.validateProcess.finished.connect(self.finishedValidate)
@@ -812,6 +814,7 @@ class CreateProcess(QThread):
         self.pgutils = PostgisUtils(self, conn)
 
         self.actconn = None
+        self.vrs = 'v2.0.2'
 
     def write(self, text):
         self.signal.emit(text)
@@ -829,6 +832,19 @@ class CreateProcess(QThread):
 
     def run(self):
         try:
+            self.actconn = self.pgutils.get_connection()
+
+            # test database version
+            finddbquery = 'select count(*) from {schema}.valor_construcao_linear;'
+            cnt = re.sub(r"{schema}", self.schema, finddbquery)
+            res = self.pgutils.run_query_with_conn(self.actconn, cnt, None, False)
+            if res and len(res) > 0 and res[0][0] == 9:
+                self.vrs = 'v1.1.2'
+            elif res and len(res) > 0 and res[0][0] == 11:
+                self.vrs = 'v2.0.1'
+
+            self.write("\tBase de dados com versão " + self.vrs)
+
             file = None
             if self.valid3d is True:
                 with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
@@ -836,7 +852,6 @@ class CreateProcess(QThread):
                 cnt = re.sub(r"{schema}", self.schema, cnt)
                 cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-                self.actconn = self.pgutils.get_connection()
                 self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
             else:
                 file = open(self.bp + '/validation_setup_no3d.sql', "r", encoding='utf-8')
@@ -844,7 +859,6 @@ class CreateProcess(QThread):
                 cnt = re.sub(r"{schema}", self.schema, cnt)
                 cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-                self.actconn = self.pgutils.get_connection()
                 self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
 
             if file is not None:
@@ -858,12 +872,13 @@ class CreateProcess(QThread):
 class ValidateProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, conn, schema, ndd1):
+    def __init__(self, conn, schema, ndd1, vrs):
         QThread.__init__(self)
 
         self.conn = conn
         self.schema = schema
         self.ndd1 = ndd1
+        self.vrs = vrs
 
         self.pgutils = PostgisUtils(self, conn)
 
@@ -887,6 +902,70 @@ class ValidateProcess(QThread):
 
     def run(self):
         try:
+            interrupt = False
+
+            # validate structure
+            base_dir = os.path.dirname(os.path.realpath(__file__))+'/convert/base/'+self.vrs
+            base_files = [os.path.join(base_dir, f) for f in os.listdir(base_dir) if os.path.isfile(
+                os.path.join(base_dir, f)) and f.lower().endswith('.json')]
+            for bfile in base_files:
+                try:
+                    if bfile.split('/')[-1] == 'relacoes.json':
+                        continue
+                    with open(bfile, encoding='utf-8') as base_file:
+                        bfp = json.load(base_file)
+
+                        objecto = bfp['objecto']
+                        ccname = re.sub(r'(?<!^)(?=[A-Z][a-z])|(?=[A-Z]{3,})',
+                                        '_', objecto['objeto']).lower()
+
+                        campos = []
+                        for attr in [r for r in objecto['Atributos'] if r['Multip.'] != '[1..*]' and r['Multip.'] != '[0..*]']:
+                            attr['Atributo'] = re.sub(
+                                r'iD', 'id', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'LAS', 'Las', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'valorElementoAssociadoPGQ', 'valor_elemento_associado_pgq', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'XY', 'Xy', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'datahomologacao', 'data_homologacao', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'nomeDoProdutor', 'nome_produtor', attr['Atributo'])
+                            attr['Atributo'] = re.sub(
+                                r'nomeDoProprietario', 'nome_proprietario', attr['Atributo'])
+                            campos.append({
+                                'nome': re.sub(r'(?<!^)(?=[A-Z])', '_', attr['Atributo']).lower(),
+                                'tipo': attr['Tipo']
+                            })
+
+                        camposFrmt = json.dumps([x['nome'] for x in campos])
+                        res = self.pgutils.run_query(
+                            'select validation.validate_table_columns(\'{}\', \'{}\');'.format(ccname, camposFrmt))
+                        if res and len(res) > 0 and res[0][0] == False:
+                            interrupt = True
+                            raise Exception(
+                                "A tabela {} não tem os campos esperados:\n\t{}".format(ccname, camposFrmt))
+
+                        for lista in objecto['listas de códigos']:
+                            ltnome = re.sub(r'(?<!^)(?=[A-Z])', '_', lista['nome']).lower()
+                            valores = json.dumps([{'identificador': val['Valores'], 'descricao': val['Descrição']} for val in lista['valores']], ensure_ascii=False)
+
+                            res = self.pgutils.run_query(
+                                'select validation.validate_table_rows(\'{}\', \'{}\');'.format(ltnome, valores))
+                            if res and len(res) > 0 and res[0][0] == False:
+                                interrupt = True
+                                raise Exception(
+                                    "A lista de valores {} não tem os valores esperados:\n\t{}".format(ltnome, valores))
+                except Exception as e:
+                    self.write(
+                        "Erro ao validar estrutura base.\n" + str(e))
+
+            if interrupt:
+                self.write("[Erro] Estrutura base inválida")
+                return
+
             self.pgutils.run_query(
                 'update validation.rules set total = 0, good = 0, bad = 0 where run=true;')
 
@@ -905,15 +984,15 @@ class ValidateProcess(QThread):
             if l > 0:
                 self.actconn = self.pgutils.get_connection()
 
-            for r in rules:
-                if self.cancel:
-                    break
+                for r in rules:
+                    if self.cancel:
+                        break
 
-                self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
-                self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + r[0] + "');")
-                i = i + 1
+                    self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
+                    self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + r[0] + "');")
+                    i = i + 1
 
-            self.actconn.close()
+                self.actconn.close()
             self.actconn = None
             if self.cancel:
                 self.write("\t [Aviso] Operação cancelada")
@@ -926,13 +1005,14 @@ class ValidateProcess(QThread):
                         coalesce(((regexp_match(code, '[0-9]+_([0-9]+)_*'))[1])::integer, 0) asc,\
                         coalesce(((regexp_match(code, '[0-9]+_[0-9]+_([0-9])_*'))[1])::integer, 0) asc;")
 
-            self.write("\n\tSumário:")
-            for line in report:
-                text = "\tValidada a regra '" + \
-                    str(line[0]) + " - " + str(line[1]) + "'\t"
-                text = text + "\n\t\tSem erros detetados." if (
-                    line[2] == line[3]) else text + "\n\t\tDetetados " + str(line[4]) + " erros."
-                self.write(text)
+            if report:
+                self.write("\n\tSumário:")
+                for line in report:
+                    text = "\tValidada a regra '" + \
+                        str(line[0]) + " - " + str(line[1]) + "'\t"
+                    text = text + "\n\t\tSem erros detetados." if (
+                        line[2] == line[3]) else text + "\n\t\tDetetados " + str(line[4]) + " erros."
+                    self.write(text)
 
             # SELECT f_table_name, f_geometry_column, "type" FROM geometry_columns WHERE f_table_schema = 'errors';
             tables = self.pgutils.run_query(
