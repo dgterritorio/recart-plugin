@@ -3,7 +3,6 @@ declare
 	tbl text;
 	pkey text;
 	total int; good int; bad int;
-	oneresult RECORD;
 	onerule RECORD;
 	rules CURSOR FOR SELECT * FROM validation.rules where enabled and run order by code;
 begin 
@@ -80,6 +79,164 @@ begin
 		execute format('delete from %s', tbl);
 		execute format('insert into %s %s', tbl, _report);
 	end if;
+end; $$;
+
+create or replace procedure validation.do_validation(nd1 bool, area_tbl varchar, _code varchar, _sec_code varchar) language plpgsql as $$
+declare 
+	tbl text;
+	pkey text;
+	total int; good int; bad int;
+	geom_record RECORD;
+
+	_query text;
+	_query_nd2 text;
+	_report text;
+	_entity text;
+	_is_global boolean;
+begin
+	select query, query_nd2, report, entity, is_global from validation.rules_area where code=_code into _query, _query_nd2, _report, _entity, _is_global;
+
+	if exists (
+		select 1 from validation.rules_area_report 
+		where rule_code::varchar = _code and geom_id::varchar = _sec_code
+	) then
+		raise notice 'Rule % already processed for geometry %', _code, _sec_code;
+		return;
+	end if;
+
+	execute format('select geometria from %s where identificador::varchar=''%s'';', area_tbl, _sec_code) INTO geom_record;
+
+	if _is_global is true and _query is not null then
+		if nd1 is true then
+			execute _query INTO total, good, bad;
+		else
+			-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
+			if _query_nd2 is not null then
+				execute _query_nd2 INTO total, good, bad;
+			else 
+				execute _query INTO total, good, bad;
+			end if;
+		end if;
+		raise notice 'Good? % % %', total, good, bad;
+		EXECUTE format('insert into validation.rules_area_report(rule_code, total, good, bad) values (''%s'', %s, %s, %s)', _code, total, good, bad);
+
+		if bad > 0 and _report is not null then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tbl := 'errors.' || _entity || '_' || _code;
+			raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			execute format('delete from %s', tbl);
+			execute format('insert into %s %s', tbl, _report);
+		end if;
+	else
+		if _query is not null then
+			if nd1 is true then
+				raise notice '%', format(_query, geom_record.geometria);
+				execute format(_query, geom_record.geometria) INTO total, good, bad;
+			else
+				-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
+				if _query_nd2 is not null then
+					execute format(_query_nd2, geom_record.geometria) INTO total, good, bad;
+				else 
+					execute format(_query, geom_record.geometria) INTO total, good, bad;
+				end if;
+			end if;
+			raise notice 'Good? % % %', total, good, bad;
+			EXECUTE format('insert into validation.rules_area_report(rule_code, geom_id, total, good, bad) values (''%s'', ''%s'', %s, %s, %s)', _code, _sec_code, total, good, bad);
+		end if;
+	
+		if bad > 0 and _report is not null then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tbl := 'errors.' || _entity || '_' || _code;
+			raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			execute format('delete from %s', tbl);
+			execute format('insert into %s %s', tbl, format(_report, geom_record.geometria));
+		end if;
+	end if;
+end; $$;
+
+create or replace procedure validation.do_validation_sect (nd1 bool, area_tbl varchar, _code varchar) language plpgsql as $$
+declare 
+	tbl text;
+	pkey text;
+	total int; good int; bad int;
+	geom_record RECORD;
+
+	_query text;
+	_query_nd2 text;
+	_report text;
+	_entity text;
+	_is_global boolean;
+begin
+	select query, query_nd2, report, entity, is_global from validation.rules_area where code=_code into _query, _query_nd2, _report, _entity, _is_global;
+
+	if _is_global is true and _query is not null then
+		if nd1 is true then
+			execute _query INTO total, good, bad;
+		else
+			-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
+			if _query_nd2 is not null then
+				execute _query_nd2 INTO total, good, bad;
+			else 
+				execute _query INTO total, good, bad;
+			end if;
+		end if;
+		raise notice 'Good? % % %', total, good, bad;
+		EXECUTE format('insert into validation.rules_area_report(rule_code, total, good, bad) values (''%s'', %s, %s, %s)', _code, total, good, bad);
+
+		if bad > 0 and _report is not null then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tbl := 'errors.' || _entity || '_' || _code;
+			raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			execute format('delete from %s', tbl);
+			execute format('insert into %s %s', tbl, _report);
+		end if;
+	end if;
+
+	FOR geom_record IN
+		EXECUTE format('SELECT identificador, geometria FROM %s;', area_tbl)
+	LOOP
+		if exists (
+			select 1 
+			from validation.rules_area_report 
+			where rule_code = _code 
+				and geom_id = geom_record.identificador
+		) then
+			raise notice 'Rule % already processed for geometry %', _code, geom_record.identificador;
+			continue;
+		end if;
+
+		if _query is not null then
+			if nd1 is true then
+				raise notice '%', format(_query, geom_record.geometria);
+				execute format(_query, geom_record.geometria) INTO total, good, bad;
+			else
+				-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
+				if _query_nd2 is not null then
+					execute format(_query_nd2, geom_record.geometria) INTO total, good, bad;
+				else 
+					execute format(_query, geom_record.geometria) INTO total, good, bad;
+				end if;
+			end if;
+			raise notice 'Good? % % %', total, good, bad;
+			EXECUTE format('insert into validation.rules_area_report(rule_code, geom_id, total, good, bad) values (''%s'', ''%s'', %s, %s, %s)', _code, geom_record.identificador, total, good, bad);
+		end if;
+	
+		if bad > 0 and _report is not null then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tbl := 'errors.' || _entity || '_' || _code;
+			raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			execute format('delete from %s', tbl);
+			execute format('insert into %s %s', tbl, format(_report, geom_record.geometria));
+		end if;
+	end loop;
 end; $$;
 
 -- supporting functions
@@ -243,7 +400,7 @@ begin
 	end if;
 
 	if rg = 1 then
-		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' ';
+		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria'' ';
 	else
 		if versao = 1 then
 			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
@@ -293,6 +450,138 @@ return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
 
+create or replace function validation.rg1_2_validation (rg int, versao int, nd1 boolean, sect geometry) returns table (total int, good int, bad int) as $$
+declare 
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	all_aux integer;
+	good_aux integer;
+	bad_aux integer;
+	tabela text;
+	tabela_erro text;
+	tabelas text;
+	cvalue integer;
+begin
+	if nd1=true then
+		cvalue = 4;
+	else
+		cvalue = 20;
+	end if;
+
+	if rg = 1 then
+		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria'' ';
+	else
+		if versao = 1 then
+			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
+			('edificio','geometria'), 
+			('ponto_interesse','geometria'), 
+			('elem_assoc_agua','geometria'), 
+			('elem_assoc_eletricidade','geometria'), 
+			('mob_urbano_sinal','geometria'))
+			SELECT * FROM dupla_geometria	$q$;
+		else
+			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
+			('constru_polig','geometria'), 
+			('edificio','geometria'), 
+			('ponto_interesse','geometria'), 
+			('elem_assoc_agua','geometria'), 
+			('elem_assoc_eletricidade','geometria'), 
+			('elem_assoc_pgq','geometria'), 
+			('mob_urbano_sinal','geometria'))
+			SELECT * FROM dupla_geometria	$q$;
+		end if;
+	end if;
+
+	for tabela in execute tabelas
+	loop 
+		-- RAISE NOTICE '-------------------------- table % -------------------------------------------------', rec.f_table_name;
+		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and ST_Intersects(geometria, %s)', tabela, sect) INTO all_aux;
+		-- RAISE NOTICE 'All is % for table %', all_aux, rec.f_table_name;
+		count_all := count_all + all_aux;
+		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) >= %s and ST_Intersects(geometria, %s)', tabela, cvalue, sect) INTO good_aux;
+		-- RAISE NOTICE 'Good is % for table %', good_aux, rec.f_table_name;
+		count_good := count_good + good_aux;
+		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s and ST_Intersects(geometria, %s)', tabela, cvalue, sect) INTO bad_aux;
+		-- RAISE NOTICE 'Bad is % for table %', bad_aux, rec.f_table_name;
+		count_bad := count_bad + bad_aux;
+	
+		if bad_aux > 0 then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tabela_erro := 'errors.' || tabela || '_rg_' || rg;
+			-- raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
+			execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela_erro, tabela, cvalue);
+		end if;
+	end loop;
+return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.rg4_1_validation (ndd integer) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+
+	valor_equi integer := case when ndd = 1 then 2 else 5 end;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+		-- table without indexes
+		-- raise notice '%', tbl;
+	CREATE TABLE IF NOT exists errors.ponto_cotado_rg_4_1 (like {schema}.ponto_cotado INCLUDING ALL);
+
+	delete from errors.ponto_cotado_rg_4_1;
+
+	select count(*) from {schema}.ponto_cotado into count_all;
+
+	WITH dumped_points AS (
+		select
+			pc.identificador,
+			pc.geometria AS ponto_cotado_geom,
+			closest_cdn.geometria as cdn_geom,
+			(ST_DumpPoints(closest_cdn.geometria)).geom AS dumped_point_geom
+		FROM {schema}.ponto_cotado AS pc
+		CROSS JOIN LATERAL (
+			SELECT geometria
+			FROM validation.curva_nivel_tin AS ports
+			ORDER BY pc.geometria <-> ports.geometria
+			LIMIT 10
+		) AS closest_cdn
+		),
+	z_distances AS (
+		select
+			identificador,
+			abs(st_z(ponto_cotado_geom) - st_z(dumped_point_geom)) AS z_distance
+		FROM dumped_points
+		),
+	min_z_distances AS (
+		select
+			identificador,
+			MIN(z_distance) AS min_z_distance
+		FROM z_distances
+		GROUP BY identificador
+	),
+	bad_rows AS (
+		INSERT INTO errors.ponto_cotado_rg_4_1
+	    SELECT pc.*
+	    FROM {schema}.ponto_cotado pc
+	    WHERE pc.identificador IN (
+			SELECT identificador
+	        FROM min_z_distances
+	        WHERE min_z_distance > valor_equi)
+		RETURNING 1
+	)
+	SELECT count(*) FROM bad_rows into count_bad;
+
+	select (count_all - count_bad) into count_good;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
 -- select * from validation.rg5_validation ();
 create or replace function validation.rg5_validation () returns table (total int, good int, bad int) as $$
 declare
@@ -334,6 +623,52 @@ begin
 			execute format('delete from %s', tabela_erro);
 			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
 				where not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela);
+		end if;
+	end loop;
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.rg5_validation(sect geometry) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	all_aux integer;
+	good_aux integer;
+	bad_aux integer;
+	tabela text;
+	tabela_erro text;
+	tabelas text[];
+begin
+	tabelas = array['agua_lentica', 'curso_de_agua_area', 'margem', 'zona_humida', 'area_infra_trans_aereo', 'area_agricola_florestal_mato', 'areas_artificializadas'];
+
+	for tabela in select unnest(tabelas)
+	loop 
+		RAISE NOTICE '-------------------------- table % -------------------------------------------------', tabela;
+		execute format('select count(*) from {schema}.%I where ST_Intersects(geometria, ''%s'')', tabela, sect) INTO all_aux;
+		RAISE NOTICE 'All is % for table %', all_aux, tabela;
+		count_all := count_all + all_aux;
+	
+		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+			where ST_Intersects(geometria, ''%s'') and St_Contains(adt.geometria, t.geometria)', tabela, sect) INTO good_aux;
+		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
+		count_good := count_good + good_aux;
+	
+		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+			where ST_Intersects(geometria, ''%s'') and not St_Contains(adt.geometria, t.geometria)', tabela, sect) INTO bad_aux;
+		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
+		count_bad := count_bad + bad_aux;
+
+		if bad_aux > 0 then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tabela_erro := 'errors.' || tabela || '_rg_5';
+			-- raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
+			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
+				where ST_Intersects(geometria, ''%s'') and not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela, sect);
 		end if;
 	end loop;
 	return query select count_all as total, count_good as good, count_bad as bad;
@@ -485,67 +820,105 @@ declare
 	count_good integer := 0;
 	count_bad integer := 0;
 
-	valor_equi integer := 0;
+	valor_equi integer := case when ndd = 1 then 2 else 5 end;
 begin
-	if ndd = 1 then
-		valor_equi = 2;
-	else
-		valor_equi = 5;
-	end if;
-
-	with 
-	pares as (SELECT
-			round( abs(st_z(ST_PointN(all_cdn.geometria, 1)) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) as z_distance
-		FROM {schema}.curva_de_nivel as all_cdn
-		CROSS JOIN LATERAL 
-		(SELECT geometria
-			FROM {schema}.curva_de_nivel ports
-			where all_cdn.identificador != ports.identificador and valor_tipo_curva in ('1','2')
-			ORDER BY ST_PointN(all_cdn.geometria, 1) <-> ports.geometria
-			LIMIT 1
-		) AS closest_cdn
-		where valor_tipo_curva in ('1','2')
-	),
-	total as (select count(*) from pares),
-	good as (select count(*) from pares where z_distance = 0 or z_distance = valor_equi),
-	bad as (select count(*)	from pares where not (z_distance = 0 or z_distance = valor_equi))
-	select total.count as total, good.count as good, bad.count as bad
-	from total, good, bad into count_all, count_good, count_bad;
-
-	RAISE NOTICE 'All is % for table %', count_all, 'curva_de_nivel';
-	RAISE NOTICE 'Good is % for table %', count_good, 'curva_de_nivel';
-	RAISE NOTICE 'Bad is % for table %', count_bad, 'curva_de_nivel';
-
-	if count_bad > 0 then
-		CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE SCHEMA IF NOT EXISTS errors;
 		-- table without indexes
 		-- raise notice '%', tbl;
-		CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel INCLUDING ALL);
+	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel INCLUDING ALL);
 
-		delete from errors.curva_de_nivel_re3_2;
-		insert into errors.curva_de_nivel_re3_2 (
-			with 
-				pares as (select all_cdn.identificador,
-						round( abs(st_z(ST_PointN(all_cdn.geometria, 1)) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) as z_distance
-					FROM {schema}.curva_de_nivel as all_cdn
-					CROSS JOIN LATERAL 
-					(SELECT geometria
-						FROM {schema}.curva_de_nivel ports
-						where all_cdn.identificador != ports.identificador and valor_tipo_curva in ('1','2')
-						ORDER BY ST_PointN(all_cdn.geometria, 1) <-> ports.geometria
-						LIMIT 1
-					) AS closest_cdn
-					where valor_tipo_curva in ('1','2')),
-				bad as (select * from pares where not (z_distance = 0 or z_distance = valor_equi))
-			select cn.* 
-			from {schema}.curva_de_nivel cn, bad
-			where cn.identificador = bad.identificador
-		);
-	end if;
+	delete from errors.curva_de_nivel_re3_2;
+
+	select count(*) from {schema}.curva_de_nivel into count_all;
+
+	WITH pares AS (
+        SELECT 
+            all_cdn.identificador,
+            round(abs(st_z(ST_PointN(all_cdn.geometria, 1)) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance
+        FROM {schema}.curva_de_nivel AS all_cdn
+        CROSS JOIN LATERAL (
+            SELECT geometria
+            FROM {schema}.curva_de_nivel AS ports
+            WHERE all_cdn.identificador != ports.identificador
+              AND valor_tipo_curva IN ('1','2')
+            ORDER BY ST_PointN(all_cdn.geometria, 1) <-> ports.geometria
+            LIMIT 1
+        ) AS closest_cdn
+        WHERE all_cdn.valor_tipo_curva IN ('1','2')
+    ),
+    bad_rows AS (        
+		INSERT INTO errors.curva_de_nivel_re3_2
+	    SELECT cn.*
+	    FROM {schema}.curva_de_nivel cn
+	    WHERE cn.identificador IN (
+			SELECT identificador
+	        FROM pares
+	        WHERE NOT (z_distance = 0 OR z_distance = valor_equi))
+		RETURNING 1
+    )
+	SELECT count(*) FROM bad_rows into count_bad;
+
+	select (count_all - count_bad) into count_good;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION validation.re3_2_validation(ndd integer, sect geometry)
+ RETURNS TABLE(total integer, good integer, bad integer)
+ LANGUAGE plpgsql
+AS $function$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+
+	valor_equi integer := case when ndd = 1 then 2 else 5 end;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+		-- table without indexes
+		-- raise notice '%', tbl;
+	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like public.curva_de_nivel INCLUDING ALL);
+
+	delete from errors.curva_de_nivel_re3_2;
+
+	execute format('select count(*) from {schema}.curva_de_nivel where ST_Intersects(geometria, %L)', sect) into count_all;
+
+	execute format(
+		'WITH pares AS ('
+			'SELECT '
+				'all_cdn.identificador,'
+				'round(abs(st_z(ST_PointN(all_cdn.geometria, 1)) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance '
+			'FROM {schema}.curva_de_nivel AS all_cdn '
+			'CROSS JOIN LATERAL ('
+				'SELECT geometria '
+				'FROM {schema}.curva_de_nivel AS ports '
+				'WHERE ST_Intersects(ports.geometria, %1$L) and all_cdn.identificador != ports.identificador '
+				'AND valor_tipo_curva IN (''1'',''2'')'
+				'ORDER BY ST_PointN(all_cdn.geometria, 1) <-> ports.geometria '
+				'LIMIT 1 '
+			') AS closest_cdn '
+			'WHERE ST_Intersects(all_cdn.geometria, %1$L) and all_cdn.valor_tipo_curva IN (''1'',''2'')'
+		'),'
+		'bad_rows AS ('
+			'INSERT INTO errors.curva_de_nivel_re3_2 '
+			'SELECT cn.* '
+			'FROM {schema}.curva_de_nivel cn '
+			'WHERE cn.identificador IN ('
+				'SELECT identificador '
+				'FROM pares '
+				'WHERE NOT (z_distance = 0 OR z_distance = %2$L))'
+			'RETURNING 1 '
+		')'
+		'SELECT count(*) FROM bad_rows;'
+	, sect, valor_equi) into count_bad;
+
+	select (count_all - count_bad) into count_good;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$function$
+;
 
 -- select * from validation.re4_10_validation ();
 create or replace function validation.re4_10_validation () returns table (total int, good int, bad int) as $$
@@ -604,6 +977,68 @@ begin
 						(select geom_col as geometria from validation.no_hidro) as f)
 					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, {schema}.no_hidrografico nh 
 						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no);
+		end if;
+	end loop;
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_10_validation (sect geometry) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	all_aux integer;
+	good_aux integer;
+	bad_aux integer;
+	tabela text;
+	tabela_erro text;
+	tabelas text[];
+	tipo_no text;
+begin
+	tabelas = array['queda_de_agua', 'zona_humida', 'barreira'];
+
+	for tabela in select unnest(tabelas)
+	loop 
+		RAISE NOTICE '-------------------------- table % -------------------------------------------------', tabela;
+		execute format('select count(*) from {schema}.%I where ST_Intersects(geometria, %s)', tabela, sect) INTO all_aux;
+		RAISE NOTICE 'All is % for table %', all_aux, tabela;
+		count_all := count_all + all_aux;
+
+		if tabela='barreira' then
+			tipo_no := '6';
+		else
+			tipo_no := '5';
+		end if;
+
+		execute format('select count(t.*) from {schema}.%I t, {schema}.no_hidrografico nh
+			where ST_Intersects(t.geometria, %s) and St_intersects(t.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%s''', tabela, tipo_no, sect) INTO good_aux;
+
+		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
+		count_good := count_good + good_aux;
+
+		execute format('select count(t.*) from {schema}.%1$I t
+			where ST_Intersects(geometria, %s) and (not (select ST_intersects(t.geometria, f.geometria) from 
+					(select geom_col as geometria from validation.no_hidro) as f)
+				or t.identificador not in (select distinct ta.identificador from {schema}.%1$I ta, {schema}.no_hidrografico nh 
+					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no, sect) INTO bad_aux;
+	
+		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
+		count_bad := count_bad + bad_aux;
+
+		if bad_aux > 0 then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tabela_erro := 'errors.' || tabela || '_re4_10_1';
+			-- raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+
+			execute format('delete from %1$s', tabela_erro);
+			execute format('insert into %1$s select t.* from {schema}.%2$I t
+				where ST_Intersects(geometria, %s) and (not (select ST_intersects(t.geometria, f.geometria) from 
+						(select geom_col as geometria from validation.no_hidro) as f)
+					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, {schema}.no_hidrografico nh 
+						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no, sect);
 		end if;
 	end loop;
 	return query select count_all as total, count_good as good, count_bad as bad;
@@ -702,38 +1137,64 @@ from envelope;
 -- primeiro e último ponto da curva de nível
 -- um ponto intercalar a cada 10 metros, para curvas de nível com mais de 10 metros
 --
-drop table if exists validation.curva_de_nivel_points_interval;
-create table validation.curva_de_nivel_points_interval as
-SELECT concat( identificador::text, '-', path[1]::text) as identificador, geom::geometry(POINTZ, 3763) as geometria
-FROM (
-SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, 10.0/st_length(geometria)))).*
-from (select identificador, (ST_Dump(geometria)).geom as geometria from {schema}.curva_de_nivel) as cdn
-where st_length(geometria) > 10.0
-) as pontos
-union SELECT concat( identificador::text, '-0') as identificador, ST_PointN(geometria, 1) as geometria
-from {schema}.curva_de_nivel cdn
-union SELECT concat( identificador::text, '-', ST_NPoints(geometria)) as identificador, ST_PointN(geometria, -1) as geometria
-from {schema}.curva_de_nivel cdn;
+-- drop table if exists validation.curva_de_nivel_points_interval;
+-- create table validation.curva_de_nivel_points_interval as
+-- SELECT concat( identificador::text, '-', path[1]::text) as identificador, geom::geometry(POINTZ, 3763) as geometria
+-- FROM (
+-- SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, 10.0/st_length(geometria)))).*
+-- from (select identificador, (ST_Dump(geometria)).geom as geometria from {schema}.curva_de_nivel) as cdn
+-- where st_length(geometria) > 10.0
+-- ) as pontos
+-- union SELECT concat( identificador::text, '-0') as identificador, ST_PointN(geometria, 1) as geometria
+-- from {schema}.curva_de_nivel cdn
+-- union SELECT concat( identificador::text, '-', ST_NPoints(geometria)) as identificador, ST_PointN(geometria, -1) as geometria
+-- from {schema}.curva_de_nivel cdn;
 
 
-drop table if exists validation.curva_de_nivel_ponto_cotado;
-create table validation.curva_de_nivel_ponto_cotado as
-SELECT pc.identificador::text, pc.geometria
-from {schema}.ponto_cotado pc, {schema}.valor_classifica_las vc 
-where pc.valor_classifica_las = vc.identificador and vc.descricao = 'Terreno'
-union
-select * 
-from validation.curva_de_nivel_points_interval;
+-- drop table if exists validation.curva_de_nivel_ponto_cotado;
+-- create table validation.curva_de_nivel_ponto_cotado as
+-- SELECT pc.identificador::text, pc.geometria
+-- from {schema}.ponto_cotado pc, {schema}.valor_classifica_las vc 
+-- where pc.valor_classifica_las = vc.identificador and vc.descricao = 'Terreno'
+-- union
+-- select * 
+-- from validation.curva_de_nivel_points_interval;
 
-CREATE TABLE IF NOT EXISTS validation.tin (
-    id integer generated by default as identity NOT NULL PRIMARY KEY,
-    geometria geometry(POLYGONZ, 3763) not null
+-- CREATE TABLE IF NOT EXISTS validation.tin (
+--     id integer generated by default as identity NOT NULL PRIMARY KEY,
+--     geometria geometry(POLYGONZ, 3763) not null
+-- );
+
+-- insert into validation.tin ( geometria)
+-- with tin as (SELECT ST_DelaunayTriangles(st_union(geometria)) as geom
+-- from validation.curva_de_nivel_ponto_cotado cnpc)
+-- select (ST_Dump(geom)).geom As geometria from tin;
+
+
+drop table if exists validation.curva_nivel_tin;
+create table validation.curva_nivel_tin (
+	id int4 GENERATED BY DEFAULT AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT null,
+	geometria public.geometry(polygonz, 3763) NOT null
 );
 
-insert into validation.tin ( geometria)
+drop table if exists validation.curva_de_nivel_points_interval_v2;
+create table validation.curva_de_nivel_points_interval_v2 as
+SELECT concat( identificador::text, '-', path[1]::text) as identificador, geom::geometry(POINTZ, 3763) as geometria
+FROM (
+SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, least(8.0/st_length(geometria), 1.0)))).*
+from (select identificador, (ST_Dump(geometria)).geom as geometria from public.curva_de_nivel) as cdn
+) as pontos
+union SELECT concat( identificador::text, '-0') as identificador, ST_PointN(geometria, 1) as geometria
+from public.curva_de_nivel cdn
+union SELECT concat( identificador::text, '-', ST_NPoints(geometria)) as identificador, ST_PointN(geometria, -1) as geometria
+from public.curva_de_nivel cdn;
+
+insert into validation.curva_nivel_tin (geometria)
 with tin as (SELECT ST_DelaunayTriangles(st_union(geometria)) as geom
-from validation.curva_de_nivel_ponto_cotado cnpc)
+from validation.curva_de_nivel_points_interval_v2)
 select (ST_Dump(geom)).geom As geometria from tin;
+
+CREATE INDEX curva_nivel_tin_geom_idx ON validation.curva_nivel_tin USING gist (geometria);
 
 -- Criar area de trabalho multi-poligono para casos com multiplas areas de trabalho no mesmo projecto
 
@@ -784,5 +1245,5 @@ CREATE TABLE IF NOT EXISTS validation.juncao_fluxo_dattr AS (
 );
 CREATE INDEX IF NOT EXISTS idx_val_juncao_fluxo_dattr_geom ON validation.juncao_fluxo_dattr USING GIST (geom_col);
 
-drop index IF EXISTS validation.tin_geom_idx;
-create index tin_geom_idx ON validation.tin using gist(geometria);
+-- drop index IF EXISTS validation.tin_geom_idx;
+-- create index tin_geom_idx ON validation.tin using gist(geometria);

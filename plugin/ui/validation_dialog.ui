@@ -45,21 +45,62 @@
          <string>Configuração</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_4">
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Nível de Detalhe</string>
+            <string>Coordenadas</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_12">
+         <item row="7" column="0" colspan="2">
+          <widget class="QGroupBox" name="groupBox">
+           <property name="title">
+            <string/>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Tabela secções</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" colspan="2">
+             <widget class="QComboBox" name="areaComboBox"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Título</string>
+            <string>Esquema</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
+         <item row="1" column="1" colspan="2">
+          <widget class="QComboBox" name="connCombo"/>
+         </item>
+         <item row="2" column="1" colspan="2">
+          <widget class="QComboBox" name="schemaName"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Ligação</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
           <widget class="QCheckBox" name="checkBox">
            <property name="enabled">
             <bool>false</bool>
@@ -75,41 +116,32 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>Ligação</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Esquema</string>
-           </property>
-          </widget>
-         </item>
          <item row="5" column="1" colspan="2">
           <widget class="QComboBox" name="comboBox"/>
-         </item>
-         <item row="4" column="1">
-          <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget"/>
-         </item>
-         <item row="2" column="1" colspan="2">
-          <widget class="QComboBox" name="schemaName"/>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Coordenadas</string>
-           </property>
-          </widget>
          </item>
          <item row="0" column="1" colspan="2">
           <widget class="QLineEdit" name="lineEdit"/>
          </item>
-         <item row="1" column="1" colspan="2">
-          <widget class="QComboBox" name="connCombo"/>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Nível de Detalhe</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Título</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QCheckBox" name="is_sections">
+           <property name="text">
+            <string>Validar por secções</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -307,6 +339,22 @@
     <hint type="destinationlabel">
      <x>511</x>
      <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>is_sections</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>groupBox</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>97</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>508</x>
+     <y>261</y>
     </hint>
    </hints>
   </connection>
