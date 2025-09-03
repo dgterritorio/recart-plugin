@@ -293,6 +293,77 @@ return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
 
+create or replace function validation.rg1_2_validation (rg int, versao int, nd1 boolean, _args json) returns table (total int, good int, bad int) as $$
+declare 
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	all_aux integer;
+	good_aux integer;
+	bad_aux integer;
+	tabela text;
+	tabela_erro text;
+	tabelas text;
+	cvalue integer;
+begin
+	if nd1=true then
+		select coalesce(_args->>'rg1_ndd1', '4')::int into cvalue;
+	else
+		select coalesce(_args->>'rg1_ndd2', '20')::int into cvalue;
+	end if;
+
+	if rg = 1 then
+		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' ';
+	else
+		if versao = 1 then
+			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
+			('edificio','geometria'), 
+			('ponto_interesse','geometria'), 
+			('elem_assoc_agua','geometria'), 
+			('elem_assoc_eletricidade','geometria'), 
+			('mob_urbano_sinal','geometria'))
+			SELECT * FROM dupla_geometria	$q$;
+		else
+			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
+			('constru_polig','geometria'), 
+			('edificio','geometria'), 
+			('ponto_interesse','geometria'), 
+			('elem_assoc_agua','geometria'), 
+			('elem_assoc_eletricidade','geometria'), 
+			('elem_assoc_pgq','geometria'), 
+			('mob_urbano_sinal','geometria'))
+			SELECT * FROM dupla_geometria	$q$;
+		end if;
+	end if;
+
+	for tabela in execute tabelas
+	loop 
+		-- RAISE NOTICE '-------------------------- table % -------------------------------------------------', rec.f_table_name;
+		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON''', tabela ) INTO all_aux;
+		-- RAISE NOTICE 'All is % for table %', all_aux, rec.f_table_name;
+		count_all := count_all + all_aux;
+		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) >= %s', tabela, cvalue) INTO good_aux;
+		-- RAISE NOTICE 'Good is % for table %', good_aux, rec.f_table_name;
+		count_good := count_good + good_aux;
+		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela, cvalue) INTO bad_aux;
+		-- RAISE NOTICE 'Bad is % for table %', bad_aux, rec.f_table_name;
+		count_bad := count_bad + bad_aux;
+	
+		if bad_aux > 0 then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tabela_erro := 'errors.' || tabela || '_rg_' || rg;
+			-- raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
+			execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela_erro, tabela, cvalue);
+		end if;
+	end loop;
+return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
 -- select * from validation.rg5_validation ();
 create or replace function validation.rg5_validation () returns table (total int, good int, bad int) as $$
 declare

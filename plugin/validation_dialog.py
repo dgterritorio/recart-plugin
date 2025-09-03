@@ -27,10 +27,10 @@ from datetime import datetime
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QHeaderView, QCheckBox, QStyle
-from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal
+from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QMetaType
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QFont
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem
+from qgis.core import QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
 from qgis.utils import iface
 
 from psycopg2 import OperationalError
@@ -94,6 +94,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             crs = QgsCoordinateReferenceSystem("EPSG:3763")
             self.mQgsProjectionSelectionWidget.setCrs( crs )
+            
+            self.comboBoxOps.addItems(['Igual', 'Diferente', 'Maior', 'Menor', 'Maior ou igual', 'Menor ou igual'])
 
             self.isRunning = False
             self.initialized = True
@@ -114,6 +116,26 @@ class ValidationDialog(QDialog, FORM_CLASS):
         else:
             self.plainTextEdit.clear()
             super(ValidationDialog, self).reject()
+
+    def toggleEdit(self, state):
+        self.ignoreSusp.setEnabled(state)
+        self.ignorarSub.setEnabled(state)
+        self.ignorarSolo.setEnabled(state)
+        self.ignorarFict.setEnabled(state)
+        self.ignorarDesc.setEnabled(state)
+
+        self.rg1_ndd1.setEnabled(state)
+        self.rg1_ndd2.setEnabled(state)
+        self.rg4_ndd1.setEnabled(state)
+        self.rg4_ndd2.setEnabled(state)
+        self.re3_2_ndd1.setEnabled(state)
+        self.re3_2_ndd2.setEnabled(state)
+        self.re3_3_ndd1.setEnabled(state)
+        self.re3_3_ndd2.setEnabled(state)
+        self.re7_1_ndd1.setEnabled(state)
+        self.re7_1_ndd2.setEnabled(state)
+        self.re7_8_ndd1.setEnabled(state)
+        self.re7_8_ndd2.setEnabled(state)
 
     @pyqtSlot('PyQt_PyObject', name='writeText')
     def writeText(self, text):
@@ -145,12 +167,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
     def validateAllChange(self, state):
         if state is True and self.ruleSetup:
             try:
-                if self.is_sections.isChecked():
-                    self.pgutils.run_query(
-                        "update validation.rules_area set run = true;")
-                else:
-                    self.pgutils.run_query(
-                        "update validation.rules set run = true;")
+                self.pgutils.run_query(
+                    "update validation.rules_area set run = true;")
+                self.pgutils.run_query(
+                    "update validation.rules set run = true;")
 
                 self.updateTable()
                 self.checkBox.setChecked(True)
@@ -159,12 +179,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.writeText(("\tException: {}".format(e)))        
         if state is False and self.ruleSetup:
             try:
-                if self.is_sections.isChecked():
-                    self.pgutils.run_query(
-                        "update validation.rules_area set run = false;")
-                else:
-                    self.pgutils.run_query(
-                        "update validation.rules set run = false;")
+                self.pgutils.run_query(
+                    "update validation.rules_area set run = false;")
+                self.pgutils.run_query(
+                    "update validation.rules set run = false;")
                 self.updateTable()
                 self.checkBox.setChecked(False)
             except Exception as e:
@@ -176,12 +194,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
         rstate = 'true' if state else 'false'
 
         try:
-            if self.is_sections.isChecked():
-                self.pgutils.run_query("update validation.rules_area set run = " +
-                                       rstate + " where code ilike '"+str(rcode)+"';")
-            else:
-                self.pgutils.run_query("update validation.rules set run = " +
-                                       rstate + " where code ilike '"+str(rcode)+"';")
+            self.pgutils.run_query("update validation.rules_area set run = " +
+                                    rstate + " where code ilike '"+str(rcode)+"';")
+            self.pgutils.run_query("update validation.rules set run = " +
+                                    rstate + " where code ilike '"+str(rcode)+"';")
 
             if (rcode == 're3_2' or rcode == 'rg_4' or rcode == 'rg_4_1' or rcode == 'rg_4_2') and state is True:
                 self.checkBox.setChecked(True)
@@ -194,10 +210,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             report = self.pgutils.run_query(
                 "select code, name, total, good, bad, run from {}\
-                    order by substring(code from 1 for 2) desc,\
-                        ((regexp_match(code, '^r(?:g_|e)([0-9]+)_*'))[1])::integer asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_([0-9]+)_*'))[1])::integer, 0) asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_[0-9]+_([0-9])_*'))[1])::integer, 0) asc;".format(report_table))
+                    order by dorder asc;".format(report_table))
 
             model = self.tableView.model()
             rn = 0
@@ -227,13 +240,58 @@ class ValidationDialog(QDialog, FORM_CLASS):
             tables = self.pgutils.run_query(
                 "with aggr_cols as (\
 	                SELECT table_schema, table_name, string_agg(column_name::varchar, '|') as cols FROM information_schema.columns\
-	                    where table_schema = 'validation'\
+	                    where table_schema = 'validation' or (table_schema = 'public' and table_name = any('{distrito,municipio,concelho,freguesia}'))\
+	                    	or (table_schema = 'reconhecimento_campo' and table_name='samples')\
 	                group by table_schema, table_name\
-                ) select table_name from aggr_cols where cols ilike '%identificador%' and cols ilike '%geometria%';")
+                ) select table_schema || '.' || table_name from aggr_cols\
+					where cols ilike '%identificador%' and cols ilike '%geometria%';")
             if tables and len(tables) > 0:
                 self.areaComboBox.addItems([row[0] for row in tables])
         except Exception as e:
             self.writeText("[Erro 13]")
+            self.writeText(("\tException: {}".format(e)))
+
+    def changeField(self, field):
+        for f in self.mFieldComboBox.fields():
+            if f.name() == field:
+                self.changeOps(f.type())
+                break
+
+    def changeOps(self, type):
+        self.comboBoxOps.clear()
+        if type == QMetaType.Type.QDateTime or type == QMetaType.Type.Int or type == QMetaType.Type.Double:
+            self.comboBoxOps.addItems(['Igual', 'Diferente', 'Maior', 'Menor', 'Maior ou igual', 'Menor ou igual'])
+        elif type == QMetaType.Type.Bool or type == QMetaType.Type.QUuid or type == QMetaType.Type.QString:
+            self.comboBoxOps.addItems(['Igual', 'Diferente'])
+
+    def areaTableChange(self, text):
+        try:
+            ts = text.split('.')[0]
+            tn = text.split('.')[1]
+
+            campos = self.pgutils.run_query(
+                "SELECT column_name, data_type FROM information_schema.columns \
+                    where table_schema='{}' and table_name='{}';".format(ts, tn))
+            if campos and len(campos) > 0:
+                fields = QgsFields()
+                for c in campos:
+                    if c[1] == 'date' or c[1].startswith('timestamp'):
+                        fields.append(QgsField(c[0], QMetaType.Type.QDateTime))
+                    elif c[1] == 'integer' or c[1] == 'bigint' or c[1] == 'smallint':
+                        fields.append(QgsField(c[0], QMetaType.Type.Int))
+                    elif c[1] == 'double precision' or c[1] == 'real' or c[1] == 'numeric':
+                        fields.append(QgsField(c[0], QMetaType.Type.Double))
+                    elif c[1] == '"char"' or c[1] == 'character varying' or c[1] == 'text':
+                        fields.append(QgsField(c[0], QMetaType.Type.QString))
+                    elif c[1] == 'boolean':
+                        fields.append(QgsField(c[0], QMetaType.Type.Bool))
+                    elif c[1] == 'uuid':
+                        fields.append(QgsField(c[0], QMetaType.Type.QUuid))
+
+                self.mFieldComboBox.setFields(fields)
+                self.changeField(fields.field(0).name())
+        except Exception as e:
+            self.writeText("[Erro 14]")
             self.writeText(("\tException: {}".format(e)))
 
     def testValidationRules(self):
@@ -242,10 +300,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             report = self.pgutils.run_query(
                 "select code, name, total, good, bad, run from {}\
-                    order by substring(code from 1 for 2) desc,\
-                        ((regexp_match(code, '^r(?:g_|e)([0-9]+)_*'))[1])::integer asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_([0-9]+)_*'))[1])::integer, 0) asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_[0-9]+_([0-9])_*'))[1])::integer, 0) asc;".format(report_table))
+                    order by dorder asc;".format(report_table))
 
             self.tableView.setVisible(True)
             self.pushButton.setVisible(False)
@@ -359,10 +414,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             summary = self.pgutils.run_query(
                 "select code, name, total, good, bad from {}\
-                    order by substring(code from 1 for 2) desc,\
-                        ((regexp_match(code, '^r(?:g_|e)([0-9]+)_*'))[1])::integer asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_([0-9]+)_*'))[1])::integer, 0) asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_[0-9]+_([0-9])_*'))[1])::integer, 0) asc;".format(report_table))
+                    order by dorder asc;".format(report_table))
 
             rq = "SELECT (REGEXP_MATCHES(relname, '([a-z_]+)_rg|([a-z_]+)_re'))[1] as objeto1, (REGEXP_MATCHES(relname, '([a-z_]+)_rg|([a-z_]+)_re'))[2] as objeto2,"
             rq = rq + " (REGEXP_MATCHES(relname, '[a-z_]+_(rg[0-9_]*)|[a-z_]+_(re[0-9_]*)'))[1] as codigo1, (REGEXP_MATCHES(relname, '[a-z_]+_(rg[0-9_]*)|[a-z_]+_(re[0-9_]*)'))[2] as codigo2, n_live_tup"
@@ -575,14 +627,50 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.writeText("Terminada a validação")
 
+
+    def getOp(self, op):
+        if op == 'Igual':
+            return '='
+        elif op == 'Diferente':
+            return '!='
+        elif op == 'Maior':
+            return '>'
+        elif op == 'Menor':
+            return '<'
+        elif op == 'Maior ou igual':
+            return '>='
+        elif op == 'Menor ou igual':
+            return '<='
+        else:
+            return None
+
     def finishedCreate(self):
         if self.createProcess is not None and not self.createProcess.cancel is True:
             conString = qgis_configs.getConnString(self, self.getConnection())
             schema = str(self.schemaName.currentText())
             self.vrs = self.createProcess.vrs
             self.baseSetup = True
+            
+            args = {
+                'rg1_ndd1': self.rg1_ndd1.text(),
+                'rg1_ndd2': self.rg1_ndd2.text(),
+                're3_2_ndd1': self.re3_2_ndd1.text(),
+                're3_2_ndd2': self.re3_2_ndd2.text(),
+                're3_3_ndd1': self.re3_3_ndd1.text(),
+                're3_3_ndd2': self.re3_3_ndd2.text(),
+                're7_1_ndd1': self.re7_1_ndd1.text(),
+                're7_1_ndd2': self.re7_1_ndd2.text(),
+                're7_8_ndd1': self.re7_8_ndd1.text(),
+                're7_8_ndd2': self.re7_8_ndd2.text(),
+                'desvio_3D': self.rg4_ndd1.text() if self.comboBox.currentText() == 'NdD1' else self.rg4_ndd2.text()
+            }
 
-            self.validateProcess = ValidateProcess(conString, schema, self.comboBox.currentText(), self.vrs, self.is_sections, self.areaComboBox.currentText())
+            fltr = None
+            if self.fltrValue is not None and self.fltrValue.text() != "":
+                fltr = "{} {} '{}'".format(self.mFieldComboBox.currentText(), self.getOp(self.comboBoxOps.currentText()),
+                                           self.fltrValue.text())
+
+            self.validateProcess = ValidateProcess(conString, schema, self.comboBox.currentText(), self.vrs, self.is_sections, self.areaComboBox.currentText(), args, fltr)
 
             self.validateProcess.signal.connect(self.writeText)
             self.validateProcess.finished.connect(self.finishedValidate)
@@ -893,20 +981,20 @@ class CreateProcess(QThread):
 
             if self.baseSetup is not True:
                 file = None
-                if self.valid3d is True:
-                    with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
-                        cnt = f.read()
-                    cnt = re.sub(r"{schema}", self.schema, cnt)
-                    cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
+                # if self.valid3d is True:
+                with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
+                    cnt = f.read()
+                cnt = re.sub(r"{schema}", self.schema, cnt)
+                cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-                    self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
-                else:
-                    file = open(self.bp + '/validation_setup_no3d.sql', "r", encoding='utf-8')
-                    cnt = file.read()
-                    cnt = re.sub(r"{schema}", self.schema, cnt)
-                    cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
+                self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
+                # else:
+                #     file = open(self.bp + '/validation_setup_no3d.sql', "r", encoding='utf-8')
+                #     cnt = file.read()
+                #     cnt = re.sub(r"{schema}", self.schema, cnt)
+                #     cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-                    self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
+                #     self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
 
                 if file is not None:
                     file.close()
@@ -919,7 +1007,7 @@ class CreateProcess(QThread):
 class ValidateProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, conn, schema, ndd1, vrs, is_sections=False, areaTable=None):
+    def __init__(self, conn, schema, ndd1, vrs, is_sections=False, areaTable=None, args=None, fltrValue=None):
         QThread.__init__(self)
 
         self.conn = conn
@@ -928,7 +1016,9 @@ class ValidateProcess(QThread):
         self.vrs = vrs
         
         self.is_sections = is_sections
-        self.areaTable = "validation.{}".format(areaTable) if areaTable is not None else None
+        self.areaTable = areaTable
+        self.args = args if args is not None else {}
+        self.fltrValue = fltrValue
 
         self.pgutils = PostgisUtils(self, conn)
 
@@ -1019,20 +1109,22 @@ class ValidateProcess(QThread):
             rules_table = "validation.rules" if not self.is_sections.isChecked() else "validation.rules_area"
             ndt = 'true' if self.ndd1 == 'NdD1' else 'false'
             sections = None
-            
+
+            fltr = 'true'
+
+            if self.fltrValue is not None and self.fltrValue != '':
+                fltr = self.fltrValue
+
             if not self.is_sections.isChecked():
                 self.pgutils.run_query(
                     'update validation.rules set total = 0, good = 0, bad = 0 where run=true;')
             else:
                 sections = self.pgutils.run_query(
-                    "select identificador from {};".format(self.areaTable))
+                    "select identificador from {} where {};".format(self.areaTable, fltr))
 
             rules = self.pgutils.run_query(
                 "select code, name from {} where run=true\
-                    order by substring(code from 1 for 2) desc,\
-                        ((regexp_match(code, '^r(?:g_|e)([0-9]+)_*'))[1])::integer asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_([0-9]+)_*'))[1])::integer, 0) asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_[0-9]+_([0-9])_*'))[1])::integer, 0) asc;".format(rules_table))
+                    order by dorder asc;".format(rules_table))
 
             i = 1
             l = 0
@@ -1047,14 +1139,15 @@ class ValidateProcess(QThread):
 
                     if not self.is_sections.isChecked():
                         self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
-                        self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + r[0] + "');")
+                        self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + r[0] + "', '" + json.dumps(self.args) + "');")
                     else:
                         s = 1
                         for sec in sections:
                             if self.cancel:
                                 break
                             self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + " - secção " + str(s) + " de " + str(len(sections)) + ")")
-                            self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "');")
+                            print("call validation.do_validation("+ ndt + ", '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
+                            self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
                             s = s + 1
                     i = i + 1
 
@@ -1067,10 +1160,7 @@ class ValidateProcess(QThread):
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             report = self.pgutils.run_query(
                 "select code, name, total, good, bad from {} where run=true\
-                    order by substring(code from 1 for 2) desc,\
-                        ((regexp_match(code, '^r(?:g_|e)([0-9]+)_*'))[1])::integer asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_([0-9]+)_*'))[1])::integer, 0) asc,\
-                        coalesce(((regexp_match(code, '[0-9]+_[0-9]+_([0-9])_*'))[1])::integer, 0) asc;".format(report_table))
+                    order by dorder asc;".format(report_table))
 
             if report:
                 self.write("\n\tSumário:")
