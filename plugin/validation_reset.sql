@@ -9,6 +9,7 @@ drop function IF EXISTS validation.validcap_pt(nome character varying);
 drop function IF EXISTS validation.valid_noabbr(nome character varying);
 
 drop function IF EXISTS validation.rg1_2_validation (rg int, versao int, nd1 boolean);
+drop function IF EXISTS validation.rg1_2_validation (rg int, versao int, nd1 boolean, _args json);
 
 drop function IF EXISTS validation.rg5_validation ();
 
@@ -19,6 +20,7 @@ drop function IF EXISTS validation.rg7_validation ();
 drop function IF EXISTS validation.rg_min_area (rg text, tabela text, minv int);
 
 drop function IF EXISTS validation.re3_2_validation (ndd integer);
+drop function IF EXISTS validation.re3_2_validation (ndd integer, sect geometry);
 
 drop function IF EXISTS validation.re4_10_validation ();
 

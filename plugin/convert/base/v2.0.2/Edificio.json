@@ -56,7 +56,7 @@
 			"D2": "x",
 			"Definição": "Estado da construção."
 		}, {
-			"Atributo": "valorElementoEdificioXY",
+			"Atributo": "valorElementoEdificioXy",
 			"Multip.": "1",
 			"Tipo": "Lista de códigos",
 			"D1": "x",
@@ -158,7 +158,7 @@
 				"Definição": "A construção está funcional. A construção pode ser utilizada em condições normais pelo(s) seu(s) valor(es) de utilização atual(is)."
 			}]
 		}, {
-			"nome": "valorElementoEdificioXY",
+			"nome": "valorElementoEdificioXy",
 			"valores": [{
 				"Valores": "1",
 				"Descrição": "Combinado",
@@ -297,7 +297,7 @@
 				"Definição": "A altura foi medida ou estimada ao nível da beira mais baixa do telhado do edifício."
 			}, {
 				"Valores": "14",
-				"Descrição": "Topo do edíficio",
+				"Descrição": "Topo do edifício",
 				"Valores INSPIRE": "topOfConstruction",
 				"D1": "x",
 				"D2": "x",
@@ -583,7 +583,7 @@
 				"Definição": "Edifício utilizado para fins residenciais."
 			}, {
 				"Valores": "1.2",
-				"Descrição": "Associado à residência",
+				"Descrição": "Asssociado à residência",
 				"Valores INSPIRE": "ancillary",
 				"D1": "x",
 				"D2": "x",
@@ -604,7 +604,7 @@
 				"Definição": "Edifício utilizado para fins agrícolas, de produção animal, caça ou serviços relacionados."
 			}, {
 				"Valores": "2.2",
-				"Descrição": "Floresta ",
+				"Descrição": "Floresta",
 				"Valores INSPIRE": "",
 				"D1": "x",
 				"D2": "",

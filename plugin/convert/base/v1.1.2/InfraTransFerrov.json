@@ -49,7 +49,7 @@
 			"D2": "",
 			"Definição": "Tipo de utilização atual da linha férrea."
 		}, {
-			"Atributo": "codigoInfraTransFerrov",
+			"Atributo": "codigoInfraFerrov",
 			"Multip.": "1",
 			"Tipo": "Texto",
 			"D1": "",

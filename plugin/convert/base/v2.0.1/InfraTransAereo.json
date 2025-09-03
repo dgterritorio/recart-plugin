@@ -56,14 +56,14 @@
 			"D2": "x",
 			"Definição": "Tipo de infraestrutura de transporte aéreo."
 		}, {
-			"Atributo": "codigoIATA",
+			"Atributo": "codigoIata",
 			"Multip.": "1",
 			"Tipo": "Texto",
 			"D1": "",
 			"D2": "",
 			"Definição": "Código IATA (nternational Air Transport Association)."
 		}, {
-			"Atributo": "codigoICAO",
+			"Atributo": "codigoIcao",
 			"Multip.": "1",
 			"Tipo": "Texto",
 			"D1": "",
