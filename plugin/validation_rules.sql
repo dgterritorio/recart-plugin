@@ -17,7 +17,7 @@ create table if not exists validation.rules (
 	required boolean not null default true, -- required by homologation process
 	enabled boolean not null default true, -- can be disabled
 	run boolean not null default false, -- can be checked/unchecked before each run,
-	dorder int not null default 99
+	dorder int GENERATED ALWAYS AS IDENTITY
 );
 
 create table if not exists validation.rules_area (
@@ -34,7 +34,7 @@ create table if not exists validation.rules_area (
 	enabled boolean not null default true,
 	run boolean not null default false,
 	is_global boolean not null default false,
-	dorder int not null default 99
+	dorder int GENERATED ALWAYS AS IDENTITY
 );
 
 create table if not exists validation.rules_area_report (
@@ -48,7 +48,7 @@ create table if not exists validation.rules_area_report (
 -- Regras Gerais
 
 delete from validation.rules where code = 'rg_1';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
 values ('rg_1', 'Dimensão mínima dos polígonos', 
 $$A área mínima de uma entidade representada através de um objeto de
 geometria polígono é:
@@ -57,10 +57,10 @@ geometria polígono é:
 $$Todas as entidades representadas exclusivamente através de objetos de
 geometria polígono.$$,
 $$select * from validation.rg1_2_validation (1, 1, true, '%s'::json )$$,
-$$select * from validation.rg1_2_validation (1, 1, false, '%s'::json )$$, 1);
+$$select * from validation.rg1_2_validation (1, 1, false, '%s'::json )$$ );
 
 delete from validation.rules_area where code = 'rg_1';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
 values ('rg_1', 'Dimensão mínima dos polígonos', 
 $$A área mínima de uma entidade representada através de um objeto de
 geometria polígono é:
@@ -69,10 +69,10 @@ geometria polígono é:
 $$Todas as entidades representadas exclusivamente através de objetos de
 geometria polígono.$$,
 $$select * from validation.rg1_2_validation (1, 1, true, '%s'::geometry, '%s'::json)$$,
-$$select * from validation.rg1_2_validation (1, 1, false, '%s'::geometry, '%s'::json)$$, 1);
+$$select * from validation.rg1_2_validation (1, 1, false, '%s'::geometry, '%s'::json)$$ );
 
 delete from validation.rules where code = 'rg_2';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
 values ('rg_2', 'Dupla geometria ponto e polígono', 
 $$Às entidades que são representadas através de objetos de geometria ponto ou
 através de objetos de geometria polígono aplica-se a regra:
@@ -86,10 +86,10 @@ $$"Construção poligonal", "Edifício", "Ponto de interesse", "Elemento associa
 de água", "Elementos associado de eletricidade", "Elementos associado de
 petróleo, gás e substâncias químicas" e "Mobiliário urbano e sinalização".$$,
 $$select * from validation.rg1_2_validation (2, 1, true, '%s'::json )$$,
-$$select * from validation.rg1_2_validation (2, 1, false, '%s'::json )$$, 2);
+$$select * from validation.rg1_2_validation (2, 1, false, '%s'::json )$$ );
 
 delete from validation.rules_area where code = 'rg_2';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
 values ('rg_2', 'Dupla geometria ponto e polígono', 
 $$Às entidades que são representadas através de objetos de geometria ponto ou
 através de objetos de geometria polígono aplica-se a regra:
@@ -103,21 +103,21 @@ $$"Construção poligonal", "Edifício", "Ponto de interesse", "Elemento associa
 de água", "Elementos associado de eletricidade", "Elementos associado de
 petróleo, gás e substâncias químicas" e "Mobiliário urbano e sinalização".$$,
 $$select * from validation.rg1_2_validation (2, 1, true, '%s'::geometry, '%s'::json )$$,
-$$select * from validation.rg1_2_validation (2, 1, false, '%s'::geometry, '%s'::json )$$, 2);
+$$select * from validation.rg1_2_validation (2, 1, false, '%s'::geometry, '%s'::json )$$ );
 
 -- TODO
 -- Eventualmente criar topologia com tolerância 0
 delete from validation.rules where code = 'rg_3';
-insert into validation.rules ( code, name, rule, scope, dorder ) 
+insert into validation.rules ( code, name, rule, scope ) 
 values ('rg_3', 'Tolerância de conetividade', 
 $$A tolerância de conetividade é 0 (zero).$$,
-$$Todas as entidades representadas através de objetos de geometria linha.$$, 3);
+$$Todas as entidades representadas através de objetos de geometria linha.$$ );
 
 delete from validation.rules_area where code = 'rg_3';
-insert into validation.rules_area ( code, name, rule, scope, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope ) 
 values ('rg_3', 'Tolerância de conetividade', 
 $$A tolerância de conetividade é 0 (zero).$$,
-$$Todas as entidades representadas através de objetos de geometria linha.$$, 3);
+$$Todas as entidades representadas através de objetos de geometria linha.$$ );
 
 -- Regras auxiliares
 -- Verificam outras caraterísticas que podem não estar explícitas nas Regras gerais e específicas da norma
@@ -127,7 +127,7 @@ $$Todas as entidades representadas através de objetos de geometria linha.$$, 3)
 -- Na criação de redes topológicas, cria problemas com certeza
 --
 delete from validation.rules where code = 'ra_3_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
 values ('ra_3_1', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
@@ -138,10 +138,10 @@ good as (select count(*) from {schema}.curso_de_agua_eixo a where st_isvalid(a.g
 bad as (select count(*) from {schema}.curso_de_agua_eixo a where not st_isvalid(a.geometria))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select a.* from {schema}.curso_de_agua_eixo a where not st_isvalid(a.geometria)$$, 4);
+$$select a.* from {schema}.curso_de_agua_eixo a where not st_isvalid(a.geometria)$$ );
 
 delete from validation.rules_area where code = 'ra_3_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
 values ('ra_3_1', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
@@ -152,11 +152,11 @@ good as (select count(*) from {schema}.curso_de_agua_eixo a where st_isvalid(a.g
 bad as (select count(*) from {schema}.curso_de_agua_eixo a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s'))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select a.* from {schema}.curso_de_agua_eixo a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s')$$, 4);
+$$select a.* from {schema}.curso_de_agua_eixo a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s')$$ );
 
 
 delete from validation.rules where code = 'ra_3_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
 values ('ra_3_2', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
@@ -167,10 +167,10 @@ good as (select count(*) from {schema}.seg_via_rodov a where st_isvalid(a.geomet
 bad as (select count(*) from {schema}.seg_via_rodov a where not st_isvalid(a.geometria))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select a.* from {schema}.seg_via_rodov a where not st_isvalid(a.geometria)$$, 5);
+$$select a.* from {schema}.seg_via_rodov a where not st_isvalid(a.geometria)$$ );
 
 delete from validation.rules_area where code = 'ra_3_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
 values ('ra_3_2', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
@@ -181,11 +181,11 @@ good as (select count(*) from {schema}.seg_via_rodov a where st_isvalid(a.geomet
 bad as (select count(*) from {schema}.seg_via_rodov a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s'))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select a.* from {schema}.seg_via_rodov a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s')$$, 5);
+$$select a.* from {schema}.seg_via_rodov a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s')$$ );
 
 
 delete from validation.rules where code = 'ra_3_3';
-insert into validation.rules ( code, name, rule, scope, entity,  query, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
 values ('ra_3_3', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
@@ -196,10 +196,10 @@ good as (select count(*) from {schema}.seg_via_ferrea a where st_isvalid(a.geome
 bad as (select count(*) from {schema}.seg_via_ferrea a where not st_isvalid(a.geometria))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select a.* from {schema}.seg_via_ferrea a where not st_isvalid(a.geometria)$$, 6);
+$$select a.* from {schema}.seg_via_ferrea a where not st_isvalid(a.geometria)$$ );
 
 delete from validation.rules_area where code = 'ra_3_3';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
 values ('ra_3_3', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
@@ -210,7 +210,7 @@ good as (select count(*) from {schema}.seg_via_ferrea a where st_isvalid(a.geome
 bad as (select count(*) from {schema}.seg_via_ferrea a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s'))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select a.* from {schema}.seg_via_ferrea a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s')$$, 6);
+$$select a.* from {schema}.seg_via_ferrea a where not st_isvalid(a.geometria) and ST_Intersects(geometria, '%1$s')$$ );
 
 -- TODO
 -- Nova redação
@@ -223,29 +223,29 @@ $$select a.* from {schema}.seg_via_ferrea a where not st_isvalid(a.geometria) an
 
 -- consistência dos pontos cotados
 delete from validation.rules where code = 'rg_4_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('rg_4_1', 'Consistência tridimensional (Parte 1 - Altimetria)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'ponto_cotado',
-$$select * from validation.rg4_1_validation(1)$$,
-$$select * from validation.rg4_1_validation(2)$$, 7);
+$$select * from validation.rg4_1_validation(1, '%s'::json)$$,
+$$select * from validation.rg4_1_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 'rg_4_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('rg_4_1', 'Consistência tridimensional (Parte 1 - Altimetria)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'ponto_cotado',
-$$select * from validation.rg4_1_validation(1, '%s'::geometry)$$,
-$$select * from validation.rg4_1_validation(2, '%s'::geometry)$$, 7);
+$$select * from validation.rg4_1_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.rg4_1_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 -- "Transportes" NoTransRodov <-> SegViaRodov
 -- "Transportes" NoTransFerrov <-> SegViaFerrea
 -- "Hidrografia" os nós hidrográficos têm que coincidir com eixos de água
 -- "Construções" só tem a entidade 3D SinalGeodesico, sem ter que ser coincidente com nada.
 delete from validation.rules where code = 'rg_4_2_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('rg_4_2_1', 'Consistência tridimensional (Hidrografia)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
@@ -288,10 +288,10 @@ where nh.identificador not in (
 SELECT a.identificador
    from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
      where st_3dintersects(a.geometria, b.geometria)    
-) $$, 8);
+) $$ );
 
 delete from validation.rules_area where code = 'rg_4_2_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('rg_4_2_1', 'Consistência tridimensional (Hidrografia)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
@@ -336,10 +336,10 @@ where nh.identificador not in (
 SELECT a.identificador
    from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
      where st_3dintersects(a.geometria, b.geometria)    
-) and ST_Intersects(geometria, '%1$s') $$, 8);
+) and ST_Intersects(geometria, '%1$s') $$ );
 --
 delete from validation.rules where code = 'rg_4_2_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('rg_4_2_2', 'Consistência tridimensional (Transportes)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
@@ -382,10 +382,10 @@ where nh.identificador not in (
 SELECT a.identificador
    from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
      where st_3dintersects(a.geometria, b.geometria)    
-) $$, 9);
+) $$ );
 
 delete from validation.rules_area where code = 'rg_4_2_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('rg_4_2_2', 'Consistência tridimensional (Transportes)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
@@ -396,15 +396,15 @@ $$with nos as (
 ),
 total as (select count(*) from {schema}.no_trans_rodov where ST_Intersects(geometria, '%1$s')),
 good as (SELECT count(distinct(a.identificador))
-   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
-     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(geometria, '%1$s')),
+   from nos a, {schema}.seg_via_rodov b
+     where st_3dintersects(a.geometria, b.geometria)),
 bad as (select count(nh.*) 
-from {schema}.no_trans_rodov nh
+from nos nh
 where nh.identificador not in (
 SELECT a.identificador
-   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
+   from nos a, {schema}.seg_via_rodov b
      where st_3dintersects(a.geometria, b.geometria)    
-) and ST_Intersects(geometria, '%1$s'))
+))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$with nos as (
@@ -413,15 +413,15 @@ $$with nos as (
 ),
 total as (select count(*) from {schema}.no_trans_rodov where ST_Intersects(geometria, '%1$s')),
 good as (SELECT count(distinct(a.identificador))
-   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
-     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(geometria, '%1$s')),
+   from nos a, {schema}.seg_via_rodov b
+     where st_3dintersects(a.geometria, b.geometria)),
 bad as (select count(nh.*) 
-from {schema}.no_trans_rodov nh
+from nos nh
 where nh.identificador not in (
 SELECT a.identificador
-   from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
+   from nos a, {schema}.seg_via_rodov b
      where st_3dintersects(a.geometria, b.geometria)    
-) and ST_Intersects(geometria, '%1$s'))
+))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select nh.* 
@@ -430,10 +430,10 @@ where nh.identificador not in (
 SELECT a.identificador
    from {schema}.no_trans_rodov a, {schema}.seg_via_rodov b
      where st_3dintersects(a.geometria, b.geometria)    
-) and ST_Intersects(geometria, '%1$s')$$, 9);
+) and ST_Intersects(nh.geometria, '%1$s')$$ );
 --
 delete from validation.rules where code = 'rg_4_2_3';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('rg_4_2_3', 'Consistência tridimensional (Transportes)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
@@ -476,10 +476,10 @@ where nh.identificador not in (
 SELECT a.identificador
    from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
      where st_3dintersects(a.geometria, b.geometria)    
-) $$, 10);
+) $$ );
 
 delete from validation.rules_area where code = 'rg_4_2_3';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('rg_4_2_3', 'Consistência tridimensional (Transportes)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
@@ -524,176 +524,336 @@ where nh.identificador not in (
 SELECT a.identificador
    from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
      where st_3dintersects(a.geometria, b.geometria)    
-) and ST_Intersects(geometria, '%1$s') $$, 10);
+) and ST_Intersects(geometria, '%1$s') $$ );
 
 
 delete from validation.rules where code = 'rg_4_3_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
-values ('rg_4_3_2', 'nome regra',
-$$descricao regra.$$,
-$$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'curso_de_agua_eixo',
+insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+values ('rg_4_3_2', 'Consistência tridimensional entre Altimetria e Hidrografia',
+$$As curva_de_nivel e curso_de_agua_eixo, quando se cruzam, têm que ter o mesmo valor Z. 
+Estas só se devem cruzar quando o curso_de_agua_eixo.valor_posicao_vertical tem valor '0'.$$,
+$$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
 $$with linhas1 as (
-	select * from {schema}.curva_de_nivel
+	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel
 ),
 linhas2 as (
-	select * from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0'
+	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and delimitacao_conhecida and not ficticio
 ),
 allintersections as (
-	SELECT linhas1.identificador as id_l1, linhas1.geometria as geom_l1, linhas2.identificador as id_l2, linhas2.geometria as geom_l2, 
+	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
+	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
+	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
 	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
 	FROM linhas1, linhas2
 	where ST_Intersects(linhas1.geometria, linhas2.geometria)
 ),
 confirmacoes as (
-	select id_l1, id_l2, geom_l1, geom_l2, ST_3DIntersects(geom_l1, (dp).geom ) as l1_intersection, ST_3DIntersects(geom_l2, (dp).geom ) as l2_intersection,
-		ST_3DLineInterpolatePoint( geom_l2, ST_LineLocatePoint(geom_l2, (dp).geom)) as p1, 
-		ST_3DLineInterpolatePoint( geom_l1, ST_LineLocatePoint(geom_l1, (dp).geom)) as p2
+	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
+			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
+			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
+		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
+		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
+		(dp).geom as geometria
 	from allintersections
 ),
+verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
+	abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z
+	from confirmacoes where not l1_intersection and not l2_intersection),
 total as (select count(*) from confirmacoes),
 verygood as (select count(*) from confirmacoes where l1_intersection or l2_intersection),
-verificar as (select st_z( p1 ) - st_z( p2 ) as distance
-	from confirmacoes where not l1_intersection and not l2_intersection),
-good as (select count(*) from verificar where distance <= ('%1$s'::json->>'desvio_3D')::numeric),
-bad as (select count(*) from verificar where distance > ('%1$s'::json->>'desvio_3D')::numeric)
+good as (select count(*) from verificar where delta_z <= ('%1$s'::json->>'desvio_3D')::numeric),
+bad as (select count(*) from verificar where delta_z > ('%1$s'::json->>'desvio_3D')::numeric)
 select total.count as total, verygood.count + good.count as good, bad.count as bad
 from total, verygood, good, bad$$,
 $$with linhas1 as (
-	select * from {schema}.curva_de_nivel
+	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel
 ),
 linhas2 as (
-	select * from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0'
+	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and delimitacao_conhecida and not ficticio
 ),
 allintersections as (
-	SELECT linhas1.identificador as id_l1, linhas1.geometria as geom_l1, linhas2.identificador as id_l2, linhas2.geometria as geom_l2, 
+	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
+	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
+	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
 	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
 	FROM linhas1, linhas2
 	where ST_Intersects(linhas1.geometria, linhas2.geometria)
 ),
 confirmacoes as (
-	select id_l1, id_l2, geom_l1, geom_l2, ST_3DIntersects(geom_l1, (dp).geom ) as l1_intersection, ST_3DIntersects(geom_l2, (dp).geom ) as l2_intersection,
-		ST_3DLineInterpolatePoint( geom_l2, ST_LineLocatePoint(geom_l2, (dp).geom)) as p1, 
-		ST_3DLineInterpolatePoint( geom_l1, ST_LineLocatePoint(geom_l1, (dp).geom)) as p2
+	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
+			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
+			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
+		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
+		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
+		(dp).geom as geometria
 	from allintersections
 ),
-total as (select count(*) from confirmacoes),
-verygood as (select count(*) from confirmacoes where l1_intersection or l2_intersection),
-verificar as (select st_z( p1 ) - st_z( p2 ) as distance
+verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
+	st_z( p1_intersecao ) - st_z( p2_intersecao ) as delta_z
 	from confirmacoes where not l1_intersection and not l2_intersection),
-good as (select count(*) from verificar where distance <= ('%1$s'::json->>'desvio_3D')::numeric),
-bad as (select count(*) from verificar where distance > ('%1$s'::json->>'desvio_3D')::numeric)
-select total.count as total, verygood.count + good.count as good, bad.count as bad
-from total, verygood, good, bad$$,
-$$with linhas1 as (
-	select * from {schema}.curva_de_nivel
-),
-linhas2 as (
-	select * from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0'
-),
-allintersections as (
-	SELECT linhas1.identificador as id_l1, linhas1.geometria as geom_l1, linhas2.identificador as id_l2, linhas2.geometria as geom_l2, 
-	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
-	FROM linhas1, linhas2
-	where ST_Intersects(linhas1.geometria, linhas2.geometria)
-),
-confirmacoes as (
-	select id_l1, id_l2, geom_l1, geom_l2, ST_3DIntersects(geom_l1, (dp).geom ) as l1_intersection, ST_3DIntersects(geom_l2, (dp).geom ) as l2_intersection,
-		ST_3DLineInterpolatePoint( geom_l2, ST_LineLocatePoint(geom_l2, (dp).geom)) as p1, 
-		ST_3DLineInterpolatePoint( geom_l1, ST_LineLocatePoint(geom_l1, (dp).geom)) as p2
-	from allintersections
-),
-verificar as (select id_l1, id_l2, geom_l1, geom_l2, st_z( p1 ) - st_z( p2 ) as distance
-	from confirmacoes where not l1_intersection and not l2_intersection),
-bad as (select id_l2 from verificar where distance > ('%1$s'::json->>'desvio_3D')::numeric)
-SELECT {schema}.curso_de_agua_eixo.*
-FROM bad
-LEFT JOIN {schema}.curso_de_agua_eixo ON bad.id_l2 = {schema}.curso_de_agua_eixo.identificador$$, 11);
+bad as (select * from verificar where delta_z > ('%1$s'::json->>'desvio_3D')::numeric)
+select * from bad$$ );
 
 delete from validation.rules_area where code = 'rg_4_3_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
-values ('rg_4_3_2', 'nome regra',
-$$descricao regra.$$,
-$$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'curso_de_agua_eixo',
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
+values ('rg_4_3_2', 'Consistência tridimensional entre Altimetria e Hidrografia',
+$$As curva_de_nivel e curso_de_agua_eixo, quando se cruzam, têm que ter o mesmo valor Z. 
+Estas só se devem cruzar quando o curso_de_agua_eixo.valor_posicao_vertical tem valor '0'.$$,
+$$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
 $$with linhas1 as (
-	select * from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
+	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
 ),
 linhas2 as (
-	select * from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and ST_Intersects(geometria, '%1$s')
+	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and delimitacao_conhecida and not ficticio and ST_Intersects(geometria, '%1$s')
 ),
 allintersections as (
-	SELECT linhas1.identificador as id_l1, linhas1.geometria as geom_l1, linhas2.identificador as id_l2, linhas2.geometria as geom_l2, 
+	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
+	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
+	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
 	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
 	FROM linhas1, linhas2
 	where ST_Intersects(linhas1.geometria, linhas2.geometria)
 ),
 confirmacoes as (
-	select id_l1, id_l2, geom_l1, geom_l2, ST_3DIntersects(geom_l1, (dp).geom ) as l1_intersection, ST_3DIntersects(geom_l2, (dp).geom ) as l2_intersection,
-		ST_3DLineInterpolatePoint( geom_l2, ST_LineLocatePoint(geom_l2, (dp).geom)) as p1, 
-		ST_3DLineInterpolatePoint( geom_l1, ST_LineLocatePoint(geom_l1, (dp).geom)) as p2
+	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
+			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
+			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
+		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
+		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
+		(dp).geom as geometria
 	from allintersections
 ),
+verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
+	abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z
+	from confirmacoes where not l1_intersection and not l2_intersection),
 total as (select count(*) from confirmacoes),
 verygood as (select count(*) from confirmacoes where l1_intersection or l2_intersection),
-verificar as (select st_z( p1 ) - st_z( p2 ) as distance
-	from confirmacoes where not l1_intersection and not l2_intersection),
-good as (select count(*) from verificar where distance <= ('%2$s'::json->>'desvio_3D')::numeric),
-bad as (select count(*) from verificar where distance > ('%2$s'::json->>'desvio_3D')::numeric)
+good as (select count(*) from verificar where delta_z <= ('%2$s'::json->>'desvio_3D')::numeric),
+bad as (select count(*) from verificar where delta_z > ('%2$s'::json->>'desvio_3D')::numeric)
 select total.count as total, verygood.count + good.count as good, bad.count as bad
 from total, verygood, good, bad$$,
 $$with linhas1 as (
-	select * from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
+	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
 ),
 linhas2 as (
-	select * from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and ST_Intersects(geometria, '%1$s')
+	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and delimitacao_conhecida and not ficticio and ST_Intersects(geometria, '%1$s')
 ),
 allintersections as (
-	SELECT linhas1.identificador as id_l1, linhas1.geometria as geom_l1, linhas2.identificador as id_l2, linhas2.geometria as geom_l2, 
+	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
+	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
+	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
 	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
 	FROM linhas1, linhas2
 	where ST_Intersects(linhas1.geometria, linhas2.geometria)
 ),
 confirmacoes as (
-	select id_l1, id_l2, geom_l1, geom_l2, ST_3DIntersects(geom_l1, (dp).geom ) as l1_intersection, ST_3DIntersects(geom_l2, (dp).geom ) as l2_intersection,
-		ST_3DLineInterpolatePoint( geom_l2, ST_LineLocatePoint(geom_l2, (dp).geom)) as p1, 
-		ST_3DLineInterpolatePoint( geom_l1, ST_LineLocatePoint(geom_l1, (dp).geom)) as p2
+	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
+			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
+			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
+		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
+		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
+		(dp).geom as geometria
 	from allintersections
 ),
-total as (select count(*) from confirmacoes),
-verygood as (select count(*) from confirmacoes where l1_intersection or l2_intersection),
-verificar as (select st_z( p1 ) - st_z( p2 ) as distance
+verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
+	st_z( p1_intersecao ) - st_z( p2_intersecao ) as delta_z
 	from confirmacoes where not l1_intersection and not l2_intersection),
-good as (select count(*) from verificar where distance <= ('%2$s'::json->>'desvio_3D')::numeric),
-bad as (select count(*) from verificar where distance > ('%2$s'::json->>'desvio_3D')::numeric)
-select total.count as total, verygood.count + good.count as good, bad.count as bad
-from total, verygood, good, bad$$,
+bad as (select * from verificar where delta_z > ('%2$s'::json->>'desvio_3D')::numeric)
+select * from bad$$ );
+
+--
+--
+--
+
+delete from validation.rules where code = 'rg_4_3_3';
+insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+values ('rg_4_3_3', 'Consistência tridimensional entre Altimetria e Hidrografia',
+$$As curva_de_nivel e curso_de_agua_eixo não se podem cruzar quando o 
+curso_de_agua_eixo.valor_posicao_vertical tem valor diferente de '0' (acima ou abaixo do solo).$$,
+$$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
 $$with linhas1 as (
-	select * from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
+	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel
 ),
 linhas2 as (
-	select * from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and ST_Intersects(geometria, '%1$s')
+	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical != '0' and delimitacao_conhecida and not ficticio
 ),
 allintersections as (
-	SELECT linhas1.identificador as id_l1, linhas1.geometria as geom_l1, linhas2.identificador as id_l2, linhas2.geometria as geom_l2, 
+	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
+	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
+	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
 	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
 	FROM linhas1, linhas2
 	where ST_Intersects(linhas1.geometria, linhas2.geometria)
 ),
 confirmacoes as (
-	select id_l1, id_l2, geom_l1, geom_l2, ST_3DIntersects(geom_l1, (dp).geom ) as l1_intersection, ST_3DIntersects(geom_l2, (dp).geom ) as l2_intersection,
-		ST_3DLineInterpolatePoint( geom_l2, ST_LineLocatePoint(geom_l2, (dp).geom)) as p1, 
-		ST_3DLineInterpolatePoint( geom_l1, ST_LineLocatePoint(geom_l1, (dp).geom)) as p2
+	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
+			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
+			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
+		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
+		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
+		(dp).geom as geometria
 	from allintersections
 ),
-verificar as (select id_l1, id_l2, geom_l1, geom_l2, st_z( p1 ) - st_z( p2 ) as distance
+verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
+	abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z
 	from confirmacoes where not l1_intersection and not l2_intersection),
-bad as (select id_l2 from verificar where distance > ('%2$s'::json->>'desvio_3D')::numeric)
-SELECT {schema}.curso_de_agua_eixo.*
-FROM bad
-LEFT JOIN {schema}.curso_de_agua_eixo ON bad.id_l2 = {schema}.curso_de_agua_eixo.identificador$$, 11);
+total as (select count(*) from confirmacoes),
+verybad as (select count(*) from confirmacoes where l1_intersection or l2_intersection),
+bad as (select count(*) from verificar where delta_z <= ('%1$s'::json->>'desvio_3D')::numeric),
+good as (select count(*) from verificar where delta_z > ('%1$s'::json->>'desvio_3D')::numeric)
+select total.count as total, good.count as good, verybad.count + bad.count as bad
+from total, verybad, good, bad$$,
+$$with linhas1 as (
+	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel
+),
+linhas2 as (
+	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical != '0' and delimitacao_conhecida and not ficticio
+),
+allintersections as (
+	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
+	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
+	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
+	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
+	FROM linhas1, linhas2
+	where ST_Intersects(linhas1.geometria, linhas2.geometria)
+),
+confirmacoes as (
+	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
+			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
+			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
+		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
+		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
+		(dp).geom as geometria
+	from allintersections
+),
+verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
+	abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z
+	from confirmacoes where not l1_intersection and not l2_intersection),
+bad as (select * from verificar where delta_z <= ('%1$s'::json->>'desvio_3D')::numeric)
+select * from bad$$ );
+
+delete from validation.rules_area where code = 'rg_4_3_3';
+insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+values ('rg_4_3_3', 'Consistência tridimensional entre Altimetria e Hidrografia',
+$$As curva_de_nivel e curso_de_agua_eixo não se podem cruzar quando o 
+curso_de_agua_eixo.valor_posicao_vertical tem valor diferente de '0' (acima ou abaixo do solo).$$,
+$$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
+$$with linhas1 as (
+	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
+),
+linhas2 as (
+	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical != '0' and delimitacao_conhecida and not ficticio and ST_Intersects(geometria, '%1$s')
+),
+allintersections as (
+	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
+	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
+	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
+	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
+	FROM linhas1, linhas2
+	where ST_Intersects(linhas1.geometria, linhas2.geometria)
+),
+confirmacoes as (
+	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
+			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
+			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
+		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
+		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
+		(dp).geom as geometria
+	from allintersections
+),
+verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
+	abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z
+	from confirmacoes where not l1_intersection and not l2_intersection),
+total as (select count(*) from confirmacoes),
+verybad as (select count(*) from confirmacoes where l1_intersection or l2_intersection),
+bad as (select count(*) from verificar where delta_z <= ('%2$s'::json->>'desvio_3D')::numeric),
+good as (select count(*) from verificar where delta_z > ('%2$s'::json->>'desvio_3D')::numeric)
+select total.count as total, good.count as good, verybad.count + bad.count as bad
+from total, verybad, good, bad$$,
+$$with linhas1 as (
+	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
+),
+linhas2 as (
+	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical != '0' and delimitacao_conhecida and not ficticio and ST_Intersects(geometria, '%1$s')
+),
+allintersections as (
+	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
+	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
+	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
+	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
+	FROM linhas1, linhas2
+	where ST_Intersects(linhas1.geometria, linhas2.geometria)
+),
+confirmacoes as (
+	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
+			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
+			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
+		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
+		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
+		(dp).geom as geometria
+	from allintersections
+),
+verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
+	abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z
+	from confirmacoes where not l1_intersection and not l2_intersection),
+bad as (select * from verificar where delta_z <= ('%2$s'::json->>'desvio_3D')::numeric)
+select * from bad$$ );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 delete from validation.rules where code = 'rg_5';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
 values ('rg_5', 'Polígonos "fechados artificialmente"', 
 $$As entidades "Água lêntica", "Curso de água - área", "Margem", "Zona
 húmida", "Área da infraestrutura de transporte aéreo", "Área agrícola,
@@ -705,10 +865,10 @@ $$"Água lêntica", "Curso de água - área", "Margem", "Zona húmida", "Área d
 infraestrutura de transporte aéreo", "Área agrícola, florestal ou mato", "Área
 artificializada" e "Área de trabalho".$$,
 $$ select * from validation.rg5_validation () $$,
-$$ select * from validation.rg5_validation () $$, 11);
+$$ select * from validation.rg5_validation () $$ );
 
 delete from validation.rules_area where code = 'rg_5';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
 values ('rg_5', 'Polígonos "fechados artificialmente"', 
 $$As entidades "Água lêntica", "Curso de água - área", "Margem", "Zona
 húmida", "Área da infraestrutura de transporte aéreo", "Área agrícola,
@@ -720,11 +880,11 @@ $$"Água lêntica", "Curso de água - área", "Margem", "Zona húmida", "Área d
 infraestrutura de transporte aéreo", "Área agrícola, florestal ou mato", "Área
 artificializada" e "Área de trabalho".$$,
 $$ select * from validation.rg5_validation ('%s'::geometry) $$,
-$$ select * from validation.rg5_validation ('%s'::geometry) $$, 11);
+$$ select * from validation.rg5_validation ('%s'::geometry) $$ );
 
 
 delete from validation.rules where code = 'rg_6';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
 values ('rg_6', 'Utilização da letra maiúscula inicial', 
 $$A letra maiúscula inicial é obrigatória nos nomes de locais ou regiões, quando
 designam siglas, símbolos ou abreviaturas internacionais e nos nomes das
@@ -732,10 +892,10 @@ instituições públicas e privadas (Serra da Estrela; Comissão de Coordenaçã
 Desenvolvimento Regional; Serviço de Estrangeiros e Fronteiras; etc.).$$,
 $$Todos os atributos "nome" (tipo texto).$$,
 $$ select * from validation.rg6_validation () $$,
-$$ select * from validation.rg6_validation () $$, 12);
+$$ select * from validation.rg6_validation () $$ );
 
 delete from validation.rules_area where code = 'rg_6';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, is_global, dorder)
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, is_global )
 values ('rg_6', 'Utilização da letra maiúscula inicial', 
 $$A letra maiúscula inicial é obrigatória nos nomes de locais ou regiões, quando
 designam siglas, símbolos ou abreviaturas internacionais e nos nomes das
@@ -743,11 +903,11 @@ instituições públicas e privadas (Serra da Estrela; Comissão de Coordenaçã
 Desenvolvimento Regional; Serviço de Estrangeiros e Fronteiras; etc.).$$,
 $$Todos os atributos "nome" (tipo texto).$$,
 $$ select * from validation.rg6_validation () $$,
-$$ select * from validation.rg6_validation () $$, true, 12);
+$$ select * from validation.rg6_validation () $$, true );
 
 
 delete from validation.rules where code = 'rg_7';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
 values ('rg_7', 'Atribuição de nomes', 
 $$O nome dos objetos é inscrito por extenso, sem abreviaturas e com recurso a
 caracteres portugueses (ex. Ribeira Grande, Praia Verde, Sapal da Ilha do
@@ -756,10 +916,10 @@ Abrantes, Ponte Vasco da Gama, etc.).$$,
 $$Todos os atributos "nome", "nomeAlternativo", "nomeDoProprietario" e
 "nomeDoProdutor", à exceção do atributo "nome" da "Via rodoviária". $$,
 $$ select * from validation.rg7_validation () $$,
-$$ select * from validation.rg7_validation () $$, 13);
+$$ select * from validation.rg7_validation () $$ );
 
 delete from validation.rules_area where code = 'rg_7';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, is_global, dorder)
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, is_global )
 values ('rg_7', 'Atribuição de nomes', 
 $$O nome dos objetos é inscrito por extenso, sem abreviaturas e com recurso a
 caracteres portugueses (ex. Ribeira Grande, Praia Verde, Sapal da Ilha do
@@ -768,7 +928,7 @@ Abrantes, Ponte Vasco da Gama, etc.).$$,
 $$Todos os atributos "nome", "nomeAlternativo", "nomeDoProprietario" e
 "nomeDoProdutor", à exceção do atributo "nome" da "Via rodoviária". $$,
 $$ select * from validation.rg7_validation () $$,
-$$ select * from validation.rg7_validation () $$, true, 13);
+$$ select * from validation.rg7_validation () $$, true );
 
 -- Regras Específicas
 
@@ -776,7 +936,7 @@ $$ select * from validation.rg7_validation () $$, true, 13);
 
 
 delete from validation.rules where code = 're3_1_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re3_1_1', 'Continuidade das curvas de nível (Parte 1)', 
 $$A "Curva de nível" é representada por uma linha contínua sem interrupção.$$, 
 $$"Curva de nível".$$, 'curva_de_nivel',
@@ -811,10 +971,10 @@ from total, good, bad $$,
 $$select cdn.*
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where not ST_IsClosed(cdn.geometria) 
-		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria))$$, 14);
+		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria))$$ );
 
 delete from validation.rules_area where code = 're3_1_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re3_1_1', 'Continuidade das curvas de nível (Parte 1)', 
 $$A "Curva de nível" é representada por uma linha contínua sem interrupção.$$, 
 $$"Curva de nível".$$, 'curva_de_nivel',
@@ -852,11 +1012,11 @@ from total, good, bad $$,
 $$select cdn.*
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where not ST_IsClosed(cdn.geometria) 
-		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria)) and ST_Intersects(cdn.geometria, '%1$s'::geometry)$$, 14);
+		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria)) and ST_Intersects(cdn.geometria, '%1$s'::geometry)$$ );
 
 
 delete from validation.rules where code = 're3_1_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re3_1_2', 'Continuidade das curvas de nível (Parte 2)', 
 $$Todos os vértices de uma "Curva de nível" devem apresentar o mesmo valor
 altimétrico.$$, 
@@ -873,10 +1033,10 @@ good as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) =
 bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria)$$, 15);
+$$select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria)$$ );
 
 delete from validation.rules_area where code = 're3_1_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re3_1_2', 'Continuidade das curvas de nível (Parte 2)', 
 $$Todos os vértices de uma "Curva de nível" devem apresentar o mesmo valor
 altimétrico.$$, 
@@ -893,33 +1053,33 @@ good as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) =
 bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'::geometry))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'::geometry)$$, 15);
+$$select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'::geometry)$$ );
 
 -- Só verifico as mestres e secundárias
 -- select count(*) from {schema}.curva_de_nivel where valor_tipo_curva <= 2
 delete from validation.rules where code = 're3_2';
-insert into validation.rules ( code, name, rule, scope,  query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope,  query, query_nd2 ) 
 values ('re3_2', 'Equidistância natural', 
 $$A equidistância natural entre os objetos "Curva de nível" é:
  - NdD1: 2 m;
  - NdD2: 5 m.$$, 
 $$"Curva de nível".$$,
 $$select * from validation.re3_2_validation (1, '%s'::json)$$,
-$$select * from validation.re3_2_validation (2, '%s'::json)$$, 16);
+$$select * from validation.re3_2_validation (2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're3_2';
-insert into validation.rules_area ( code, name, rule, scope,  query, query_nd2, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope,  query, query_nd2 ) 
 values ('re3_2', 'Equidistância natural', 
 $$A equidistância natural entre os objetos "Curva de nível" é:
  - NdD1: 2 m;
  - NdD2: 5 m.$$, 
 $$"Curva de nível".$$,
 $$select * from validation.re3_2_validation(1, '%s'::geometry, '%s'::json)$$,
-$$select * from validation.re3_2_validation(2, '%s'::geometry, '%s'::json)$$, 16);
+$$select * from validation.re3_2_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 -- Pontos cotados
 delete from validation.rules where code = 're3_3';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re3_3', 'Pontos cotados', 
 $$É recolhido pelo menos um "Ponto cotado" nas zonas planas onde a distância
 horizontal entre os objetos "Curva de nível" exceda os seguintes valores:
@@ -956,10 +1116,10 @@ difference as (select (st_dump(st_difference( st_difference(adt.geometria, cdn_b
 	from validation.area_trabalho_multi adt, cdn_buffer, pc_buffer)
 select uuid_generate_v1mc() as identificador, now() as inicio_objeto, null as fim_objeto, 1 as valor_classifica_las, ST_Force3D(st_centroid(d.geom)) as geometria
 from difference d
-where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)$$, 17);
+where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)$$ );
 
 delete from validation.rules_area where code = 're3_3';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re3_3', 'Pontos cotados', 
 $$É recolhido pelo menos um "Ponto cotado" nas zonas planas onde a distância
 horizontal entre os objetos "Curva de nível" exceda os seguintes valores:
@@ -996,12 +1156,12 @@ difference as (select (st_dump(st_difference( st_difference('%1$s', cdn_buffer.g
 	from cdn_buffer, pc_buffer)
 select uuid_generate_v1mc() as identificador, now() as inicio_objeto, null as fim_objeto, 1 as valor_classifica_las, ST_Force3D(st_centroid(d.geom)) as geometria
 from difference d
-where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)$$, 17);
+where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)$$ );
 
 -- Regras do tema Hidrografia
 
 delete from validation.rules where code = 're4_1_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_1_1', 'Representação de água lêntica (Parte 1)', 
 $$A representação de "Água lêntica" ("Lagoa", "Albufeira" ou "Charca") é
 sempre feita à custa da cota plena de armazenamento. Se este valor
@@ -1019,10 +1179,10 @@ good as (select count(*) from {schema}.agua_lentica al where (cota_plena_armazen
 bad as (select count(*) from {schema}.agua_lentica al where (cota_plena_armazenamento=false and data_fonte_dados is null))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.agua_lentica al where (cota_plena_armazenamento=false and data_fonte_dados is null)$$, 18);
+$$select * from {schema}.agua_lentica al where (cota_plena_armazenamento=false and data_fonte_dados is null)$$ );
 
 delete from validation.rules_area where code = 're4_1_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_1_1', 'Representação de água lêntica (Parte 1)', 
 $$A representação de "Água lêntica" ("Lagoa", "Albufeira" ou "Charca") é
 sempre feita à custa da cota plena de armazenamento. Se este valor
@@ -1040,11 +1200,11 @@ good as (select count(*) from {schema}.agua_lentica al where (cota_plena_armazen
 bad as (select count(*) from {schema}.agua_lentica al where (cota_plena_armazenamento=false and data_fonte_dados is null) and ST_Intersects(geometria, '%1$s'))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.agua_lentica al where (cota_plena_armazenamento=false and data_fonte_dados is null) and ST_Intersects(geometria, '%1$s')$$, 18);
+$$select * from {schema}.agua_lentica al where (cota_plena_armazenamento=false and data_fonte_dados is null) and ST_Intersects(geometria, '%1$s')$$ );
 
 
 delete from validation.rules where code = 're4_1_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_1_2', 'Representação de água lêntica (Parte 2 - geometria)', 
 $$A representação de "Água lêntica" ("Lagoa", "Albufeira" ou "Charca") é
 sempre feita à custa da cota plena de armazenamento. Este valor deve ser consistente na sua geometria (constante).$$, 
@@ -1061,10 +1221,10 @@ good as (select count(*) from {schema}.agua_lentica al where ST_ZMax(geometria) 
 bad as (select count(*) from {schema}.agua_lentica al where ST_ZMax(geometria) != ST_ZMin(geometria))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.agua_lentica al where ST_ZMax(geometria) != ST_ZMin(geometria)$$, 19);
+$$select * from {schema}.agua_lentica al where ST_ZMax(geometria) != ST_ZMin(geometria)$$ );
 
 delete from validation.rules_area where code = 're4_1_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_1_2', 'Representação de água lêntica (Parte 2 - geometria)', 
 $$A representação de "Água lêntica" ("Lagoa", "Albufeira" ou "Charca") é
 sempre feita à custa da cota plena de armazenamento. Este valor deve ser consistente na sua geometria (constante).$$, 
@@ -1081,11 +1241,11 @@ good as (select count(*) from {schema}.agua_lentica al where ST_ZMax(geometria) 
 bad as (select count(*) from {schema}.agua_lentica al where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.agua_lentica al where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s')$$, 19);
+$$select * from {schema}.agua_lentica al where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s')$$ );
 
 
 delete from validation.rules where code = 're4_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_2', 'Representação do dique, da comporta e da eclusa', 
 $$A representação do "Dique" é sempre feita através de uma linha.
 A representação da "Comporta" é sempre feita através de uma única linha
@@ -1155,10 +1315,10 @@ union
 select b.*	from {schema}.barreira b, {schema}.valor_barreira vb
 	where b.valor_barreira = vb.identificador 
 	and lower(vb.descricao) = 'eclusa'
-	and geometrytype(b.geometria) != 'POLYGON' $$, 20);
+	and geometrytype(b.geometria) != 'POLYGON' $$ );
 
 delete from validation.rules_area where code = 're4_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_2', 'Representação do dique, da comporta e da eclusa', 
 $$A representação do "Dique" é sempre feita através de uma linha.
 A representação da "Comporta" é sempre feita através de uma única linha
@@ -1228,7 +1388,7 @@ union
 select b.*	from {schema}.barreira b, {schema}.valor_barreira vb
 	where b.valor_barreira = vb.identificador 
 	and lower(vb.descricao) = 'eclusa'
-	and geometrytype(b.geometria) != 'POLYGON' and ST_Intersects(geometria, '%1$s')$$, 20);
+	and geometrytype(b.geometria) != 'POLYGON' and ST_Intersects(geometria, '%1$s')$$ );
 
 -- TODO
 --Sempre que for possível, a representação desta linha deve coincidir com o
@@ -1236,7 +1396,7 @@ select b.*	from {schema}.barreira b, {schema}.valor_barreira vb
 --num dos seus vértices, com o objeto "Nó hidrográfico" ("Regulação de fluxo").
 
 delete from validation.rules where code = 're4_3_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_3_1', 'Representação da barreira da barragem de betão ou terra e da barreira do açude ou represa (Parte 1)', 
 $$A representação da "Barreira da barragem de betão", "Barreira da barragem
 de terra" e "Barreira do açude ou represa" é sempre feita através de uma
@@ -1248,33 +1408,33 @@ $$"Barreira" e "Edifício".$$, 'barreira',
 $$with 
 total as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa')),
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa')),
 good as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) = 'LINESTRING'),
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) = 'LINESTRING'),
 bad as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING')
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING')
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$with 
 total as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa')),
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa')),
 good as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) = 'LINESTRING'),
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) = 'LINESTRING'),
 bad as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING')
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING')
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select b.*
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING'$$, 21);
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING'$$ );
 
 delete from validation.rules_area where code = 're4_3_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_3_1', 'Representação da barreira da barragem de betão ou terra e da barreira do açude ou represa (Parte 1)', 
 $$A representação da "Barreira da barragem de betão", "Barreira da barragem
 de terra" e "Barreira do açude ou represa" é sempre feita através de uma
@@ -1286,40 +1446,40 @@ $$"Barreira" e "Edifício".$$, 'barreira',
 $$with 
 total as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa')
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa')
 	and ST_Intersects(geometria, '%1$s')),
 good as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) = 'LINESTRING'
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) = 'LINESTRING'
 	and ST_Intersects(geometria, '%1$s')),
 bad as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING'
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING'
 	and ST_Intersects(geometria, '%1$s'))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$with 
 total as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa')
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa')
 	and ST_Intersects(geometria, '%1$s')),
 good as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) = 'LINESTRING'
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) = 'LINESTRING'
 	and ST_Intersects(geometria, '%1$s')),
 bad as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING'
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING'
 	and ST_Intersects(geometria, '%1$s'))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select b.*
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra' or vb.descricao ilike '%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING' and ST_Intersects(geometria, '%1$s')$$, 21);
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra' or vb.descricao ilike '%%açude ou represa') and geometrytype(b.geometria) != 'LINESTRING' and ST_Intersects(geometria, '%1$s')$$ );
 
 
 delete from validation.rules where code = 're4_3_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_3_2', 'Representação da barreira da barragem de betão ou terra e da barreira do açude ou represa (Parte 2)', 
 $$Se estivermos perante uma "Barreira da barragem de betão" ou uma
 "Barreira da barragem de terra" terá ainda de ser feita a representação da
@@ -1329,16 +1489,16 @@ $$"Barreira" e "Edifício".$$, 'barreira',
 $$with 
 total as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')),
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')),
 good as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
-		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
 	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )),
 bad as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
-		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and not exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
 	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) ))
@@ -1347,16 +1507,16 @@ from total, good, bad $$,
 $$with 
 total as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')),
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')),
 good as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
-		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
 	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )),
 bad as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
-		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and not exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
 	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) ))
@@ -1364,13 +1524,13 @@ select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select b.*
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 	and not exists (select e.* 
 from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )$$, 22);
+where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )$$ );
 
 delete from validation.rules_area where code = 're4_3_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_3_2', 'Representação da barreira da barragem de betão ou terra e da barreira do açude ou represa (Parte 2)', 
 $$Se estivermos perante uma "Barreira da barragem de betão" ou uma
 "Barreira da barragem de terra" terá ainda de ser feita a representação da
@@ -1380,18 +1540,18 @@ $$"Barreira" e "Edifício".$$, 'barreira',
 $$with 
 total as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 	and ST_Intersects(geometria, '%1$s')),
 good as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
-		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and ST_Intersects(geometria, '%1$s')
 		and exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
 	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )),
 bad as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
-		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and ST_Intersects(geometria, '%1$s')
 		and not exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
@@ -1401,18 +1561,18 @@ from total, good, bad $$,
 $$with 
 total as (select count(*)
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 	and ST_Intersects(geometria, '%1$s')),
 good as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
-		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and ST_Intersects(geometria, '%1$s')
 		and exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
 	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )),
 bad as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
-		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and ST_Intersects(geometria, '%1$s')
 		and not exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
@@ -1421,16 +1581,16 @@ select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select b.*
 	from {schema}.barreira b, {schema}.valor_barreira vb
-	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%betão' or vb.descricao ilike '%terra')
+	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 	and ST_Intersects(geometria, '%1$s')
 	and not exists (select e.* 
 from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )$$, 22);
+where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )$$ );
 
 
 -- TODO
 delete from validation.rules where code = 're4_4';
-insert into validation.rules ( code, name, rule, scope, entity, dorder) 
+insert into validation.rules ( code, name, rule, scope, entity ) 
 values ('re4_4', 'Representação da área e do eixo do curso de água', 
 $$A representação do curso de água resulta da aplicação dos critérios:
 NdD1: o "Curso de água - área" é representado através de um polígono,
@@ -1443,7 +1603,25 @@ que traduz o limite das suas margens, se a distância entre as margens for
 igual ou superior a 5 m; se a distância entre as margens for inferior a 5 m
 então o curso de água é representado através de uma linha que traduz o
 seu eixo ("Curso de água – eixo").$$,
-$$"Curso de água - eixo" e "Curso de água - área".$$, 'curso_de_agua_area', 23);
+$$"Curso de água - eixo" e "Curso de água - área".$$, 'curso_de_agua_area' );
+
+-- TODO
+delete from validation.rules_area where code = 're4_4';
+insert into validation.rules_area ( code, name, rule, scope, entity ) 
+values ('re4_4', 'Representação da área e do eixo do curso de água', 
+$$A representação do curso de água resulta da aplicação dos critérios:
+NdD1: o "Curso de água - área" é representado através de um polígono,
+que traduz o limite das suas margens, se a distância entre as margens for
+igual ou superior a 1 m; se a distância entre as margens for inferior a 1 m
+o curso de água é representado através de uma linha que traduz o seu
+eixo ("Curso de água - eixo");
+NdD2: o "Curso de água - área" é representado através de um polígono,
+que traduz o limite das suas margens, se a distância entre as margens for
+igual ou superior a 5 m; se a distância entre as margens for inferior a 5 m
+então o curso de água é representado através de uma linha que traduz o
+seu eixo ("Curso de água – eixo").$$,
+$$"Curso de água - eixo" e "Curso de água - área".$$, 'curso_de_agua_area' );
+
 
 -- TODO
 -- Verificação muito limitada
@@ -1452,7 +1630,7 @@ $$"Curso de água - eixo" e "Curso de água - área".$$, 'curso_de_agua_area', 2
 -- Para já, neste teste limitado não se testa se os eixos são fictícios
 -- Testar fictícios dentro e ausência de fisctícios fora.
 delete from validation.rules where code = 're4_5_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_5_1', 'Representação do eixo do curso de água (Parte 1)', 
 $$Um "Curso de água - eixo" é sempre representado pelo seu eixo mesmo
 quando (também) é representado através de um polígono "Curso de água -
@@ -1475,10 +1653,10 @@ bad as (select count(*) from {schema}.curso_de_agua_area cdaa
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select * from {schema}.curso_de_agua_area cdaa 
-where not exists (select * from {schema}.curso_de_agua_eixo cdae where st_within( cdae.geometria, cdaa.geometria))$$, 24);
+where not exists (select * from {schema}.curso_de_agua_eixo cdae where st_within( cdae.geometria, cdaa.geometria))$$ );
 
 delete from validation.rules_area where code = 're4_5_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_5_1', 'Representação do eixo do curso de água (Parte 1)', 
 $$Um "Curso de água - eixo" é sempre representado pelo seu eixo mesmo
 quando (também) é representado através de um polígono "Curso de água -
@@ -1501,43 +1679,67 @@ bad as (select count(*) from {schema}.curso_de_agua_area cdaa
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select * from {schema}.curso_de_agua_area cdaa 
-where st_intersects(geometria, '%1$s') and not exists (select * from {schema}.curso_de_agua_eixo cdae where st_within( cdae.geometria, cdaa.geometria))$$, 24);
+where st_intersects(geometria, '%1$s') and not exists (select * from {schema}.curso_de_agua_eixo cdae where st_within( cdae.geometria, cdaa.geometria))$$ );
 
 -- TODO
 -- Garantir a monotonia de uma LineString
 -- As LineString estão orientadas?
 -- Percorrer todos os vértices da geometria, ou seja, todos os pontos da LineString
 delete from validation.rules where code = 're4_5_2';
-insert into validation.rules ( code, name, rule, scope, entity, dorder) 
+insert into validation.rules ( code, name, rule, scope, entity ) 
 values ('re4_5_2', 'Representação do eixo do curso de água (Parte 2 - Vértices)', 
 $$Todos os vértices do "Curso de água - eixo" devem ser coerentes entre si
 também na componente tridimensional.$$,
-$$"Curso de água - eixo".$$, 'curso_de_agua_area', 25);
+$$"Curso de água - eixo".$$, 'curso_de_agua_area' );
+
+delete from validation.rules_area where code = 're4_5_2';
+insert into validation.rules_area ( code, name, rule, scope, entity ) 
+values ('re4_5_2', 'Representação do eixo do curso de água (Parte 2 - Vértices)', 
+$$Todos os vértices do "Curso de água - eixo" devem ser coerentes entre si
+também na componente tridimensional.$$,
+$$"Curso de água - eixo".$$, 'curso_de_agua_area' );
 
 -- TODO
 -- O que podemos testar? Se há eixos a chegar ou a sair de uma água lêntica?
 -- Testar se há águas lênticas isoladas...
 -- Assumir que tem que ter
 delete from validation.rules where code = 're4_6';
-insert into validation.rules ( code, name, rule, scope, entity, dorder) 
+insert into validation.rules ( code, name, rule, scope, entity ) 
 values ('re4_6', 'Representação do curso de água quando atravessa uma massa de água', 
 $$Quando um curso de água atravessa uma massa de água totalmente rodeada
 por terra ou localizada junto à costa ("Água lêntica") então também é
 representado o curso de água pelo seu eixo através do objeto "Curso de água -
 eixo" (Figura 29).$$,
-$$"Curso de água - eixo" e "Água lêntica".$$, 'curso_de_agua_eixo', 26);
+$$"Curso de água - eixo" e "Água lêntica".$$, 'curso_de_agua_eixo' );
+
+delete from validation.rules_area where code = 're4_6';
+insert into validation.rules_area ( code, name, rule, scope, entity ) 
+values ('re4_6', 'Representação do curso de água quando atravessa uma massa de água', 
+$$Quando um curso de água atravessa uma massa de água totalmente rodeada
+por terra ou localizada junto à costa ("Água lêntica") então também é
+representado o curso de água pelo seu eixo através do objeto "Curso de água -
+eixo" (Figura 29).$$,
+$$"Curso de água - eixo" e "Água lêntica".$$, 'curso_de_agua_eixo' );
 
 -- TODO
 -- Tem alaguma coisa a ver com a verificação em re4_5_1
 -- Eventualmente usar o pgRouting para estabelecer a rede entre os pontos de entrada e de saída
 -- E depois, confirmar que todos os troços estão dentro
 delete from validation.rules where code = 're4_7';
-insert into validation.rules ( code, name, rule, scope, entity, dorder) 
+insert into validation.rules ( code, name, rule, scope, entity ) 
 values ('re4_7', 'Traçado do eixo do curso de água quando atravessa uma massa de água', 
 $$O eixo de curso de água ("Curso de água - eixo") está totalmente incluído nos
 polígonos que representam o "Curso de água - área" ou a "Água lêntica"
 (Figura 30).$$,
-$$"Curso de água - eixo".$$, 'curso_de_agua_eixo', 27);
+$$"Curso de água - eixo".$$, 'curso_de_agua_eixo' );
+
+delete from validation.rules_area where code = 're4_7';
+insert into validation.rules_area ( code, name, rule, scope, entity ) 
+values ('re4_7', 'Traçado do eixo do curso de água quando atravessa uma massa de água', 
+$$O eixo de curso de água ("Curso de água - eixo") está totalmente incluído nos
+polígonos que representam o "Curso de água - área" ou a "Água lêntica"
+(Figura 30).$$,
+$$"Curso de água - eixo".$$, 'curso_de_agua_eixo' );
 
 /* delete from validation.rules where code = 're4_8';
 insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report) 
@@ -1664,7 +1866,7 @@ $$select a.*
  */
 
 delete from validation.rules where code = 're4_8_1';
-insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report, dorder) 
+insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report ) 
 values ('re4_8_1', 'Interrupção do curso de água', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
@@ -1695,10 +1897,10 @@ NULL,
 $$select distinct a.*
 	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 	where a.identificador != b.identificador and 
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$, 28);
+		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$ );
 
 delete from validation.rules_area where code = 're4_8_1';
-insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2, report, dorder) 
+insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2, report ) 
 values ('re4_8_1', 'Interrupção do curso de água', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
@@ -1732,11 +1934,11 @@ $$select distinct a.*
 	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
 	where a.identificador != b.identificador and 
 		ST_Intersects(a.geometria, '%1$s') and
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$, 28);
+		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$ );
 
 
 delete from validation.rules where code = 're4_8_2';
-insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report, dorder) 
+insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report ) 
 values ('re4_8_2', 'Interrupção do curso de água', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
@@ -1792,10 +1994,10 @@ from pontos, {schema}.curso_de_agua_eixo c
 where pontos.identificador = c.identificador and not exists (select * 
 	from {schema}.curso_de_agua_eixo e
 	where pontos.geometria = ST_StartPoint(e.geometria) 
-	or pontos.geometria = ST_EndPoint(e.geometria))$$, 29);
+	or pontos.geometria = ST_EndPoint(e.geometria))$$ );
 
 delete from validation.rules_area where code = 're4_8_2';
-insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2, report, dorder) 
+insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2, report ) 
 values ('re4_8_2', 'Interrupção do curso de água', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
@@ -1851,12 +2053,12 @@ from pontos, {schema}.curso_de_agua_eixo c
 where pontos.identificador = c.identificador and not exists (select * 
 	from {schema}.curso_de_agua_eixo e
 	where ST_Intersects(e.geometria, '%1$s') and pontos.geometria = ST_StartPoint(e.geometria) 
-	or pontos.geometria = ST_EndPoint(e.geometria))$$, 29);
+	or pontos.geometria = ST_EndPoint(e.geometria))$$ );
 
 
 -- Regras semelhantes: re4_9_1, re5_2_3, re5_5_3
 delete from validation.rules where code = 're4_9_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_9_1', 'Conexão entre o eixo de curso de água e os nós hidrográficos (Parte 1 - Eixos)', 
 $$Cada "Curso de água - eixo" conecta obrigatoriamente com dois objetos "Nó hidrográfico".$$, 
 $$"Curso de água - eixo" e "Nó hidrográfico".$$, 'curso_de_agua_eixo',
@@ -1891,10 +2093,10 @@ from total, good, bad$$,
 $$select cdae.*
 	from {schema}.curso_de_agua_eixo cdae, validation.area_trabalho_multi adt
 	where (ST_StartPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico) or ST_EndPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico))
-		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))$$, 30);
+		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria))$$ );
 
 delete from validation.rules_area where code = 're4_9_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_9_1', 'Conexão entre o eixo de curso de água e os nós hidrográficos (Parte 1 - Eixos)', 
 $$Cada "Curso de água - eixo" conecta obrigatoriamente com dois objetos "Nó hidrográfico".$$, 
 $$"Curso de água - eixo" e "Nó hidrográfico".$$, 'curso_de_agua_eixo',
@@ -1929,11 +2131,11 @@ from total, good, bad$$,
 $$select cdae.*
 	from {schema}.curso_de_agua_eixo cdae, validation.area_trabalho_multi adt
 	where ST_Intersects(cdae.geometria, '%1$s') and ((ST_StartPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico) or ST_EndPoint(cdae.geometria) not in (select geometria from {schema}.no_hidrografico))
-		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria)))$$, 30);
+		and not st_intersects(cdae.geometria, ST_ExteriorRing(adt.geometria)))$$ );
 
 
 delete from validation.rules where code = 're4_9_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_9_2', 'Conexão entre o eixo de curso de água e os nós hidrográficos (Parte 2 - Nós)', 
 $$Um "Nó hidrográfico" conecta obrigatoriamente com pelo menos um "Curso de água - eixo".$$, 
 $$"Curso de água - eixo" e "Nó hidrográfico".$$, 'no_hidrografico',
@@ -1974,10 +2176,10 @@ from {schema}.no_hidrografico
 where geometria not in (
 select ST_StartPoint(geometria) from {schema}.curso_de_agua_eixo cdae
 union
-select ST_EndPoint(geometria) from {schema}.curso_de_agua_eixo cdae) $$, 31);
+select ST_EndPoint(geometria) from {schema}.curso_de_agua_eixo cdae) $$ );
 
 delete from validation.rules_area where code = 're4_9_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_9_2', 'Conexão entre o eixo de curso de água e os nós hidrográficos (Parte 2 - Nós)', 
 $$Um "Nó hidrográfico" conecta obrigatoriamente com pelo menos um "Curso de água - eixo".$$, 
 $$"Curso de água - eixo" e "Nó hidrográfico".$$, 'no_hidrografico',
@@ -2018,11 +2220,11 @@ from {schema}.no_hidrografico
 where ST_Intersects(geometria, '%1$s') and geometria not in (
 select ST_StartPoint(geometria) from {schema}.curso_de_agua_eixo cdae
 union
-select ST_EndPoint(geometria) from {schema}.curso_de_agua_eixo cdae) $$, 31);
+select ST_EndPoint(geometria) from {schema}.curso_de_agua_eixo cdae) $$ );
 
 
 delete from validation.rules where code = 're4_10_1';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2, dorder )
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 )
 values ('re4_10_1', 'Nós de variação ou regulação de fluxo (Parte 1)', 
 $$Quando existe uma "Queda de água" ou uma "Zona húmida" é colocado no 
 correspondente "Curso de água - eixo" um "Nó hidrográfico" correspondente 
@@ -2031,10 +2233,10 @@ Quando existe uma "Barreira" é colocado no correspondente "Curso de água
 - eixo" um "Nó hidrográfico" correspondente à "Regulação de fluxo".$$,
 $$"Barreira", "Queda de água", "Zona húmida" e "Nó hidrográfico".$$,
 $$ select * from validation.re4_10_validation () $$,
-$$ select * from validation.re4_10_validation () $$, 32);
+$$ select * from validation.re4_10_validation () $$ );
 
 delete from validation.rules_area where code = 're4_10_1';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, dorder )
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 )
 values ('re4_10_1', 'Nós de variação ou regulação de fluxo (Parte 1)', 
 $$Quando existe uma "Queda de água" ou uma "Zona húmida" é colocado no 
 correspondente "Curso de água - eixo" um "Nó hidrográfico" correspondente 
@@ -2043,11 +2245,11 @@ Quando existe uma "Barreira" é colocado no correspondente "Curso de água
 - eixo" um "Nó hidrográfico" correspondente à "Regulação de fluxo".$$,
 $$"Barreira", "Queda de água", "Zona húmida" e "Nó hidrográfico".$$,
 $$ select * from validation.re4_10_validation('%s'::geometry)$$,
-$$ select * from validation.re4_10_validation('%s'::geometry)$$, 32);
+$$ select * from validation.re4_10_validation('%s'::geometry)$$ );
 
 
 delete from validation.rules where code = 're4_10_2';
-insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2, report, dorder )
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2, report )
 values ('re4_10_2', 'Nós de variação ou regulação de fluxo (Parte 2 - Nós)',
 $$O nó é colocado no "Curso de água" no ponto correspondente ao local onde o 
 fenómeno acontece e em conformidade com a topologia.$$,
@@ -2102,10 +2304,10 @@ $$select nh.* from {schema}.no_hidrografico nh
 				where St_intersects(nha.geometria, qda.geometria) or St_intersects(nha.geometria, zh.geometria)))
 		or (nh.valor_tipo_no_hidrografico='6'
 			and nh.identificador not in (select distinct nha.identificador from {schema}.no_hidrografico nha, {schema}.barreira b 
-				where St_intersects(nha.geometria, b.geometria)))$$, 33);
+				where St_intersects(nha.geometria, b.geometria)))$$ );
 
 delete from validation.rules_area where code = 're4_10_2';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2, report, dorder )
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2, report )
 values ('re4_10_2', 'Nós de variação ou regulação de fluxo (Parte 2 - Nós)',
 $$O nó é colocado no "Curso de água" no ponto correspondente ao local onde o 
 fenómeno acontece e em conformidade com a topologia.$$,
@@ -2160,11 +2362,11 @@ $$select nh.* from {schema}.no_hidrografico nh
 				where St_intersects(nha.geometria, qda.geometria) or St_intersects(nha.geometria, zh.geometria)))
 		or (nh.valor_tipo_no_hidrografico='6'
 			and nh.identificador not in (select distinct nha.identificador from {schema}.no_hidrografico nha, {schema}.barreira b 
-				where St_intersects(nha.geometria, b.geometria))))$$, 33);
+				where St_intersects(nha.geometria, b.geometria))))$$ );
 
 
 delete from validation.rules where code = 're4_11_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_11_1', 'Hierarquia dos nós hidrográficos (Parte 1 - Eixos)', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
@@ -2288,10 +2490,10 @@ $$select distinct on (a.identificador) a.*
 				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, '')) and not ((select st_intersects(a.geometria, f.geometria) from
 					(select geom_col as geometria from validation.no_hidro_juncao) as f)
 				or (select ST_intersects(a.geometria, i.geometria) from 
-					(select geom_col as geometria from validation.interrupcao_fluxo) as i))$$, 34);
+					(select geom_col as geometria from validation.interrupcao_fluxo) as i))$$ );
 
 delete from validation.rules_area where code = 're4_11_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_11_1', 'Hierarquia dos nós hidrográficos (Parte 1 - Eixos)', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
@@ -2415,11 +2617,11 @@ $$select distinct on (a.identificador) a.*
 				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, '')) and not ((select st_intersects(a.geometria, f.geometria) from
 					(select geom_col as geometria from validation.no_hidro_juncao) as f)
 				or (select ST_intersects(a.geometria, i.geometria) from 
-					(select geom_col as geometria from validation.interrupcao_fluxo) as i))$$, 34);
+					(select geom_col as geometria from validation.interrupcao_fluxo) as i))$$ );
 
 
 delete from validation.rules where code = 're4_11_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_11_2', 'Hierarquia dos nós hidrográficos (Parte 2 - Nós)', 
 $$Apenas é inserido um nó que assume o valor "Junção" prevalecendo este sobre o valor "Pseudo-nó".$$, 
 $$"Nó hidrográfico".$$, 'no_hidrografico',
@@ -2481,10 +2683,10 @@ $$select t.*
             select 1 
             from validation.juncao_fluxo_dattr f
             where st_intersects(t.geometria, f.geom_col)
-        )$$, 35);
+        )$$ );
 
 delete from validation.rules_area where code = 're4_11_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_11_2', 'Hierarquia dos nós hidrográficos (Parte 2 - Nós)', 
 $$Apenas é inserido um nó que assume o valor "Junção" prevalecendo este sobre o valor "Pseudo-nó".$$, 
 $$"Nó hidrográfico".$$, 'no_hidrografico',
@@ -2546,7 +2748,7 @@ $$select t.*
             select 1 
             from validation.juncao_fluxo_dattr f
             where st_intersects(t.geometria, f.geom_col)
-        )$$, 35);
+        )$$ );
 
 -- pseudo-nós
 -- Entre dois nós só pode haver um segmento
@@ -2555,7 +2757,7 @@ $$select t.*
 -- 6.5.3 REGRAS DO TEMA TRANSPORTES
 -- SUBTEMA TRANSPORTE AÉREO
 delete from validation.rules where code = 're5_1_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_1_1', 'Caracterização das áreas da infraestrutura de transporte aéreo', 
 $$Cada área ou eventualmente um conjunto de áreas que caracterizam uma
 "Área da infraestrutura de transporte aéreo" relacionam-se com um ponto
@@ -2594,10 +2796,10 @@ from total, good, bad $$,
 $$select ai.*
 	from {schema}.area_infra_trans_aereo  ai, {schema}.valor_tipo_area_infra_trans_aereo v
 	where ai.valor_tipo_area_infra_trans_aereo = v.identificador and v.descricao = 'Área da infraestrutura'
-	and not exists (select * from {schema}.infra_trans_aereo where st_contains(ai.geometria, geometria))$$, 36);
+	and not exists (select * from {schema}.infra_trans_aereo where st_contains(ai.geometria, geometria))$$ );
 
 delete from validation.rules_area where code = 're5_1_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_1_1', 'Caracterização das áreas da infraestrutura de transporte aéreo', 
 $$Cada área ou eventualmente um conjunto de áreas que caracterizam uma
 "Área da infraestrutura de transporte aéreo" relacionam-se com um ponto
@@ -2636,11 +2838,11 @@ from total, good, bad $$,
 $$select ai.*
 	from {schema}.area_infra_trans_aereo  ai, {schema}.valor_tipo_area_infra_trans_aereo v
 	where ST_Intersects(geometria, '%1$s'::geometry) and ai.valor_tipo_area_infra_trans_aereo = v.identificador and v.descricao = 'Área da infraestrutura'
-	and not exists (select * from {schema}.infra_trans_aereo where st_contains(ai.geometria, geometria))$$, 36);
+	and not exists (select * from {schema}.infra_trans_aereo where st_contains(ai.geometria, geometria))$$ );
 
 
 delete from validation.rules where code = 're5_1_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_1_2', 'Representação de um heliporto', 
 $$Um heliporto é representado pela "Área da infraestrutura de transporte
 aéreo" que limita a respetiva "Área de pista" (Figura 31 e Figura 32).$$, 
@@ -2725,10 +2927,10 @@ $$ select ia.* from {schema}.infra_trans_aereo  ia, {schema}.valor_tipo_infra_tr
 		where aia_pista.valor_tipo_area_infra_trans_aereo = v.identificador and v.descricao = 'Área de pista'
 		and st_contains(aia.geometria, aia_pista.geometria)
 		)
- )$$, 37);
+ )$$ );
 
 delete from validation.rules_area where code = 're5_1_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_1_2', 'Representação de um heliporto', 
 $$Um heliporto é representado pela "Área da infraestrutura de transporte
 aéreo" que limita a respetiva "Área de pista" (Figura 31 e Figura 32).$$, 
@@ -2813,14 +3015,14 @@ $$ select ia.* from {schema}.infra_trans_aereo  ia, {schema}.valor_tipo_infra_tr
 		where aia_pista.valor_tipo_area_infra_trans_aereo = v.identificador and v.descricao = 'Área de pista'
 		and st_contains(aia.geometria, aia_pista.geometria)
 		)
- )$$, 37);
+ )$$ );
 
 
 -- TODO
 -- TODAS AS INTERSEÇÕES entre seg_via_ferrea
 -- POINT ou MULTIPOINT; Se as mesmas duas linhas se voltam a juntar, o resultado é MULTIPOINT
 delete from validation.rules where code = 're5_2_2_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_2_2_1', 'Interrupção da via-férrea', 
 $$O "Segmento da via-férrea" é interrompido quando:
  - Existe uma interceção com outro "Segmento de via-férrea";
@@ -2913,10 +3115,10 @@ inexistentes as (
 		select st_endpoint(geometria) from {schema}.seg_via_ferrea
 	)),
 segmentos as (select svf.* from {schema}.seg_via_ferrea svf, inexistentes i where st_contains(svf.geometria, i.geom) )
-select * from segmentos union select * from linhas_duplicadas $$, 38);
+select * from segmentos union select * from linhas_duplicadas $$ );
 
 delete from validation.rules_area where code = 're5_2_2_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_2_2_1', 'Interrupção da via-férrea', 
 $$O "Segmento da via-férrea" é interrompido quando:
  - Existe uma interceção com outro "Segmento de via-férrea";
@@ -3009,14 +3211,14 @@ inexistentes as (
 		select st_endpoint(geometria) from {schema}.seg_via_ferrea
 	)),
 segmentos as (select svf.* from {schema}.seg_via_ferrea svf, inexistentes i where st_contains(svf.geometria, i.geom) )
-select * from segmentos union select * from linhas_duplicadas $$, 38);
+select * from segmentos union select * from linhas_duplicadas $$ );
 
 -- RE5.2.3
 -- Regras semelhantes: re4_9_1, re5_2_3, re5_5_3
 -- TODO
 -- Respeitar o tipo de nós:
 delete from validation.rules where code = 're5_2_3_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_2_3_1', 'Conexão entre segmentos e nós da via-férrea (Parte 1)', 
 $$Um "Segmento da via-férrea" conecta obrigatoriamente com dois objetos "Nó
 de transporte ferroviário".$$, 
@@ -3052,10 +3254,10 @@ from total, good, bad$$,
 $$select svf.*
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
-		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))$$, 39);
+		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))$$ );
 
 delete from validation.rules_area where code = 're5_2_3_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_2_3_1', 'Conexão entre segmentos e nós da via-férrea (Parte 1)', 
 $$Um "Segmento da via-férrea" conecta obrigatoriamente com dois objetos "Nó
 de transporte ferroviário".$$, 
@@ -3091,11 +3293,11 @@ from total, good, bad$$,
 $$select svf.*
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where ST_Intersects(svf.geometria, '%1$s'::geometry) and (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
-		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))$$, 39);
+		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))$$ );
 
 
 delete from validation.rules where code = 're5_2_3_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_2_3_2', 'Conexão entre segmentos e nós da via-férrea (Parte 2)', 
 $$Um "Nó de transporte ferroviário" conecta obrigatoriamente com pelo menos
 um "Segmento da via-férrea".$$, 
@@ -3137,10 +3339,10 @@ $$ select *
 	where geometria not in (
 	select ST_StartPoint(geometria) from {schema}.seg_via_ferrea
 	union
-	select ST_EndPoint(geometria) from {schema}.seg_via_ferrea)$$, 40);
+	select ST_EndPoint(geometria) from {schema}.seg_via_ferrea)$$ );
 
 delete from validation.rules_area where code = 're5_2_3_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_2_3_2', 'Conexão entre segmentos e nós da via-férrea (Parte 2)', 
 $$Um "Nó de transporte ferroviário" conecta obrigatoriamente com pelo menos
 um "Segmento da via-férrea".$$, 
@@ -3182,14 +3384,14 @@ $$ select *
 	where ST_Intersects(geometria, '%1$s'::geometry) and geometria not in (
 	select ST_StartPoint(geometria) from {schema}.seg_via_ferrea
 	union
-	select ST_EndPoint(geometria) from {schema}.seg_via_ferrea)$$, 40);
+	select ST_EndPoint(geometria) from {schema}.seg_via_ferrea)$$ );
 	
 
 -- RE5.2.6
 -- Regras semelhantes: re5_1_1, re_5_2_6, re_5_5_7
 -- Esta regra é garantida pelo modelo de dados
 delete from validation.rules where code = 're5_2_6';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_2_6', 'Caracterização das áreas da infraestrutura de transporte ferroviário', 
 $$Cada área ou eventualmente um conjunto de áreas que caracterizam uma
 "Área da infraestrutura de transporte ferroviário" relacionam-se com um
@@ -3209,10 +3411,10 @@ good as (select count(*) from {schema}.area_infra_trans_ferrov where infra_trans
 bad as (select count(*) from {schema}.area_infra_trans_ferrov where infra_trans_ferrov_id is NULL)
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.area_infra_trans_ferrov where infra_trans_ferrov_id is null $$, 41);
+$$select * from {schema}.area_infra_trans_ferrov where infra_trans_ferrov_id is null $$ );
 
 delete from validation.rules_area where code = 're5_2_6';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_2_6', 'Caracterização das áreas da infraestrutura de transporte ferroviário', 
 $$Cada área ou eventualmente um conjunto de áreas que caracterizam uma
 "Área da infraestrutura de transporte ferroviário" relacionam-se com um
@@ -3232,7 +3434,7 @@ good as (select count(*) from {schema}.area_infra_trans_ferrov where ST_Intersec
 bad as (select count(*) from {schema}.area_infra_trans_ferrov where ST_Intersects(geometria, '%1$s'::geometry) and infra_trans_ferrov_id is NULL)
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.area_infra_trans_ferrov where ST_Intersects(geometria, '%1$s'::geometry) and infra_trans_ferrov_id is null $$, 41);
+$$select * from {schema}.area_infra_trans_ferrov where ST_Intersects(geometria, '%1$s'::geometry) and infra_trans_ferrov_id is null $$ );
 
 -- SUBTEMA TRANSPORTE POR CABO
 -- RE5.3.1
@@ -3251,7 +3453,7 @@ $$select * from {schema}.area_infra_trans_ferrov where ST_Intersects(geometria, 
 -- RE5.5.3
 -- Regras semelhantes: re4_9_1, re5_2_3, re5_5_3
 delete from validation.rules where code = 're5_5_3_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_3_1', 'Conexão entre segmentos e nós da via rodoviária (Parte 1)', 
 $$Um "Segmento da via rodoviária" conecta obrigatoriamente com dois objetos
 "Nó de transporte rodoviário".$$, 
@@ -3287,10 +3489,10 @@ from total, good, bad$$,
 $$select svr.*
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
-		and not st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))$$, 42);
+		and not st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))$$ );
 
 delete from validation.rules_area where code = 're5_5_3_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_3_1', 'Conexão entre segmentos e nós da via rodoviária (Parte 1)', 
 $$Um "Segmento da via rodoviária" conecta obrigatoriamente com dois objetos
 "Nó de transporte rodoviário".$$, 
@@ -3326,11 +3528,11 @@ from total, good, bad$$,
 $$select svr.*
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where ST_Intersects(svr.geometria, '%1$s'::geometry) and ((ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
-		and not st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)))$$, 42);
+		and not st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)))$$ );
 
 
 delete from validation.rules where code = 're5_5_3_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_3_2', 'Conexão entre segmentos e nós da via rodoviária (Parte 2)', 
 $$Um "Nó de transporte rodoviário" conecta obrigatoriamente com pelo menos
 um "Segmento da via rodoviária".$$, 
@@ -3372,10 +3574,10 @@ $$ select *
 	where geometria not in (
 	select ST_StartPoint(geometria) from {schema}.seg_via_rodov
 	union
-	select ST_EndPoint(geometria) from {schema}.seg_via_rodov)$$, 43);
+	select ST_EndPoint(geometria) from {schema}.seg_via_rodov)$$ );
 
 delete from validation.rules_area where code = 're5_5_3_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_3_2', 'Conexão entre segmentos e nós da via rodoviária (Parte 2)', 
 $$Um "Nó de transporte rodoviário" conecta obrigatoriamente com pelo menos
 um "Segmento da via rodoviária".$$, 
@@ -3417,13 +3619,13 @@ $$ select *
 	where ST_Intersects(geometria, '%1$s'::geometry) and geometria not in (
 	select ST_StartPoint(geometria) from {schema}.seg_via_rodov
 	union
-	select ST_EndPoint(geometria) from {schema}.seg_via_rodov)$$, 43);
+	select ST_EndPoint(geometria) from {schema}.seg_via_rodov)$$ );
 
 -- RE5.5.7
 -- Regras semelhantes: re5_1_1, re_5_2_6, re_5_5_7
 -- Esta regra é garantida pelo modelo de dados
 delete from validation.rules where code = 're5_5_7';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_7', 'Caracterização das áreas da infraestrutura de transporte rodoviário', 
 $$Cada área ou eventualmente um conjunto de áreas que caracterizam uma
 "Área da infraestrutura de transporte rodoviário" relacionam-se com um
@@ -3443,10 +3645,10 @@ good as (select count(*) from {schema}.area_infra_trans_rodov where infra_trans_
 bad as (select count(*) from {schema}.area_infra_trans_rodov where infra_trans_rodov_id is NULL)
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.area_infra_trans_rodov where infra_trans_rodov_id is null $$, 44);
+$$select * from {schema}.area_infra_trans_rodov where infra_trans_rodov_id is null $$ );
 
 delete from validation.rules_area where code = 're5_5_7';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_7', 'Caracterização das áreas da infraestrutura de transporte rodoviário', 
 $$Cada área ou eventualmente um conjunto de áreas que caracterizam uma
 "Área da infraestrutura de transporte rodoviário" relacionam-se com um
@@ -3466,11 +3668,11 @@ good as (select count(*) from {schema}.area_infra_trans_rodov where ST_Intersect
 bad as (select count(*) from {schema}.area_infra_trans_rodov where ST_Intersects(geometria, '%1$s'::geometry) and infra_trans_rodov_id is NULL)
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
-$$select * from {schema}.area_infra_trans_rodov where ST_Intersects(geometria, '%1$s'::geometry) and infra_trans_rodov_id is null $$, 44);
+$$select * from {schema}.area_infra_trans_rodov where ST_Intersects(geometria, '%1$s'::geometry) and infra_trans_rodov_id is null $$ );
 
 
 delete from validation.rules where code = 're5_5_8';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_8', 'Representação da infraestrutura de transporte rodoviário', 
 $$Se a "Área da infraestrutura de transporte rodoviário" não possuir dimensões
 para ser representada (RG2) a "Infraestrutura de transporte rodoviário" é
@@ -3492,10 +3694,10 @@ good as (select * from {schema}.infra_trans_rodov itr
 where not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria )))
 select total.count as total, good.count as good, 0 as bad
 from total, good $$,
-$$ select * from {schema}.infra_trans_rodov where false $$, 45);
+$$ select * from {schema}.infra_trans_rodov where false $$ );
 
 delete from validation.rules_area where code = 're5_5_8';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_8', 'Representação da infraestrutura de transporte rodoviário', 
 $$Se a "Área da infraestrutura de transporte rodoviário" não possuir dimensões
 para ser representada (RG2) a "Infraestrutura de transporte rodoviário" é
@@ -3517,11 +3719,11 @@ good as (select * from {schema}.infra_trans_rodov itr
 where ST_Intersects(geometria, '%1$s'::geometry) and not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria )))
 select total.count as total, good.count as good, 0 as bad
 from total, good $$,
-$$ select * from {schema}.infra_trans_rodov where false $$, 45);
+$$ select * from {schema}.infra_trans_rodov where false $$ );
 
 
 delete from validation.rules where code = 're5_5_9';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_9', 'Nó da infraestrutura rodoviária', 
 $$Cada "Infraestrutura de transporte rodoviário" tem obrigatoriamente
 associada um "Nó de transporte rodoviário" do tipo "Infraestrutura" (#5
@@ -3562,10 +3764,10 @@ from total, good, bad$$,
 $$select * from {schema}.infra_trans_rodov where identificador not in (
 	select infra_trans_rodov_id from {schema}.lig_infratransrodov_notransrodov lin 
 		inner join {schema}.no_trans_rodov ntr on lin.no_trans_rodov_id=ntr.identificador
-	where ntr.valor_tipo_no_trans_rodov = '5')$$, 46);
+	where ntr.valor_tipo_no_trans_rodov = '5')$$ );
 
 delete from validation.rules_area where code = 're5_5_9';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re5_5_9', 'Nó da infraestrutura rodoviária', 
 $$Cada "Infraestrutura de transporte rodoviário" tem obrigatoriamente
 associada um "Nó de transporte rodoviário" do tipo "Infraestrutura" (#5
@@ -3606,11 +3808,11 @@ from total, good, bad$$,
 $$select * from {schema}.infra_trans_rodov where ST_Intersects(geometria, '%1$s'::geometry) and identificador not in (
 	select infra_trans_rodov_id from {schema}.lig_infratransrodov_notransrodov lin 
 		inner join {schema}.no_trans_rodov ntr on lin.no_trans_rodov_id=ntr.identificador
-	where ntr.valor_tipo_no_trans_rodov = '5')$$, 46);
+	where ntr.valor_tipo_no_trans_rodov = '5')$$ );
 
 
 delete from validation.rules where code = 're7_1';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
 values ('re7_1', 'Representação da área agrícola, florestal ou mato',
 $$A área agrícola, florestal ou mato é recolhida e representada se possuir uma
 área igual ou superior a:
@@ -3618,10 +3820,10 @@ $$A área agrícola, florestal ou mato é recolhida e representada se possuir um
  - NdD2: 5 000 m².$$,
 $$Área agrícola, florestal ou mato.$$,
 $$select * from validation.rg_min_area ('re7_1', 'area_agricola_florestal_mato', ('%1$s'::json->>'re7_1_ndd1')::int)$$,
-$$select * from validation.rg_min_area ('re7_1', 'area_agricola_florestal_mato', ('%1$s'::json->>'re7_1_ndd2')::int)$$, 47);
+$$select * from validation.rg_min_area ('re7_1', 'area_agricola_florestal_mato', ('%1$s'::json->>'re7_1_ndd2')::int)$$ );
 
 delete from validation.rules_area where code = 're7_1';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
 values ('re7_1', 'Representação da área agrícola, florestal ou mato',
 $$A área agrícola, florestal ou mato é recolhida e representada se possuir uma
 área igual ou superior a:
@@ -3629,11 +3831,11 @@ $$A área agrícola, florestal ou mato é recolhida e representada se possuir um
  - NdD2: 5 000 m².$$,
 $$Área agrícola, florestal ou mato.$$,
 $$select * from validation.rg_min_area ('re7_1', 'area_agricola_florestal_mato', ('%2$s'::json->>'re7_1_ndd1')::int, '%1$s'::geometry)$$,
-$$select * from validation.rg_min_area ('re7_1', 'area_agricola_florestal_mato', ('%2$s'::json->>'re7_1_ndd2')::int, '%1$s'::geometry)$$, 47);
+$$select * from validation.rg_min_area ('re7_1', 'area_agricola_florestal_mato', ('%2$s'::json->>'re7_1_ndd2')::int, '%1$s'::geometry)$$ );
 
 
 delete from validation.rules where code = 're7_8';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
 values ('re7_8', 'Representação de parque, jardim e área verde',
 $$O parque e jardim e a área verde são recolhidos e representados se possuírem
 uma área igual ou superior a:
@@ -3641,10 +3843,10 @@ uma área igual ou superior a:
  - NdD2: 1 000 m².$$,
 $$Área artificializada.$$,
 $$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%1$s'::json->>'re7_8_ndd1')::int)$$,
-$$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%1$s'::json->>'re7_8_ndd2')::int)$$, 48);
+$$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%1$s'::json->>'re7_8_ndd2')::int)$$ );
 
 delete from validation.rules_area where code = 're7_8';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2, dorder ) 
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
 values ('re7_8', 'Representação de parque, jardim e área verde',
 $$O parque e jardim e a área verde são recolhidos e representados se possuírem
 uma área igual ou superior a:
@@ -3652,7 +3854,7 @@ uma área igual ou superior a:
  - NdD2: 1 000 m².$$,
 $$Área artificializada.$$,
 $$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$s'::json->>'re7_8_ndd1')::int, '%1$s'::geometry)$$,
-$$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$s'::json->>'re7_8_ndd2')::int, '%1$s'::geometry)$$, 48);
+$$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$s'::json->>'re7_8_ndd2')::int, '%1$s'::geometry)$$ );
 
 
 drop table if exists validation.area_trabalho_grid;
