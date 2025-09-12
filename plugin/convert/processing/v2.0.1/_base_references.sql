@@ -1841,7 +1841,7 @@ CREATE TABLE IF NOT EXISTS {schema}.valor_utilizacao_atual (
 	CONSTRAINT valor_utilizacao_atual_pkey PRIMARY KEY (identificador)
 );
 INSERT INTO {schema}.valor_utilizacao_atual (identificador, descricao) VALUES
-('1', 'Habitação'), ('1.1', 'Residencial'), ('1.2', 'Asssociado à residencia')
+('1', 'Habitação'), ('1.1', 'Residencial'), ('1.2', 'Associado à residencia')
 , ('2', 'Agricultura e pescas'), ('2.1', 'Agricultura'), ('2.2', 'Floresta'), ('2.3', 'Pesca e aquicultura')
 , ('3', 'Indústria')
 , ('4', 'Comércio'), ('4.1', 'Pequena loja'), ('4.2', 'Mercado'), ('4.3', 'Centro comercial'), ('4.4', 'Grande loja'), ('4.5', 'Armazém')

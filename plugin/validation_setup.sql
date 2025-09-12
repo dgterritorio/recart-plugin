@@ -380,11 +380,11 @@ end; $$;
 -- supporting functions
 
 create or replace function validation.validate_table_rows(table_name text, erows jsonb)
- RETURNS boolean
+ RETURNS json
  LANGUAGE plpgsql
 AS $function$
 declare
-	val_result boolean;
+	val_result json;
 begin
 	execute format('with expected_results as (
 		select * from json_to_recordset(''%1$s'') as x("identificador" varchar, "descricao" varchar)
@@ -393,7 +393,7 @@ begin
 		select identificador, descricao from {schema}.%2$s
 	)
 	select case when not exists (select * from expected_results except select * from actual_results)
-	and not exists (select * from actual_results except select * from expected_results) then true else false end as tres', erows, table_name) into val_result;
+	and not exists (select * from actual_results except select * from expected_results) then ''[]''::json else (select json_agg(t) from (select * from expected_results except select * from actual_results) t) end as tres', erows, table_name) into val_result;
 
 	return val_result;
 end;
