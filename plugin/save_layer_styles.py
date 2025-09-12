@@ -1,6 +1,6 @@
 #
 # Esta script Python permite guardar os estilos de todos os layers na base de dados, a partir da consola do QGIS.
-# Depois de guardados em base de dados, os comendos seguintes podem ser usados para gerar um ficheiro SQL com esses estilos.
+# Depois de guardados em base de dados, os comandos seguintes podem ser usados para gerar um ficheiro SQL com esses estilos.
 # 
 # Possíveis problemas e acertos:
 # select * from public.layer_styles ls where type = 'Unknown geometry';

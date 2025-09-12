@@ -1,4 +1,4 @@
-create or replace procedure validation.do_validation (nd1 bool) language plpgsql as $$
+/* create or replace procedure validation.do_validation (nd1 bool) language plpgsql as $$
 declare 
 	tbl text;
 	pkey text;
@@ -38,15 +38,18 @@ begin
 	
 	end loop;
 	CLOSE rules;
-end; $$;
+end; $$; 
+*/
 
-create or replace procedure validation.do_validation (nd1 bool, _code varchar) language plpgsql as $$
+/* create or replace procedure validation.do_validation (nd1 bool, _code varchar) language plpgsql as $$
 declare 
 	tbl text;
 	pkey text;
 	total int;
 	good int;
 	bad int;
+	tblname text;
+	schname text;
 
 	_query text;
 	_query_nd2 text;
@@ -72,15 +75,22 @@ begin
 
 	if bad > 0 and _report is not null then
 		CREATE SCHEMA IF NOT EXISTS errors;
-		-- table without indexes
-		tbl := 'errors.' || _entity || '_' || _code;
+		-- tables are created without indexes
+		tblname := substring(_entity from position('.' in _entity)+1 );
+		-- tbl := 'errors.' || tblname || '_' || _code;
+		tbl = format('%I.%I', 'errors', tblname || '_' || _code );
 		raise notice '%', tbl;
-		execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+		if position('.' in _entity) > 0 then
+			schname = substring(_entity from 1 for position('.' in _entity)-1 );
+			execute format('CREATE TABLE IF NOT exists %s (like %I.%I INCLUDING ALL)', tbl, schname, tblname);
+		else
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+		end if;		
 		execute format('delete from %s', tbl);
-		execute format('insert into %s %s', tbl, _report);
+		execute format('insert into %s %s', tbl, format(_report, _args));
 	end if;
 end; $$;
-
+*/
 create or replace procedure validation.do_validation (nd1 bool, _code varchar, _args json) language plpgsql as $$
 declare 
 	tbl text;
@@ -88,6 +98,8 @@ declare
 	total int;
 	good int;
 	bad int;
+	tblname text;
+	schname text;
 
 	_query text;
 	_query_nd2 text;
@@ -113,21 +125,30 @@ begin
 
 	if bad > 0 and _report is not null then
 		CREATE SCHEMA IF NOT EXISTS errors;
-		-- table without indexes
-		tbl := 'errors.' || _entity || '_' || _code;
+		-- tables are created without indexes
+		tblname := substring(_entity from position('.' in _entity)+1 );
+		-- tbl := 'errors.' || tblname || '_' || _code;
+		tbl = format('%I.%I', 'errors', tblname || '_' || _code );
 		raise notice '%', tbl;
-		execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+		if position('.' in _entity) > 0 then
+			schname = substring(_entity from 1 for position('.' in _entity)-1 );
+			execute format('CREATE TABLE IF NOT exists %s (like %I.%I INCLUDING ALL)', tbl, schname, tblname);
+		else
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+		end if;		
 		execute format('delete from %s', tbl);
 		execute format('insert into %s %s', tbl, format(_report, _args));
 	end if;
 end; $$;
 
-create or replace procedure validation.do_validation(nd1 bool, area_tbl varchar, _code varchar, _sec_code varchar) language plpgsql as $$
+/* create or replace procedure validation.do_validation(nd1 bool, area_tbl varchar, _code varchar, _sec_code varchar) language plpgsql as $$
 declare 
 	tbl text;
 	pkey text;
 	total int; good int; bad int;
 	geom_record RECORD;
+	tblname text;
+	schname text;
 
 	_query text;
 	_query_nd2 text;
@@ -173,12 +194,19 @@ begin
 
 		if bad > 0 and _report is not null then
 			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tbl := 'errors.' || _entity || '_' || _code;
+			-- tables are created without indexes
+			tblname := substring(_entity from position('.' in _entity)+1 );
+			-- tbl := 'errors.' || tblname || '_' || _code;
+			tbl = format('%I.%I', 'errors', tblname || '_' || _code );
 			raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			if position('.' in _entity) > 0 then
+				schname = substring(_entity from 1 for position('.' in _entity)-1 );
+				execute format('CREATE TABLE IF NOT exists %s (like %I.%I INCLUDING ALL)', tbl, schname, tblname);
+			else
+				execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			end if;		
 			execute format('delete from %s', tbl);
-			execute format('insert into %s %s', tbl, _report);
+			execute format('insert into %s %s', tbl, format(_report, _args));
 		end if;
 	else
 		if _query is not null then
@@ -199,15 +227,23 @@ begin
 	
 		if bad > 0 and _report is not null then
 			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tbl := 'errors.' || _entity || '_' || _code;
+			-- tables are created without indexes
+			tblname := substring(_entity from position('.' in _entity)+1 );
+			-- tbl := 'errors.' || tblname || '_' || _code;
+			tbl = format('%I.%I', 'errors', tblname || '_' || _code );
 			raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			if position('.' in _entity) > 0 then
+				schname = substring(_entity from 1 for position('.' in _entity)-1 );
+				execute format('CREATE TABLE IF NOT exists %s (like %I.%I INCLUDING ALL)', tbl, schname, tblname);
+			else
+				execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			end if;		
 			execute format('delete from %s', tbl);
-			execute format('insert into %s %s', tbl, format(_report, geom_record.geometria));
+			execute format('insert into %s %s', tbl, format(_report, _args));
 		end if;
 	end if;
 end; $$;
+*/
 
 create or replace procedure validation.do_validation(nd1 bool, area_tbl varchar, _code varchar, _sec_code varchar, _args json) language plpgsql as $$
 declare 
@@ -215,6 +251,9 @@ declare
 	pkey text;
 	total int; good int; bad int;
 	geom_record RECORD;
+	tblname text;
+	schname text;
+	existe int;
 
 	_query text;
 	_query_nd2 text;
@@ -260,12 +299,19 @@ begin
 
 		if bad > 0 and _report is not null then
 			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tbl := 'errors.' || _entity || '_' || _code;
+			-- tables are created without indexes
+			tblname := substring(_entity from position('.' in _entity)+1 );
+			-- tbl := 'errors.' || tblname || '_' || _code;
+			tbl = format('%I.%I', 'errors', tblname || '_' || _code );
 			raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			if position('.' in _entity) > 0 then
+				schname = substring(_entity from 1 for position('.' in _entity)-1 );
+				execute format('CREATE TABLE IF NOT exists %s (like %I.%I INCLUDING ALL)', tbl, schname, tblname);
+			else
+				execute format('CREATE TABLE IF NOT exists %s (like public.%I INCLUDING ALL)', tbl, _entity);
+			end if;	
 			-- execute format('delete from %s', tbl);
-			execute format('insert into %s %s on conflict (identificador) do nothing', tbl, _report);
+			execute format('insert into %s %s on conflict ON constraint %s_pkey do nothing', tbl, _report, tblname || '_' || _code);
 		end if;
 	else
 		if _query is not null then
@@ -286,22 +332,33 @@ begin
 	
 		if bad > 0 and _report is not null then
 			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tbl := 'errors.' || _entity || '_' || _code;
+			-- tables are created without indexes
+			tblname := substring(_entity from position('.' in _entity)+1 );
+			-- tbl := 'errors.' || tblname || '_' || _code;
+			tbl = format('%I.%I', 'errors', tblname || '_' || _code );
 			raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			if position('.' in _entity) > 0 then
+				schname = substring(_entity from 1 for position('.' in _entity)-1 );
+				execute format('CREATE TABLE IF NOT exists %s (like %I.%I INCLUDING ALL)', tbl, schname, tblname);
+			else
+				execute format('CREATE TABLE IF NOT exists %s (like public.%I INCLUDING ALL)', tbl, _entity);
+			end if;	
 			-- execute format('delete from %s', tbl);
-			execute format('insert into %s %s on conflict (identificador) do nothing', tbl, format(_report, geom_record.geometria, _args));
+			raise notice '%', format('insert into %s %s on conflict ON constraint %s_pkey do nothing', tbl, format(_report, geom_record.geometria, _args), tblname || '_' || _code);
+			-- intersecoes_3d_rg_4_3_2_pkey
+			execute format('insert into %s %s on conflict ON constraint %s_pkey do nothing', tbl, format(_report, geom_record.geometria, _args), tblname || '_' || _code);
 		end if;
 	end if;
 end; $$;
 
-create or replace procedure validation.do_validation_sect (nd1 bool, area_tbl varchar, _code varchar) language plpgsql as $$
+/* create or replace procedure validation.do_validation_sect (nd1 bool, area_tbl varchar, _code varchar) language plpgsql as $$
 declare 
 	tbl text;
 	pkey text;
 	total int; good int; bad int;
 	geom_record RECORD;
+	tblname text;
+	schname text;
 
 	_query text;
 	_query_nd2 text;
@@ -327,12 +384,19 @@ begin
 
 		if bad > 0 and _report is not null then
 			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tbl := 'errors.' || _entity || '_' || _code;
+			-- tables are created without indexes
+			tblname := substring(_entity from position('.' in _entity)+1 );
+			-- tbl := 'errors.' || tblname || '_' || _code;
+			tbl = format('%I.%I', 'errors', tblname || '_' || _code );
 			raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			if position('.' in _entity) > 0 then
+				schname = substring(_entity from 1 for position('.' in _entity)-1 );
+				execute format('CREATE TABLE IF NOT exists %s (like %I.%I INCLUDING ALL)', tbl, schname, tblname);
+			else
+				execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			end if;		
 			execute format('delete from %s', tbl);
-			execute format('insert into %s %s', tbl, _report);
+			execute format('insert into %s %s', tbl, format(_report, _args));
 		end if;
 	end if;
 
@@ -367,16 +431,23 @@ begin
 	
 		if bad > 0 and _report is not null then
 			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tbl := 'errors.' || _entity || '_' || _code;
+			-- tables are created without indexes
+			tblname := substring(_entity from position('.' in _entity)+1 );
+			-- tbl := 'errors.' || tblname || '_' || _code;
+			tbl = format('%I.%I', 'errors', tblname || '_' || _code );
 			raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			if position('.' in _entity) > 0 then
+				schname = substring(_entity from 1 for position('.' in _entity)-1 );
+				execute format('CREATE TABLE IF NOT exists %s (like %I.%I INCLUDING ALL)', tbl, schname, tblname);
+			else
+				execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
+			end if;		
 			execute format('delete from %s', tbl);
-			execute format('insert into %s %s', tbl, format(_report, geom_record.geometria));
+			execute format('insert into %s %s', tbl, format(_report, _args));
 		end if;
 	end loop;
 end; $$;
-
+*/
 -- supporting functions
 
 create or replace function validation.validate_table_rows(table_name text, erows jsonb)
@@ -802,14 +873,20 @@ return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
 
-create or replace function validation.rg4_1_validation (ndd integer) returns table (total int, good int, bad int) as $$
+create or replace function validation.rg4_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
 	count_bad integer := 0;
 
-	valor_equi integer := case when ndd = 1 then 2 else 5 end;
+	valor_equi integer;
 begin
+	if ndd=1 then
+		select coalesce(_args->>'re3_2_ndd1', '2')::int into valor_equi;
+	else
+		select coalesce(_args->>'re3_2_ndd2', '5')::int into valor_equi;
+	end if;
+
 	CREATE SCHEMA IF NOT EXISTS errors;
 		-- table without indexes
 		-- raise notice '%', tbl;
@@ -832,6 +909,75 @@ begin
 			ORDER BY pc.geometria <-> ports.geometria
 			LIMIT 10
 		) AS closest_cdn
+		),
+	z_distances AS (
+		select
+			identificador,
+			abs(st_z(ponto_cotado_geom) - st_z(dumped_point_geom)) AS z_distance
+		FROM dumped_points
+		),
+	min_z_distances AS (
+		select
+			identificador,
+			MIN(z_distance) AS min_z_distance
+		FROM z_distances
+		GROUP BY identificador
+	),
+	bad_rows AS (
+		INSERT INTO errors.ponto_cotado_rg_4_1
+	    SELECT pc.*
+	    FROM {schema}.ponto_cotado pc
+	    WHERE pc.identificador IN (
+			SELECT identificador
+	        FROM min_z_distances
+	        WHERE min_z_distance > valor_equi)
+		RETURNING 1
+	)
+	SELECT count(*) FROM bad_rows into count_bad;
+
+	select (count_all - count_bad) into count_good;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.rg4_1_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+
+	valor_equi integer;
+begin
+	if ndd=1 then
+		select coalesce(_args->>'re3_2_ndd1', '2')::int into valor_equi;
+	else
+		select coalesce(_args->>'re3_2_ndd2', '5')::int into valor_equi;
+	end if;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+		-- table without indexes
+		-- raise notice '%', tbl;
+	CREATE TABLE IF NOT exists errors.ponto_cotado_rg_4_1 (like {schema}.ponto_cotado INCLUDING ALL);
+
+	delete from errors.ponto_cotado_rg_4_1;
+
+	select count(*) from {schema}.ponto_cotado into count_all;
+
+	WITH dumped_points AS (
+		select
+			pc.identificador,
+			pc.geometria AS ponto_cotado_geom,
+			closest_cdn.geometria as cdn_geom,
+			(ST_DumpPoints(closest_cdn.geometria)).geom AS dumped_point_geom
+		FROM {schema}.ponto_cotado AS pc
+		CROSS JOIN LATERAL (
+			SELECT geometria
+			FROM validation.curva_nivel_tin AS ports
+			ORDER BY pc.geometria <-> ports.geometria
+			LIMIT 10
+		) AS closest_cdn
+		where ST_Intersects(pc.geometria, sect)
 		),
 	z_distances AS (
 		select
@@ -1677,3 +1823,30 @@ CREATE INDEX IF NOT EXISTS idx_val_juncao_fluxo_dattr_geom ON validation.juncao_
 
 -- drop index IF EXISTS validation.tin_geom_idx;
 -- create index tin_geom_idx ON validation.tin using gist(geometria);
+
+-- tabela para acumular os possíveis erros de consistência 3D
+-- id_1, id_2 - ids dos elementos que se intersetam em 2D, mas não em 3D
+-- tabela_1, tabela_2 - tabelas dos elementos que estão inconsistentes
+-- geom_1, geom_2 - geometria dos elementos que estão inconsistentes
+-- p_intersecao - ponto de interseção entre as duas geometrias (resulta de ST_Intersection)
+-- p1_intersecao - ponto da geom_1 mais próximo do ponto de interseção
+-- p2_intersecao - ponto da geom_2 mais próximo do ponto de interseção
+-- delta_z - diferença de cota entre os pontos de interseção
+-- regra - regra que foi violada
+CREATE TABLE IF NOT EXISTS validation.intersecoes_3d (
+	id_1 uuid NULL,
+	id_2 uuid NULL,
+	tabela_1 text NULL,
+	tabela_2 text NULL,
+	geom_1 public.geometry(linestringz, 3763) NULL,
+	geom_2 public.geometry(linestringz, 3763) NULL,
+	geometria public.geometry(pointz, 3763) NOT NULL,
+	p1_intersecao public.geometry(pointz, 3763) NULL,
+	p2_intersecao public.geometry(pointz, 3763) NULL,
+	delta_z float8 null,
+	regra text NULL
+);
+
+-- As copias desta tabela terão primary keys com o nome deste genero: intersecoes_3d_rg_4_3_2_pkey
+-- quando se cria a tabela com um LIKE INCLUDING ALL os nomes das restrições são gerados automaticamente
+ALTER TABLE validation.intersecoes_3d ADD CONSTRAINT ponto_unico PRIMARY KEY (geometria);

@@ -8,6 +8,7 @@ displayList = {
     'curva_de_nivel': {'index': 310, 'alias': 'Curva de nível', 'name': '[03] ALTIMETRIA', 'geom': ['LINESTRINGZ']},
     'linha_de_quebra': {'index': 320, 'alias': 'Linha de quebra', 'name': '[03] ALTIMETRIA', 'geom': ['LINESTRINGZ']},
     'ponto_cotado': {'index': 330, 'alias': 'Ponto cotado', 'name': '[03] ALTIMETRIA', 'geom': ['POINTZ']},
+    'intersecoes_3d': {'index': 340, 'alias': 'Interseções 3D', 'name': '[03] ALTIMETRIA', 'geom': ['POINTZ']},
     'agua_lentica': {'index': 410, 'alias': 'Água lêntica', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGONZ']},
     'barreira': {'index': 420, 'alias': 'Barreira', 'name': '[04] HIDROGRAFIA', 'geom': ['LINESTRING', 'POLYGON']},
     'curso_de_agua_area': {'index': 430, 'alias': 'Curso de água - área', 'name': '[04] HIDROGRAFIA', 'geom': ['POLYGONZ']},

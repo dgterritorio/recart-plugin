@@ -416,8 +416,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 "select code, name, total, good, bad from {}\
                     order by dorder asc;".format(report_table))
 
-            rq = "SELECT (REGEXP_MATCHES(relname, '([a-z_]+)_rg|([a-z_]+)_re'))[1] as objeto1, (REGEXP_MATCHES(relname, '([a-z_]+)_rg|([a-z_]+)_re'))[2] as objeto2,"
-            rq = rq + " (REGEXP_MATCHES(relname, '[a-z_]+_(rg[0-9_]*)|[a-z_]+_(re[0-9_]*)'))[1] as codigo1, (REGEXP_MATCHES(relname, '[a-z_]+_(rg[0-9_]*)|[a-z_]+_(re[0-9_]*)'))[2] as codigo2, n_live_tup"
+            rq = "SELECT (REGEXP_MATCHES(relname, '([a-z_0-9]+)_rg|([a-z_0-9]+)_re'))[1] as objeto1, (REGEXP_MATCHES(relname, '([a-z_0-9]+)_rg|([a-z_0-9]+)_re'))[2] as objeto2,"
+            rq = rq + " (REGEXP_MATCHES(relname, '[a-z_0-9]+_(rg[0-9_]*)|[a-z_0-9]+_(re[0-9_]*)'))[1] as codigo1, (REGEXP_MATCHES(relname, '[a-z_0-9]+_(rg[0-9_]*)|[a-z_0-9]+_(re[0-9_]*)'))[2] as codigo2, n_live_tup"
             rq = rq + " FROM pg_stat_user_tables where schemaname = 'errors' and n_live_tup > 0 ORDER BY codigo1, codigo2, n_live_tup DESC;"
             report = self.pgutils.run_query(rq)
 
@@ -841,7 +841,7 @@ class AddLayersProcess(QThread):
 
             if ( tables ):
                 for tb in tables:
-                    ts = re.search(r'([a-z_]+)_rg|([a-z_]+)_re|([a-z_]+)_ra', tb[0])
+                    ts = re.search(r'([a-z0-9_]+)_rg|([a-z0-9_]+)_re|([a-z0-9_]+)_ra', tb[0])
                     slayer = None
                     if ts.group(1) is not None:
                         slayer = ts.group(1)
