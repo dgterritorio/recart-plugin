@@ -2,7 +2,7 @@ create schema if not exists validation;
 
 -- code HAS TO BE a valid PG identifier; it will be appended to the table name
 create table if not exists validation.rules (
-	code varchar not null primary key,
+	code varchar not null,
 	name varchar not null,
 	rule text null,
 	scope varchar null,
@@ -17,11 +17,14 @@ create table if not exists validation.rules (
 	required boolean not null default true, -- required by homologation process
 	enabled boolean not null default true, -- can be disabled
 	run boolean not null default false, -- can be checked/unchecked before each run,
-	dorder int GENERATED ALWAYS AS IDENTITY
+	dorder int GENERATED ALWAYS AS IDENTITY,
+	versoes text[] not null default '{ "v1.1.2", "v2.0.1", "v2.0.2" }'
 );
 
+ALTER TABLE validation.rules ADD CONSTRAINT rules_pky PRIMARY KEY (code, versoes);
+
 create table if not exists validation.rules_area (
-	code varchar not null primary key,
+	code varchar not null,
 	name varchar not null,
 	rule text null,
 	scope varchar null,
@@ -34,8 +37,11 @@ create table if not exists validation.rules_area (
 	enabled boolean not null default true,
 	run boolean not null default false,
 	is_global boolean not null default false,
-	dorder int GENERATED ALWAYS AS IDENTITY
+	dorder int GENERATED ALWAYS AS IDENTITY,
+	versoes text[] not null default '{ "v1.1.2", "v2.0.1", "v2.0.2" }'
 );
+
+ALTER TABLE validation.rules_area ADD CONSTRAINT rules_area_pky PRIMARY KEY (code, versoes);
 
 create table if not exists validation.rules_area_report (
 	rule_code varchar not null,
@@ -3868,9 +3874,11 @@ CREATE INDEX ON validation.area_trabalho_grid USING gist(geometria);
 
 create or replace view validation.rules_area_report_view as (
 	with aggr_report as (
-		select rule_code, max(total) as total, max(total) - sum(bad) as good, sum(bad) as bad from validation.rules_area_report
-		group by rule_code	
+		select rule_code, max(total) as total, max(total) - sum(bad) as good, sum(bad) as bad 
+		from validation.rules_area_report
+		group by rule_code
 	)
-	select ra.code, ra.name, ra.rule, ra.scope, ra.entity, ra.required, ra.enabled, ra.run, ra.dorder, ra.is_global, rar.total, rar.good, rar.bad from validation.rules_area ra
+	select ra.code, ra.name, ra.rule, ra.scope, ra.entity, ra.required, ra.enabled, ra.run, ra.dorder, ra.versoes, ra.is_global, rar.total, rar.good, rar.bad 
+	from validation.rules_area ra
 	left join aggr_report rar on ra.code=rar.rule_code
 );

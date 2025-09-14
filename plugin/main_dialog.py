@@ -144,6 +144,8 @@ class MainDialog(QDialog, FORM_CLASS):
                         return
 
                     self.schemaName.addItems(schemas)
+                    self.schemaName.setCurrentIndex(schemas.index('public') if 'public' in schemas else 0)
+
                 except ValueError as error:
                     self.plainTextEdit.appendPlainText(
                         "[Erro]: {0}\n".format(error))

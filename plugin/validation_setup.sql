@@ -91,7 +91,7 @@ begin
 	end if;
 end; $$;
 */
-create or replace procedure validation.do_validation (nd1 bool, _code varchar, _args json) language plpgsql as $$
+create or replace procedure validation.do_validation (nd1 bool, vrs varchar, _code varchar, _args json) language plpgsql as $$
 declare 
 	tbl text;
 	pkey text;
@@ -245,7 +245,7 @@ begin
 end; $$;
 */
 
-create or replace procedure validation.do_validation(nd1 bool, area_tbl varchar, _code varchar, _sec_code varchar, _args json) language plpgsql as $$
+create or replace procedure validation.do_validation(nd1 bool, vrs varchar, area_tbl varchar, _code varchar, _sec_code varchar, _args json) language plpgsql as $$
 declare 
 	tbl text;
 	pkey text;
