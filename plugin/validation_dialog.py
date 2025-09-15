@@ -59,7 +59,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.buttonBox.button(
             QDialogButtonBox.StandardButton.Reset).clicked.connect(self.reset)
 
-        self.comboBox.addItems(['NdD1', 'NdD2'])
+        self.ndCombo.addItems(['NdD1', 'NdD2'])
+        self.vrsCombo.addItems(['Desconhecida', 'v1.1.2', 'v2.0.1', 'v2.0.2'])
+        
         self.groupBox.setVisible(False)
 
         self.validateProcess = None
@@ -70,7 +72,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.baseSetup = False
 
         self.srsid = 0
-        self.vrs = None
+        self.vrs = 'Desconhecida'
 
     def showEvent(self, event):
         super(ValidationDialog, self).showEvent(event)
@@ -118,9 +120,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
             super(ValidationDialog, self).reject()
 
     def toggleEdit(self, state):
-        self.ignoreSusp.setEnabled(state)
-        self.ignorarSub.setEnabled(state)
-        self.ignorarSolo.setEnabled(state)
+        # self.ignoreSusp.setEnabled(state)
+        # self.ignorarSub.setEnabled(state)
+        # self.ignorarSolo.setEnabled(state)
         self.ignorarFict.setEnabled(state)
         self.ignorarDesc.setEnabled(state)
 
@@ -154,11 +156,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
         secondRow = 'Atualizar conexões...'
         self.connCombo.addItems([firstRow, secondRow] + dblist)
 
+    # a checkbox está disabled na UI, pelo que este método nunca é invocado
     def validate3dChange(self, state):
         if state is False and self.ruleSetup:
             try:
                 self.pgutils.run_query(
-                    "update validation.rules set run = false where code ilike 're3_2' or code ilike 'rg_4' or code ilike 'rg_4_1' or code ilike 'rg_4_2';")
+                    "update validation.rules set run = false \
+                        where '{}' =any(versoes) and \
+                        (code ilike 're3_2' or code ilike 'rg_4' or code ilike 'rg_4_1' or code ilike 'rg_4_2');".format(self.vers))
                 self.updateTable()
             except Exception as e:
                 self.writeText("[Erro 1]")
@@ -168,9 +173,11 @@ class ValidationDialog(QDialog, FORM_CLASS):
         if state is True and self.ruleSetup:
             try:
                 self.pgutils.run_query(
-                    "update validation.rules_area set run = true;")
+                    "update validation.rules_area set run = true\
+                        where '{}' =any(versoes);".format(self.vers))
                 self.pgutils.run_query(
-                    "update validation.rules set run = true;")
+                    "update validation.rules set run = true\
+                        where '{}' =any(versoes);".format(self.vers))
 
                 self.updateTable()
                 self.checkBox.setChecked(True)
@@ -180,9 +187,11 @@ class ValidationDialog(QDialog, FORM_CLASS):
         if state is False and self.ruleSetup:
             try:
                 self.pgutils.run_query(
-                    "update validation.rules_area set run = false;")
+                    "update validation.rules_area set run = false \
+                        where '{}' =any(versoes);".format(self.vers))
                 self.pgutils.run_query(
-                    "update validation.rules set run = false;")
+                    "update validation.rules set run = false \
+                        where '{}' =any(versoes);".format(self.vers))
                 self.updateTable()
                 self.checkBox.setChecked(False)
             except Exception as e:
@@ -194,10 +203,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
         rstate = 'true' if state else 'false'
 
         try:
-            self.pgutils.run_query("update validation.rules_area set run = " +
-                                    rstate + " where code ilike '"+str(rcode)+"';")
-            self.pgutils.run_query("update validation.rules set run = " +
-                                    rstate + " where code ilike '"+str(rcode)+"';")
+            self.pgutils.run_query("update validation.rules_area set run = {} \
+                where '{}' =any(versoes) and code ilike '{}';".format(rstate, self.vrs, rcode))
+            self.pgutils.run_query("update validation.rules set run = {} \
+                where '{}' =any(versoes) and code ilike '{}';".format(rstate, self.vrs, rcode))
 
             if (rcode == 're3_2' or rcode == 'rg_4' or rcode == 'rg_4_1' or rcode == 'rg_4_2') and state is True:
                 self.checkBox.setChecked(True)
@@ -209,8 +218,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
         try:
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             report = self.pgutils.run_query(
-                "select code, name, total, good, bad, run from {}\
-                    order by dorder asc;".format(report_table))
+                "select code, name, total, good, bad, run from {} \
+                    where '{}' =any(versoes) \
+                    order by dorder asc;".format(report_table, self.vrs))
 
             model = self.tableView.model()
             rn = 0
@@ -294,13 +304,82 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.writeText("[Erro 14]")
             self.writeText(("\tException: {}".format(e)))
 
+    def testDbVersion(self):
+        finddbquery = 'select count(*) from {schema}.valor_construcao_linear;'
+        
+        self.schema = str(self.schemaName.currentText())
+        
+        cnt = re.sub(r"{schema}", self.schema, finddbquery)
+
+        """ versão = 'v1.1.2'
+        INSERT INTO valor_construcao_linear VALUES ('1','Muro de alvenaria ou betão');
+        INSERT INTO valor_construcao_linear VALUES ('2','Muro de pedra');
+        INSERT INTO valor_construcao_linear VALUES ('3','Sebe');
+        INSERT INTO valor_construcao_linear VALUES ('4','Gradeamento ou vedação');
+        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
+        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
+        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
+        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
+        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
+        """
+                
+        """ versão 2.0.1
+        INSERT INTO valor_construcao_linear VALUES ('1','Muro de alvenaria ou betão');
+        INSERT INTO valor_construcao_linear VALUES ('2','Muro de pedra');
+        INSERT INTO valor_construcao_linear VALUES ('3','Sebe');
+        INSERT INTO valor_construcao_linear VALUES ('4','Gradeamento ou vedação');
+        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
+        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
+        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
+        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
+        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
+        INSERT INTO valor_construcao_linear VALUES ('10','Guarda de segurança');
+        INSERT INTO valor_construcao_linear VALUES ('11','Tapete para transporte de materiais');
+        """        
+
+        """ versão 2.0.2        
+        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
+        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
+        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
+        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
+        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
+        INSERT INTO valor_construcao_linear VALUES ('10','Guarda de segurança');
+        INSERT INTO valor_construcao_linear VALUES ('11','Tapete para transporte de materiais');
+        INSERT INTO valor_construcao_linear VALUES ('12','Muro');
+        INSERT INTO valor_construcao_linear VALUES ('13','Muro de vedação');
+        INSERT INTO valor_construcao_linear VALUES ('14','Vedação');
+        """        
+        
+        try:
+            result = self.pgutils.run_query(cnt)
+            if result and len(result) > 0:
+                if result[0][0] == 9:
+                    self.vrs = 'v1.1.2'
+                elif res[0][0] == 11:
+                    self.vrs = 'v2.0.1'
+                elif res[0][0] == 10:
+                    self.vrs = 'v2.0.2'
+                else:
+                    self.vrs = 'Desconhecida'                
+                self.writeText("[Sucesso] {0}: {1}\n".format("Versão das regras: ", self.vrs))
+                self.vrsCombo.setCurrentText(self.vrs)
+            else:
+                self.writeText("[Aviso] {0}\n".format("Não foi possível detetar a versão das regras"))
+        except Exception as e:
+            self.writeText("[Erro 15] Falha ao detetar a versão das regras")
+            self.vrs = 'Desconhecida'
+            self.vrsCombo.setCurrentText(self.vrs)
+            # self.writeText(("\tException: {}".format(e)))
+
     def testValidationRules(self):
+        self.writeText("A carregar a versão das regras {}...".format(self.vrs if self.vrs is not None else 'Desconhecida'))
         try:
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
 
             report = self.pgutils.run_query(
                 "select code, name, total, good, bad, run from {}\
-                    order by dorder asc;".format(report_table))
+                    where '{}' =any(versoes) \
+                    order by dorder asc;".format(report_table, self.vrs))
 
             self.tableView.setVisible(True)
             self.pushButton.setVisible(False)
@@ -315,6 +394,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             rn = 0
             for row in report:
+                self.writeText("{} Regra {}...".format(rn, row[0]))
                 model.appendRow([QStandardItem(row[0]), QStandardItem(row[1]), QStandardItem(
                     str(row[2])), QStandardItem(str(row[3])), QStandardItem(str(row[4]))])
 
@@ -337,6 +417,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.pushButton.setVisible(True)
 
     def changeConn(self, newConnName):
+        self.schemaName.clear()
+        self.vrsCombo.setCurrentText('Desconhecida')
+        self.vrs = 'Desconhecida'
+        
         if newConnName == 'Atualizar conexões...':
             self.fillDataSources()
             self.plainTextEdit.appendPlainText("Conexões Postgis atualizadas")
@@ -353,13 +437,15 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     schemas = self.pgutils.read_db_schemas()
                     # self.plainTextEdit.appendPlainText(
                     #     "Schemas: {0}\n".format(','.join(schemas)))
-                    self.schemaName.clear()
+                    # self.schemaName.clear()
                     self.schemaName.addItems(schemas)
+                    self.schemaName.setCurrentIndex(schemas.index('public') if 'public' in schemas else 0)
 
                     model = self.tableView.model()
                     if model is not None:
                         model.clear()
 
+                    self.testDbVersion()
                     self.testValidationRules()
                     self.getAreaTables()
                 except ValueError as error:
@@ -413,8 +499,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
         try:
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             summary = self.pgutils.run_query(
-                "select code, name, total, good, bad from {}\
-                    order by dorder asc;".format(report_table))
+                "select code, name, total, good, bad from {} \
+                    where '{}' =any(versoes) \
+                    order by dorder asc;".format(report_table, self.vrs))
 
             rq = "SELECT (REGEXP_MATCHES(relname, '([a-z_0-9]+)_rg|([a-z_0-9]+)_re'))[1] as objeto1, (REGEXP_MATCHES(relname, '([a-z_0-9]+)_rg|([a-z_0-9]+)_re'))[2] as objeto2,"
             rq = rq + " (REGEXP_MATCHES(relname, '[a-z_0-9]+_(rg[0-9_]*)|[a-z_0-9]+_(re[0-9_]*)'))[1] as codigo1, (REGEXP_MATCHES(relname, '[a-z_0-9]+_(rg[0-9_]*)|[a-z_0-9]+_(re[0-9_]*)'))[2] as codigo2, n_live_tup"
@@ -423,7 +510,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             times = datetime.now()
             footnote = times.strftime("%Y-%m-%d %H:%M:%S") +\
-                " | Recart " + self.vrs + " | " + self.comboBox.currentText()
+                " | Recart " + self.vrs + " | " + self.ndCombo.currentText()
 
             project = QgsProject.instance()
             layout = QgsPrintLayout(project)
@@ -582,7 +669,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
     def changeSchema(self):
         # if self.ruleSetup:
         #     self.setupRules()
-        pass
+        self.testDbVersion()
+        # pass
 
     def setupRules(self):
         self.bp = os.path.dirname(os.path.realpath(__file__))
@@ -648,7 +736,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         if self.createProcess is not None and not self.createProcess.cancel is True:
             conString = qgis_configs.getConnString(self, self.getConnection())
             schema = str(self.schemaName.currentText())
-            self.vrs = self.createProcess.vrs
+            # self.vrs = self.createProcess.vrs
             self.baseSetup = True
             
             args = {
@@ -662,7 +750,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 're7_1_ndd2': self.re7_1_ndd2.text(),
                 're7_8_ndd1': self.re7_8_ndd1.text(),
                 're7_8_ndd2': self.re7_8_ndd2.text(),
-                'desvio_3D': self.rg4_ndd1.text() if self.comboBox.currentText() == 'NdD1' else self.rg4_ndd2.text()
+                'desvio_3D': self.rg4_ndd1.text() if self.ndCombo.currentText() == 'NdD1' else self.rg4_ndd2.text()
             }
 
             fltr = None
@@ -670,7 +758,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 fltr = "{} {} '{}'".format(self.mFieldComboBox.currentText(), self.getOp(self.comboBoxOps.currentText()),
                                            self.fltrValue.text())
 
-            self.validateProcess = ValidateProcess(conString, schema, self.comboBox.currentText(), self.vrs, self.is_sections, self.areaComboBox.currentText(), args, fltr)
+            self.validateProcess = ValidateProcess(conString, schema, self.ndCombo.currentText(), self.vrs, self.is_sections, self.areaComboBox.currentText(), args, fltr)
 
             self.validateProcess.signal.connect(self.writeText)
             self.validateProcess.finished.connect(self.finishedValidate)
@@ -768,7 +856,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             valid3d = True #self.checkBox.isChecked()
 
-            self.createProcess = CreateProcess(conString, schema, valid3d, self.srsid, self.baseSetup)
+            self.createProcess = CreateProcess(conString, schema, valid3d, self.srsid, self.vrs, self.baseSetup)
 
             self.createProcess.signal.connect(self.writeText)
             self.createProcess.finished.connect(self.finishedCreate)
@@ -931,7 +1019,7 @@ class ResetProcess(QThread):
 class CreateProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, conn, schema, valid3d, srsid, baseSetup=False):
+    def __init__(self, conn, schema, valid3d, srsid, vrs, baseSetup=False):
         QThread.__init__(self)
 
         self.conn = conn
@@ -948,7 +1036,7 @@ class CreateProcess(QThread):
         self.pgutils = PostgisUtils(self, conn)
 
         self.actconn = None
-        self.vrs = 'v2.0.2'
+        self.vrs = vrs
 
     def write(self, text):
         self.signal.emit(text)
@@ -969,13 +1057,13 @@ class CreateProcess(QThread):
             self.actconn = self.pgutils.get_connection()
 
             # test database version
-            finddbquery = 'select count(*) from {schema}.valor_construcao_linear;'
-            cnt = re.sub(r"{schema}", self.schema, finddbquery)
-            res = self.pgutils.run_query_with_conn(self.actconn, cnt, None, False)
-            if res and len(res) > 0 and res[0][0] == 9:
-                self.vrs = 'v1.1.2'
-            elif res and len(res) > 0 and res[0][0] == 11:
-                self.vrs = 'v2.0.1'
+            # finddbquery = 'select count(*) from {schema}.valor_construcao_linear;'
+            # cnt = re.sub(r"{schema}", self.schema, finddbquery)
+            # res = self.pgutils.run_query_with_conn(self.actconn, cnt, None, False)
+            # if res and len(res) > 0 and res[0][0] == 9:
+            #     self.vrs = 'v1.1.2'
+            # elif res and len(res) > 0 and res[0][0] == 11:
+            #     self.vrs = 'v2.0.1'
 
             self.write("\tBase de dados com versão " + self.vrs)
 
@@ -1119,14 +1207,16 @@ class ValidateProcess(QThread):
 
             if not self.is_sections.isChecked():
                 self.pgutils.run_query(
-                    'update validation.rules set total = 0, good = 0, bad = 0 where run=true;')
+                    "update validation.rules set total = 0, good = 0, bad = 0 \
+                        where '{}' =any(versoes) and run=true;".format(self.vrs))
             else:
                 sections = self.pgutils.run_query(
                     "select identificador from {} where {};".format(self.areaTable, fltr))
 
             rules = self.pgutils.run_query(
-                "select code, name from {} where run=true\
-                    order by dorder asc;".format(rules_table))
+                "select code, name from {} \
+                    where '{}' =any(versoes) and run=true\
+                    order by dorder asc;".format(rules_table, self.vrs))
 
             i = 1
             l = 0
@@ -1140,16 +1230,16 @@ class ValidateProcess(QThread):
                         break
 
                     if not self.is_sections.isChecked():
-                        self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
-                        self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + r[0] + "', '" + json.dumps(self.args) + "');")
+                        self.write("\tA executar validação '" + self.vrs + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
+                        self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + r[0] + "', '" + json.dumps(self.args) + "');")
                     else:
                         s = 1
                         for sec in sections:
                             if self.cancel:
                                 break
-                            self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + " - secção " + str(s) + " de " + str(len(sections)) + ")")
-                            print("call validation.do_validation("+ ndt + ", '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
-                            self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
+                            self.write("\tA executar validação '" + self.vrs + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + " - secção " + str(s) + " de " + str(len(sections)) + ")")
+                            # print("call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
+                            self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
                             s = s + 1
                     i = i + 1
 
@@ -1161,8 +1251,9 @@ class ValidateProcess(QThread):
 
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             report = self.pgutils.run_query(
-                "select code, name, total, good, bad from {} where run=true\
-                    order by dorder asc;".format(report_table))
+                "select code, name, total, good, bad from {} \
+                    where '{}' =any(versoes) and run=true\
+                    order by dorder asc;".format(report_table, self.vrs))
 
             if report:
                 self.write("\n\tSumário:")
@@ -1184,8 +1275,10 @@ class ValidateProcess(QThread):
                 self.write(
                     "\t[Sucesso] Base de dados validada. Não foram detetados erros.")
 
-            self.pgutils.run_query('update validation.rules set run = false;')
-            self.pgutils.run_query('update validation.rules_area set run = false;')
+            self.pgutils.run_query("update validation.rules set run = false \
+                where '{}' =any(versoes);".format(self.vrs))
+            self.pgutils.run_query("update validation.rules_area set run = false \
+                where '{}' =any(versoes);".format(self.vrs))
         except Exception as e:
             if not self.cancel:
                 self.write("[Erro 11]")
