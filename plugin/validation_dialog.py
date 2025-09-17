@@ -311,53 +311,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
         
         cnt = re.sub(r"{schema}", self.schema, finddbquery)
 
-        """ versão = 'v1.1.2'
-        INSERT INTO valor_construcao_linear VALUES ('1','Muro de alvenaria ou betão');
-        INSERT INTO valor_construcao_linear VALUES ('2','Muro de pedra');
-        INSERT INTO valor_construcao_linear VALUES ('3','Sebe');
-        INSERT INTO valor_construcao_linear VALUES ('4','Gradeamento ou vedação');
-        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
-        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
-        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
-        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
-        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
-        """
-                
-        """ versão 2.0.1
-        INSERT INTO valor_construcao_linear VALUES ('1','Muro de alvenaria ou betão');
-        INSERT INTO valor_construcao_linear VALUES ('2','Muro de pedra');
-        INSERT INTO valor_construcao_linear VALUES ('3','Sebe');
-        INSERT INTO valor_construcao_linear VALUES ('4','Gradeamento ou vedação');
-        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
-        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
-        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
-        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
-        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
-        INSERT INTO valor_construcao_linear VALUES ('10','Guarda de segurança');
-        INSERT INTO valor_construcao_linear VALUES ('11','Tapete para transporte de materiais');
-        """        
-
-        """ versão 2.0.2        
-        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
-        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
-        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
-        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
-        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
-        INSERT INTO valor_construcao_linear VALUES ('10','Guarda de segurança');
-        INSERT INTO valor_construcao_linear VALUES ('11','Tapete para transporte de materiais');
-        INSERT INTO valor_construcao_linear VALUES ('12','Muro');
-        INSERT INTO valor_construcao_linear VALUES ('13','Muro de vedação');
-        INSERT INTO valor_construcao_linear VALUES ('14','Vedação');
-        """        
-        
         try:
             result = self.pgutils.run_query(cnt)
             if result and len(result) > 0:
                 if result[0][0] == 9:
                     self.vrs = 'v1.1.2'
-                elif res[0][0] == 11:
+                elif result[0][0] == 11:
                     self.vrs = 'v2.0.1'
-                elif res[0][0] == 10:
+                elif result[0][0] == 10:
                     self.vrs = 'v2.0.2'
                 else:
                     self.vrs = 'Desconhecida'                
@@ -394,7 +355,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             rn = 0
             for row in report:
-                self.writeText("{} Regra {}...".format(rn, row[0]))
+                # self.writeText("{} Regra {}...".format(rn, row[0]))
                 model.appendRow([QStandardItem(row[0]), QStandardItem(row[1]), QStandardItem(
                     str(row[2])), QStandardItem(str(row[3])), QStandardItem(str(row[4]))])
 
@@ -445,7 +406,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     if model is not None:
                         model.clear()
 
-                    self.testDbVersion()
+                    # self.testDbVersion()
                     self.testValidationRules()
                     self.getAreaTables()
                 except ValueError as error:
@@ -929,14 +890,16 @@ class AddLayersProcess(QThread):
 
             if ( tables ):
                 for tb in tables:
-                    ts = re.search(r'([a-z0-9_]+)_rg|([a-z0-9_]+)_re|([a-z0-9_]+)_ra', tb[0])
+                    ts = re.search(r'([a-z0-9_]+)_rg|([a-z0-9_]+)_re|([a-z0-9_]+)_ra|([a-z0-9_]+)_pq', tb[0])
                     slayer = None
                     if ts.group(1) is not None:
                         slayer = ts.group(1)
                     elif ts.group(2) is not None:
                         slayer = ts.group(2)
                     elif ts.group(3) is not None:
-                        slayer = ts.group(3)                        
+                        slayer = ts.group(3)
+                    elif ts.group(4) is not None:
+                        slayer = ts.group(4)
                     else:
                         print('-----')
                         print(tb[0])
@@ -1130,6 +1093,7 @@ class ValidateProcess(QThread):
 
     def run(self):
         try:
+            validated = {}
             interrupt = False
 
             # validate structure
@@ -1179,6 +1143,10 @@ class ValidateProcess(QThread):
                         for lista in objecto['listas de códigos']:
                             ltnome = re.sub(r'(?<!^)(?=[A-Z])', '_', lista['nome']).lower()
                             valores = json.dumps([{'identificador': val['Valores'], 'descricao': val['Descrição']} for val in lista['valores']], ensure_ascii=False)
+
+                            if ltnome in validated:
+                                continue
+                            validated[ltnome] = True
 
                             res = self.pgutils.run_query(
                                 'select validation.validate_table_rows(\'{}\', \'{}\');'.format(ltnome, valores))
@@ -1230,14 +1198,14 @@ class ValidateProcess(QThread):
                         break
 
                     if not self.is_sections.isChecked():
-                        self.write("\tA executar validação '" + self.vrs + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
+                        self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
                         self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + r[0] + "', '" + json.dumps(self.args) + "');")
                     else:
                         s = 1
                         for sec in sections:
                             if self.cancel:
                                 break
-                            self.write("\tA executar validação '" + self.vrs + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + " - secção " + str(s) + " de " + str(len(sections)) + ")")
+                            self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + " - secção " + str(s) + " de " + str(len(sections)) + ")")
                             # print("call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
                             self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
                             s = s + 1
