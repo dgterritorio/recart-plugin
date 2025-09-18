@@ -33,8 +33,6 @@ from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QFont
 from qgis.core import QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
 from qgis.utils import iface
 
-from psycopg2 import OperationalError
-
 from . import qgis_configs
 from .postgis_helper import PostgisUtils
 from .aux_export import displayList
@@ -50,6 +48,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, parent=None):
         super(ValidationDialog, self).__init__(parent)
         self.initialized = False
+        self.newConn = True
         self.setupUi(self)
 
         self.iface = iface
@@ -378,6 +377,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.pushButton.setVisible(True)
 
     def changeConn(self, newConnName):
+        self.newConn = True
         self.schemaName.clear()
         self.vrsCombo.setCurrentText('Desconhecida')
         self.vrs = 'Desconhecida'
@@ -386,15 +386,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.fillDataSources()
             self.plainTextEdit.appendPlainText("Conexões Postgis atualizadas")
             self.connCombo.setCurrentIndex(0)
-
-            self.getAreaTables()
         else:
             if newConnName != 'Escolher conexão...' and newConnName != 'Sem conexões disponíveis' and newConnName != "":
-                conString = qgis_configs.getConnString(self, newConnName)
-                # self.plainTextEdit.appendPlainText(
-                #     "New connection to: {0}\n".format(conString))
-                self.pgutils = PostgisUtils(self, conString)
                 try:
+                    conString = qgis_configs.getConnString(self, newConnName)
+                    # self.plainTextEdit.appendPlainText(
+                    #     "New connection to: {0}\n".format(conString))
+                    self.pgutils = PostgisUtils(self, conString)
+                
                     schemas = self.pgutils.read_db_schemas()
                     # self.plainTextEdit.appendPlainText(
                     #     "Schemas: {0}\n".format(','.join(schemas)))
@@ -406,10 +405,11 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     if model is not None:
                         model.clear()
 
-                    # self.testDbVersion()
+                    self.testDbVersion()
                     self.testValidationRules()
                     self.getAreaTables()
-                except ValueError as error:
+                    self.newConn = False
+                except Exception as error:
                     self.plainTextEdit.appendPlainText(
                         "[Erro 6]: {0}\n".format(error))
 
@@ -628,10 +628,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.writeText(("\tException: {}".format(e)))
 
     def changeSchema(self):
-        # if self.ruleSetup:
-        #     self.setupRules()
-        self.testDbVersion()
-        # pass
+        if not self.newConn:
+            self.testDbVersion()
 
     def setupRules(self):
         self.bp = os.path.dirname(os.path.realpath(__file__))
