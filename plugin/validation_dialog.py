@@ -1158,7 +1158,7 @@ class ValidateProcess(QThread):
 
             if interrupt:
                 self.write("[Erro] Estrutura base inválida")
-                return
+                # return
             else:
                 self.write("\tEstrutura base validada")
 

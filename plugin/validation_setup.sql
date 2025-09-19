@@ -2150,6 +2150,7 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_3d (
 
 -- As copias desta tabela terão primary keys com o nome deste genero: intersecoes_3d_rg_4_3_2_pkey
 -- quando se cria a tabela com um LIKE INCLUDING ALL os nomes das restrições são gerados automaticamente
+ALTER TABLE validation.intersecoes_3d DROP CONSTRAINT IF EXISTS ponto_unico;
 ALTER TABLE validation.intersecoes_3d ADD CONSTRAINT ponto_unico PRIMARY KEY (geometria);
 
 CREATE TABLE IF NOT EXISTS validation.descontinuidades (
@@ -2166,4 +2167,5 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_2d (
 	geometria geometry(pointz, 3763) NULL
 );
 
+ALTER TABLE validation.intersecoes_2d DROP CONSTRAINT IF EXISTS intersecoes_2d_pk;
 ALTER TABLE validation.intersecoes_2d ADD CONSTRAINT intersecoes_2d_pk PRIMARY KEY (p1_id, p2_id);
