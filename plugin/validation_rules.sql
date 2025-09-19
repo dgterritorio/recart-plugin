@@ -3863,6 +3863,23 @@ $$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$
 $$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$s'::json->>'re7_8_ndd2')::int, '%1$s'::geometry)$$ );
 
 
+delete from validation.rules where code = 'pq2_4_1';
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 )
+values ('pq2_4_1', 'Consistência topológica dos objetos',
+$$Avalia a existência erros topológicos nos dados.$$,
+$$Todos os objetos com exceção dos objetos do Tema Toponímia.$$,
+$$select * from validation.pq2_4_1_validation ()$$,
+$$select * from validation.pq2_4_1_validation ()$$ );
+
+delete from validation.rules_area where code = 'pq2_4_1';
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 )
+values ('pq2_4_1', 'Consistência topológica dos objetos',
+$$Avalia a existência erros topológicos nos dados.$$,
+$$Todos os objetos com exceção dos objetos do Tema Toponímia.$$,
+$$select * from validation.pq2_4_1_validation ('%1$s'::geometry)$$,
+$$select * from validation.pq2_4_1_validation ('%1$s'::geometry)$$ );
+
+
 drop table if exists validation.area_trabalho_grid;
 create table if not exists validation.area_trabalho_grid as
 with grid as (

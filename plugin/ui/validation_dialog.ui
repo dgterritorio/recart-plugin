@@ -267,64 +267,71 @@
             <property name="title">
              <string>Caraterísticas da Cartografia</string>
             </property>
-            <widget class="QLabel" name="label_4">
-             <property name="geometry">
-              <rect>
-               <x>30</x>
-               <y>30</y>
-               <width>121</width>
-               <height>20</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Nível de detalhe</string>
-             </property>
-            </widget>
-            <widget class="QComboBox" name="ndCombo">
-             <property name="geometry">
-              <rect>
-               <x>160</x>
-               <y>30</y>
-               <width>291</width>
-               <height>27</height>
-              </rect>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>200</width>
-               <height>0</height>
-              </size>
-             </property>
-            </widget>
-            <widget class="QLabel" name="label_20">
-             <property name="geometry">
-              <rect>
-               <x>30</x>
-               <y>70</y>
-               <width>121</width>
-               <height>20</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Versão das Regras</string>
-             </property>
-            </widget>
-            <widget class="QComboBox" name="vrsCombo">
-             <property name="geometry">
-              <rect>
-               <x>160</x>
-               <y>70</y>
-               <width>291</width>
-               <height>27</height>
-              </rect>
-             </property>
-            </widget>
+            <layout class="QGridLayout" name="gridLayout_13">
+             <item row="0" column="2">
+              <layout class="QHBoxLayout" name="horizontalLayout">
+               <property name="rightMargin">
+                <number>30</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Nível de detalhe</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="ndCombo">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="0" column="3">
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <property name="leftMargin">
+                <number>30</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_20">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Versão das Regras</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="vrsCombo">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </widget>
           </item>
           <item row="4" column="0">

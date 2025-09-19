@@ -583,7 +583,7 @@
 				"Definição": "Edifício utilizado para fins residenciais."
 			}, {
 				"Valores": "1.2",
-				"Descrição": "Associado à residência",
+				"Descrição": "Asssociado à residência",
 				"Valores INSPIRE": "ancillary",
 				"D1": "x",
 				"D2": "x",
@@ -835,7 +835,7 @@
 				"Definição": "Edifício onde se desenvolvem atividades financeiras, informáticas, imobiliárias, de saúde ou outras."
 			}, {
 				"Valores": "8",
-				"Descrição": "Serviços coletivos, sociais e pessoais",
+				"Descrição": "Serviços coletivos sociais e pessoais",
 				"Valores INSPIRE": "",
 				"D1": "",
 				"D2": "",
