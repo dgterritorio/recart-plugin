@@ -106,7 +106,7 @@ declare
 	_report text;
 	_entity text;
 begin
-	select query, query_nd2, report, entity from validation.rules where code=_code into _query, _query_nd2, _report, _entity;
+	select query, query_nd2, report, entity from validation.rules where code=_code and vrs=any(versoes) into _query, _query_nd2, _report, _entity;
 
 	if _query is not null then
 		if nd1 is true then
@@ -261,7 +261,7 @@ declare
 	_entity text;
 	_is_global boolean;
 begin
-	select query, query_nd2, report, entity, is_global from validation.rules_area where code=_code into _query, _query_nd2, _report, _entity, _is_global;
+	select query, query_nd2, report, entity, is_global from validation.rules_area where code=_code and vrs=any(versoes) into _query, _query_nd2, _report, _entity, _is_global;
 
 	if exists (
 		select 1 from validation.rules_area_report 
@@ -1103,6 +1103,99 @@ begin
 end;
 $$ language plpgsql;
 
+-- select * from validation.rg5_validation ();
+create or replace function validation.rg5_validation_v2 () returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	all_aux integer;
+	good_aux integer;
+	bad_aux integer;
+	tabela text;
+	tabela_erro text;
+	tabelas text[];
+begin
+	tabelas = array['agua_lentica', 'curso_de_agua_area', 'terreno_marginal', 'zona_humida', 'area_infra_trans_aereo', 'area_agricola_florestal_mato', 'areas_artificializadas'];
+
+	for tabela in select unnest(tabelas)
+	loop 
+		RAISE NOTICE '-------------------------- table % -------------------------------------------------', tabela;
+		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
+		RAISE NOTICE 'All is % for table %', all_aux, tabela;
+		count_all := count_all + all_aux;
+	
+		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+			where St_Contains(adt.geometria, t.geometria)', tabela) INTO good_aux;
+		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
+		count_good := count_good + good_aux;
+	
+		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+			where not St_Contains(adt.geometria, t.geometria)', tabela) INTO bad_aux;
+		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
+		count_bad := count_bad + bad_aux;
+
+		if bad_aux > 0 then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tabela_erro := 'errors.' || tabela || '_rg_5';
+			-- raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
+			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
+				where not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela);
+		end if;
+	end loop;
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.rg5_validation_v2(sect geometry) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	all_aux integer;
+	good_aux integer;
+	bad_aux integer;
+	tabela text;
+	tabela_erro text;
+	tabelas text[];
+begin
+	tabelas = array['agua_lentica', 'curso_de_agua_area', 'terreno_marginal', 'zona_humida', 'area_infra_trans_aereo', 'area_agricola_florestal_mato', 'areas_artificializadas'];
+
+	for tabela in select unnest(tabelas)
+	loop 
+		RAISE NOTICE '-------------------------- table % -------------------------------------------------', tabela;
+		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
+		RAISE NOTICE 'All is % for table %', all_aux, tabela;
+		count_all := count_all + all_aux;
+	
+		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+			where ST_Intersects(t.geometria, %L) and St_Contains(adt.geometria, t.geometria)', tabela, sect) INTO good_aux;
+		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
+		count_good := count_good + good_aux;
+	
+		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+			where ST_Intersects(t.geometria, %L) and not St_Contains(adt.geometria, t.geometria)', tabela, sect) INTO bad_aux;
+		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
+		count_bad := count_bad + bad_aux;
+
+		if bad_aux > 0 then
+			CREATE SCHEMA IF NOT EXISTS errors;
+			-- table without indexes
+			tabela_erro := 'errors.' || tabela || '_rg_5';
+			-- raise notice '%', tbl;
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('delete from %s', tabela_erro);
+			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
+				where ST_Intersects(t.geometria, %L) and not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela, sect);
+		end if;
+	end loop;
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
 -- select * from validation.rg6_validation ();
 create or replace function validation.rg6_validation () returns table (total int, good int, bad int) as $$
 declare
@@ -1878,7 +1971,7 @@ begin
 	for tabela in select unnest(tabelas)
 	loop 
 		RAISE NOTICE '-------------------------- table % -------------------------------------------------', tabela;
-		execute format('select count(*) from {schema}.%I where ST_Intersects(geometria, %s)', tabela, sect) INTO all_aux;
+		execute format('select count(*) from {schema}.%I where ST_Intersects(geometria, %L)', tabela, sect) INTO all_aux;
 		RAISE NOTICE 'All is % for table %', all_aux, tabela;
 		count_all := count_all + all_aux;
 
@@ -1889,13 +1982,13 @@ begin
 		end if;
 
 		execute format('select count(t.*) from {schema}.%I t, {schema}.no_hidrografico nh
-			where ST_Intersects(t.geometria, %s) and St_intersects(t.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%s''', tabela, tipo_no, sect) INTO good_aux;
+			where ST_Intersects(t.geometria, %3$L) and St_intersects(t.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''', tabela, tipo_no, sect) INTO good_aux;
 
 		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
 		count_good := count_good + good_aux;
 
 		execute format('select count(t.*) from {schema}.%1$I t
-			where ST_Intersects(geometria, %s) and (not (select ST_intersects(t.geometria, f.geometria) from 
+			where ST_Intersects(geometria, %3$L) and (not (select ST_intersects(t.geometria, f.geometria) from 
 					(select geom_col as geometria from validation.no_hidro) as f)
 				or t.identificador not in (select distinct ta.identificador from {schema}.%1$I ta, {schema}.no_hidrografico nh 
 					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no, sect) INTO bad_aux;
@@ -1912,7 +2005,7 @@ begin
 
 			execute format('delete from %1$s', tabela_erro);
 			execute format('insert into %1$s select t.* from {schema}.%2$I t
-				where ST_Intersects(geometria, %s) and (not (select ST_intersects(t.geometria, f.geometria) from 
+				where ST_Intersects(geometria, %4$L) and (not (select ST_intersects(t.geometria, f.geometria) from 
 						(select geom_col as geometria from validation.no_hidro) as f)
 					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, {schema}.no_hidrografico nh 
 						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no, sect);

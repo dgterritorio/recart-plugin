@@ -309,7 +309,7 @@ $$with nos as (
 total as (select count(*) from {schema}.no_hidrografico where ST_Intersects(geometria, '%1$s')),
 good as (SELECT count(distinct(a.identificador))
    from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
-     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(geometria, '%1$s')),
+     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(a.geometria, '%1$s')),
 bad as (select count(nh.*) 
 from {schema}.no_hidrografico nh
 where nh.identificador not in (
@@ -326,7 +326,7 @@ $$with nos as (
 total as (select count(*) from {schema}.no_hidrografico where ST_Intersects(geometria, '%1$s')),
 good as (SELECT count(distinct(a.identificador))
    from {schema}.no_hidrografico a, {schema}.curso_de_agua_eixo b
-     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(geometria, '%1$s')),
+     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(a.geometria, '%1$s')),
 bad as (select count(nh.*) 
 from {schema}.no_hidrografico nh
 where nh.identificador not in (
@@ -497,7 +497,7 @@ $$with nos as (
 total as (select count(*) from {schema}.no_trans_ferrov where ST_Intersects(geometria, '%1$s')),
 good as (SELECT count(distinct(a.identificador))
    from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
-     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(geometria, '%1$s')),
+     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(a.geometria, '%1$s')),
 bad as (select count(nh.*) 
 from {schema}.no_trans_ferrov nh
 where nh.identificador not in (
@@ -514,7 +514,7 @@ $$with nos as (
 total as (select count(*) from {schema}.no_trans_ferrov where ST_Intersects(geometria, '%1$s')),
 good as (SELECT count(distinct(a.identificador))
    from {schema}.no_trans_ferrov a, {schema}.seg_via_ferrea b
-     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(geometria, '%1$s')),
+     where st_3dintersects(a.geometria, b.geometria) and ST_Intersects(a.geometria, '%1$s')),
 bad as (select count(nh.*) 
 from {schema}.no_trans_ferrov nh
 where nh.identificador not in (
@@ -806,61 +806,9 @@ bad as (select * from verificar where delta_z <= ('%2$s'::json->>'desvio_3D')::n
 select * from bad$$ );
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 delete from validation.rules where code = 'rg_5';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
-values ('rg_5', 'Polígonos "fechados artificialmente"', 
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('rg_5', '{v1.1.2}', 'Polígonos "fechados artificialmente"',
 $$As entidades "Água lêntica", "Curso de água - área", "Margem", "Zona
 húmida", "Área da infraestrutura de transporte aéreo", "Área agrícola,
 florestal ou mato" e "Área artificializada" podem, quando são representados
@@ -872,10 +820,23 @@ infraestrutura de transporte aéreo", "Área agrícola, florestal ou mato", "Ár
 artificializada" e "Área de trabalho".$$,
 $$ select * from validation.rg5_validation () $$,
 $$ select * from validation.rg5_validation () $$ );
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('rg_5', '{v2.0.1,v2.0.2}', 'Polígonos "fechados artificialmente"',
+$$As entidades "Água lêntica", "Curso de água - área", "Margem", "Zona
+húmida", "Área da infraestrutura de transporte aéreo", "Área agrícola,
+florestal ou mato" e "Área artificializada" podem, quando são representados
+através de objetos de geometria polígono e a sua representação extravasa a
+"Área de trabalho", ser "fechados artificialmente" nos exatos limites desta
+área.$$,
+$$"Água lêntica", "Curso de água - área", "Margem", "Zona húmida", "Área da
+infraestrutura de transporte aéreo", "Área agrícola, florestal ou mato", "Área
+artificializada" e "Área de trabalho".$$,
+$$ select * from validation.rg5_validation_v2 () $$,
+$$ select * from validation.rg5_validation_v2 () $$ );
 
 delete from validation.rules_area where code = 'rg_5';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
-values ('rg_5', 'Polígonos "fechados artificialmente"', 
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('rg_5', '{v1.1.2}', 'Polígonos "fechados artificialmente"',
 $$As entidades "Água lêntica", "Curso de água - área", "Margem", "Zona
 húmida", "Área da infraestrutura de transporte aéreo", "Área agrícola,
 florestal ou mato" e "Área artificializada" podem, quando são representados
@@ -887,6 +848,19 @@ infraestrutura de transporte aéreo", "Área agrícola, florestal ou mato", "Ár
 artificializada" e "Área de trabalho".$$,
 $$ select * from validation.rg5_validation ('%s'::geometry) $$,
 $$ select * from validation.rg5_validation ('%s'::geometry) $$ );
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('rg_5', '{v2.0.1,v2.0.2}', 'Polígonos "fechados artificialmente"',
+$$As entidades "Água lêntica", "Curso de água - área", "Margem", "Zona
+húmida", "Área da infraestrutura de transporte aéreo", "Área agrícola,
+florestal ou mato" e "Área artificializada" podem, quando são representados
+através de objetos de geometria polígono e a sua representação extravasa a
+"Área de trabalho", ser "fechados artificialmente" nos exatos limites desta
+área.$$,
+$$"Água lêntica", "Curso de água - área", "Margem", "Zona húmida", "Área da
+infraestrutura de transporte aéreo", "Área agrícola, florestal ou mato", "Área
+artificializada" e "Área de trabalho".$$,
+$$ select * from validation.rg5_validation_v2 ('%s'::geometry) $$,
+$$ select * from validation.rg5_validation_v2 ('%s'::geometry) $$ );
 
 
 delete from validation.rules where code = 'rg_6';
@@ -1010,8 +984,8 @@ good as (select count(cdn.identificador)
 bad as (select count(cdn.identificador) 
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where not ST_IsClosed(cdn.geometria) 
-		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria)
-		and ST_Intersects(cdn.geometria, '%1$s'::geometry))
+		and not st_intersects(cdn.geometria, ST_ExteriorRing(adt.geometria))
+		and ST_Intersects(cdn.geometria, '%1$s'::geometry)
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,

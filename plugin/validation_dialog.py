@@ -162,7 +162,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.pgutils.run_query(
                     "update validation.rules set run = false \
                         where '{}' =any(versoes) and \
-                        (code ilike 're3_2' or code ilike 'rg_4' or code ilike 'rg_4_1' or code ilike 'rg_4_2');".format(self.vers))
+                        (code ilike 're3_2' or code ilike 'rg_4' or code ilike 'rg_4_1' or code ilike 'rg_4_2');".format(self.vrs))
                 self.updateTable()
             except Exception as e:
                 self.writeText("[Erro 1]")
@@ -173,10 +173,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
             try:
                 self.pgutils.run_query(
                     "update validation.rules_area set run = true\
-                        where '{}' =any(versoes);".format(self.vers))
+                        where '{}' =any(versoes);".format(self.vrs))
                 self.pgutils.run_query(
                     "update validation.rules set run = true\
-                        where '{}' =any(versoes);".format(self.vers))
+                        where '{}' =any(versoes);".format(self.vrs))
 
                 self.updateTable()
                 self.checkBox.setChecked(True)
@@ -187,10 +187,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
             try:
                 self.pgutils.run_query(
                     "update validation.rules_area set run = false \
-                        where '{}' =any(versoes);".format(self.vers))
+                        where '{}' =any(versoes);".format(self.vrs))
                 self.pgutils.run_query(
                     "update validation.rules set run = false \
-                        where '{}' =any(versoes);".format(self.vers))
+                        where '{}' =any(versoes);".format(self.vrs))
                 self.updateTable()
                 self.checkBox.setChecked(False)
             except Exception as e:
@@ -245,6 +245,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
     def getAreaTables(self):
         tables = []
 
+        self.areaComboBox.clear()
         try:
             tables = self.pgutils.run_query(
                 "with aggr_cols as (\
@@ -275,8 +276,12 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     def areaTableChange(self, text):
         try:
-            ts = text.split('.')[0]
-            tn = text.split('.')[1]
+            aux = text.split('.')
+            if len(aux) != 2:
+                return
+
+            ts = aux[0]
+            tn = aux[1]
 
             campos = self.pgutils.run_query(
                 "SELECT column_name, data_type FROM information_schema.columns \
@@ -284,6 +289,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
             if campos and len(campos) > 0:
                 fields = QgsFields()
                 for c in campos:
+                    if len(c) != 2:
+                        continue
                     if c[1] == 'date' or c[1].startswith('timestamp'):
                         fields.append(QgsField(c[0], QMetaType.Type.QDateTime))
                     elif c[1] == 'integer' or c[1] == 'bigint' or c[1] == 'smallint':
