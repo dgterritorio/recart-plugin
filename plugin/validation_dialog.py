@@ -33,8 +33,6 @@ from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QFont
 from qgis.core import QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
 from qgis.utils import iface
 
-from psycopg2 import OperationalError
-
 from . import qgis_configs
 from .postgis_helper import PostgisUtils
 from .aux_export import displayList
@@ -50,6 +48,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, parent=None):
         super(ValidationDialog, self).__init__(parent)
         self.initialized = False
+        self.newConn = True
         self.setupUi(self)
 
         self.iface = iface
@@ -163,7 +162,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.pgutils.run_query(
                     "update validation.rules set run = false \
                         where '{}' =any(versoes) and \
-                        (code ilike 're3_2' or code ilike 'rg_4' or code ilike 'rg_4_1' or code ilike 'rg_4_2');".format(self.vers))
+                        (code ilike 're3_2' or code ilike 'rg_4' or code ilike 'rg_4_1' or code ilike 'rg_4_2');".format(self.vrs))
                 self.updateTable()
             except Exception as e:
                 self.writeText("[Erro 1]")
@@ -174,10 +173,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
             try:
                 self.pgutils.run_query(
                     "update validation.rules_area set run = true\
-                        where '{}' =any(versoes);".format(self.vers))
+                        where '{}' =any(versoes);".format(self.vrs))
                 self.pgutils.run_query(
                     "update validation.rules set run = true\
-                        where '{}' =any(versoes);".format(self.vers))
+                        where '{}' =any(versoes);".format(self.vrs))
 
                 self.updateTable()
                 self.checkBox.setChecked(True)
@@ -188,10 +187,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
             try:
                 self.pgutils.run_query(
                     "update validation.rules_area set run = false \
-                        where '{}' =any(versoes);".format(self.vers))
+                        where '{}' =any(versoes);".format(self.vrs))
                 self.pgutils.run_query(
                     "update validation.rules set run = false \
-                        where '{}' =any(versoes);".format(self.vers))
+                        where '{}' =any(versoes);".format(self.vrs))
                 self.updateTable()
                 self.checkBox.setChecked(False)
             except Exception as e:
@@ -246,6 +245,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
     def getAreaTables(self):
         tables = []
 
+        self.areaComboBox.clear()
         try:
             tables = self.pgutils.run_query(
                 "with aggr_cols as (\
@@ -276,8 +276,12 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     def areaTableChange(self, text):
         try:
-            ts = text.split('.')[0]
-            tn = text.split('.')[1]
+            aux = text.split('.')
+            if len(aux) != 2:
+                return
+
+            ts = aux[0]
+            tn = aux[1]
 
             campos = self.pgutils.run_query(
                 "SELECT column_name, data_type FROM information_schema.columns \
@@ -285,6 +289,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
             if campos and len(campos) > 0:
                 fields = QgsFields()
                 for c in campos:
+                    if len(c) != 2:
+                        continue
                     if c[1] == 'date' or c[1].startswith('timestamp'):
                         fields.append(QgsField(c[0], QMetaType.Type.QDateTime))
                     elif c[1] == 'integer' or c[1] == 'bigint' or c[1] == 'smallint':
@@ -311,53 +317,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
         
         cnt = re.sub(r"{schema}", self.schema, finddbquery)
 
-        """ versão = 'v1.1.2'
-        INSERT INTO valor_construcao_linear VALUES ('1','Muro de alvenaria ou betão');
-        INSERT INTO valor_construcao_linear VALUES ('2','Muro de pedra');
-        INSERT INTO valor_construcao_linear VALUES ('3','Sebe');
-        INSERT INTO valor_construcao_linear VALUES ('4','Gradeamento ou vedação');
-        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
-        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
-        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
-        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
-        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
-        """
-                
-        """ versão 2.0.1
-        INSERT INTO valor_construcao_linear VALUES ('1','Muro de alvenaria ou betão');
-        INSERT INTO valor_construcao_linear VALUES ('2','Muro de pedra');
-        INSERT INTO valor_construcao_linear VALUES ('3','Sebe');
-        INSERT INTO valor_construcao_linear VALUES ('4','Gradeamento ou vedação');
-        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
-        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
-        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
-        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
-        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
-        INSERT INTO valor_construcao_linear VALUES ('10','Guarda de segurança');
-        INSERT INTO valor_construcao_linear VALUES ('11','Tapete para transporte de materiais');
-        """        
-
-        """ versão 2.0.2        
-        INSERT INTO valor_construcao_linear VALUES ('5','Muralha');
-        INSERT INTO valor_construcao_linear VALUES ('6','Portão');
-        INSERT INTO valor_construcao_linear VALUES ('7','Barreira acústica');
-        INSERT INTO valor_construcao_linear VALUES ('8','Pista');
-        INSERT INTO valor_construcao_linear VALUES ('9','Lancil');
-        INSERT INTO valor_construcao_linear VALUES ('10','Guarda de segurança');
-        INSERT INTO valor_construcao_linear VALUES ('11','Tapete para transporte de materiais');
-        INSERT INTO valor_construcao_linear VALUES ('12','Muro');
-        INSERT INTO valor_construcao_linear VALUES ('13','Muro de vedação');
-        INSERT INTO valor_construcao_linear VALUES ('14','Vedação');
-        """        
-        
         try:
             result = self.pgutils.run_query(cnt)
             if result and len(result) > 0:
                 if result[0][0] == 9:
                     self.vrs = 'v1.1.2'
-                elif res[0][0] == 11:
+                elif result[0][0] == 11:
                     self.vrs = 'v2.0.1'
-                elif res[0][0] == 10:
+                elif result[0][0] == 10:
                     self.vrs = 'v2.0.2'
                 else:
                     self.vrs = 'Desconhecida'                
@@ -394,7 +361,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             rn = 0
             for row in report:
-                self.writeText("{} Regra {}...".format(rn, row[0]))
+                # self.writeText("{} Regra {}...".format(rn, row[0]))
                 model.appendRow([QStandardItem(row[0]), QStandardItem(row[1]), QStandardItem(
                     str(row[2])), QStandardItem(str(row[3])), QStandardItem(str(row[4]))])
 
@@ -417,6 +384,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.pushButton.setVisible(True)
 
     def changeConn(self, newConnName):
+        self.newConn = True
         self.schemaName.clear()
         self.vrsCombo.setCurrentText('Desconhecida')
         self.vrs = 'Desconhecida'
@@ -425,15 +393,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.fillDataSources()
             self.plainTextEdit.appendPlainText("Conexões Postgis atualizadas")
             self.connCombo.setCurrentIndex(0)
-
-            self.getAreaTables()
         else:
             if newConnName != 'Escolher conexão...' and newConnName != 'Sem conexões disponíveis' and newConnName != "":
-                conString = qgis_configs.getConnString(self, newConnName)
-                # self.plainTextEdit.appendPlainText(
-                #     "New connection to: {0}\n".format(conString))
-                self.pgutils = PostgisUtils(self, conString)
                 try:
+                    conString = qgis_configs.getConnString(self, newConnName)
+                    # self.plainTextEdit.appendPlainText(
+                    #     "New connection to: {0}\n".format(conString))
+                    self.pgutils = PostgisUtils(self, conString)
+                
                     schemas = self.pgutils.read_db_schemas()
                     # self.plainTextEdit.appendPlainText(
                     #     "Schemas: {0}\n".format(','.join(schemas)))
@@ -448,7 +415,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     self.testDbVersion()
                     self.testValidationRules()
                     self.getAreaTables()
-                except ValueError as error:
+                    self.newConn = False
+                except Exception as error:
                     self.plainTextEdit.appendPlainText(
                         "[Erro 6]: {0}\n".format(error))
 
@@ -667,10 +635,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.writeText(("\tException: {}".format(e)))
 
     def changeSchema(self):
-        # if self.ruleSetup:
-        #     self.setupRules()
-        self.testDbVersion()
-        # pass
+        if not self.newConn:
+            self.testDbVersion()
 
     def setupRules(self):
         self.bp = os.path.dirname(os.path.realpath(__file__))
@@ -929,14 +895,16 @@ class AddLayersProcess(QThread):
 
             if ( tables ):
                 for tb in tables:
-                    ts = re.search(r'([a-z0-9_]+)_rg|([a-z0-9_]+)_re|([a-z0-9_]+)_ra', tb[0])
+                    ts = re.search(r'([a-z0-9_]+)_rg|([a-z0-9_]+)_re|([a-z0-9_]+)_ra|([a-z0-9_]+)_pq', tb[0])
                     slayer = None
                     if ts.group(1) is not None:
                         slayer = ts.group(1)
                     elif ts.group(2) is not None:
                         slayer = ts.group(2)
                     elif ts.group(3) is not None:
-                        slayer = ts.group(3)                        
+                        slayer = ts.group(3)
+                    elif ts.group(4) is not None:
+                        slayer = ts.group(4)
                     else:
                         print('-----')
                         print(tb[0])
@@ -1130,6 +1098,7 @@ class ValidateProcess(QThread):
 
     def run(self):
         try:
+            validated = {}
             interrupt = False
 
             # validate structure
@@ -1180,6 +1149,10 @@ class ValidateProcess(QThread):
                             ltnome = re.sub(r'(?<!^)(?=[A-Z])', '_', lista['nome']).lower()
                             valores = json.dumps([{'identificador': val['Valores'], 'descricao': val['Descrição']} for val in lista['valores']], ensure_ascii=False)
 
+                            if ltnome in validated:
+                                continue
+                            validated[ltnome] = True
+
                             res = self.pgutils.run_query(
                                 'select validation.validate_table_rows(\'{}\', \'{}\');'.format(ltnome, valores))
                             if res and len(res) > 0 and res[0][0] != []:
@@ -1192,7 +1165,7 @@ class ValidateProcess(QThread):
 
             if interrupt:
                 self.write("[Erro] Estrutura base inválida")
-                return
+                # return
             else:
                 self.write("\tEstrutura base validada")
 
@@ -1230,14 +1203,14 @@ class ValidateProcess(QThread):
                         break
 
                     if not self.is_sections.isChecked():
-                        self.write("\tA executar validação '" + self.vrs + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
+                        self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + ")")
                         self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + r[0] + "', '" + json.dumps(self.args) + "');")
                     else:
                         s = 1
                         for sec in sections:
                             if self.cancel:
                                 break
-                            self.write("\tA executar validação '" + self.vrs + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + " - secção " + str(s) + " de " + str(len(sections)) + ")")
+                            self.write("\tA executar validação '" + r[0] + " " + r[1] + "' (" + str(i) + " de " + str(l) + " - secção " + str(s) + " de " + str(len(sections)) + ")")
                             # print("call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
                             self.pgutils.run_query_with_conn(self.actconn, "call validation.do_validation("+ ndt + ", '" + self.vrs + "', '" + self.areaTable + "', '" + r[0] + "', '" + sec[0] + "', '" + json.dumps(self.args) + "');")
                             s = s + 1
