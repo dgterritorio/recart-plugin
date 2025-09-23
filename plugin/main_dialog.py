@@ -61,7 +61,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.iface = iface
         self.treeView.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
         self.exportFormat.addItems(
-            ['Shapefile', 'GeoJSON', 'GeoPackage', 'Projeto QGIS'])
+            ['Projeto QGIS', 'GeoPackage', 'Shapefile', 'GeoJSON'])
         self.exportEncoding.addItems(
             ['utf-8', 'iso-8859-1'])
 
@@ -254,7 +254,7 @@ class MainDialog(QDialog, FORM_CLASS):
 
         seli = self.treeView.selectionModel().selectedIndexes()
         for index in seli:
-            name = index.data(Qt.DisplayRole)
+            name = index.data(Qt.ItemDataRole.DisplayRole)
             layerList.append(name)
 
         self.exportLayersProcess = ExportLayersProcess(
