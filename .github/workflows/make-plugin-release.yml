@@ -24,6 +24,7 @@ jobs:
           make zip
       - name: Automatic push changes
         run: |
+          git config --global user.email "jgr@geomaster.pt"
           git config --global user.name ${{github.actor}}
           git stash
           git checkout main
