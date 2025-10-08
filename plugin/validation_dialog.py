@@ -355,9 +355,11 @@ class ValidationDialog(QDialog, FORM_CLASS):
             if model is None or model.rowCount() == 0:
                 model = QStandardItemModel()
                 self.tableView.setModel(model)
+            else:
+                model.clear()
 
-                model.setHorizontalHeaderLabels(
-                    ['Código', 'Nome', 'Elementos', 'Corretos', 'Erros', 'Correr?'])
+            model.setHorizontalHeaderLabels(
+                ['Código', 'Nome', 'Elementos', 'Corretos', 'Erros', 'Correr?'])
 
             rn = 0
             for row in report:
@@ -1147,7 +1149,7 @@ class ValidateProcess(QThread):
 
                         for lista in objecto['listas de códigos']:
                             ltnome = re.sub(r'(?<!^)(?=[A-Z])', '_', lista['nome']).lower()
-                            valores = json.dumps([{'identificador': val['Valores'], 'descricao': val['Descrição']} for val in lista['valores']], ensure_ascii=False)
+                            valores = json.dumps([{'identificador': val['Valores'], 'descricao': val['Descrição'].replace("'", "''''")} for val in lista['valores']], ensure_ascii=False)
 
                             if ltnome in validated:
                                 continue
