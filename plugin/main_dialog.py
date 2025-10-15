@@ -64,6 +64,7 @@ class MainDialog(QDialog, FORM_CLASS):
             ['Projeto QGIS', 'GeoPackage', 'Shapefile', 'GeoJSON'])
         self.exportEncoding.addItems(
             ['utf-8', 'iso-8859-1'])
+        self.vrsCombo.addItems(['Desconhecida', 'v1.1.2', 'v2.0.1', 'v2.0.2'])
 
         self.displayLayerList = displayList
         # para se adivinhar o CRS da fonte de dados
@@ -187,6 +188,7 @@ class MainDialog(QDialog, FORM_CLASS):
         try:
             self.dataSource = self.loadLayersProcess.dataSource
             self.vrs = self.loadLayersProcess.vrs
+            self.vrsCombo.setCurrentText(self.vrs)
             self.fillLayerList(self.dataSource)
 
             crs = QgsCoordinateReferenceSystem("EPSG:" + self.srs)
