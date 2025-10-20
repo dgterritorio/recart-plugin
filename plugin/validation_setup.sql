@@ -1049,8 +1049,8 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
-				where not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela);
+			execute format('insert into %1$s select t.* from {schema}.%2$I t, {schema}.area_trabalho adt
+				where not St_Contains(adt.geometria, t.geometria) on conflict ON constraint %3$s_pkey do nothing', tabela_erro, tabela, tabela || '_rg_5');
 		end if;
 	end loop;
 	return query select count_all as total, count_good as good, count_bad as bad;
@@ -1095,8 +1095,8 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
-				where ST_Intersects(t.geometria, %L) and not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela, sect);
+			execute format('insert into %1$s select t.* from {schema}.%2$I t, {schema}.area_trabalho adt
+				where ST_Intersects(t.geometria, %3$L) and not St_Contains(adt.geometria, t.geometria) on conflict ON constraint %4$s_pkey do nothing', tabela_erro, tabela, sect, tabela || '_rg_5');
 		end if;
 	end loop;
 	return query select count_all as total, count_good as good, count_bad as bad;
@@ -1142,8 +1142,8 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
-				where not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela);
+			execute format('insert into %1$s select t.* from {schema}.%2$I t, {schema}.area_trabalho adt
+				where not St_Contains(adt.geometria, t.geometria) on conflict ON constraint %3$s_pkey do nothing', tabela_erro, tabela, tabela || '_rg_5');
 		end if;
 	end loop;
 	return query select count_all as total, count_good as good, count_bad as bad;
@@ -1188,8 +1188,8 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %s select t.* from {schema}.%I t, {schema}.area_trabalho adt
-				where ST_Intersects(t.geometria, %L) and not St_Contains(adt.geometria, t.geometria)', tabela_erro, tabela, sect);
+			execute format('insert into %1$s select t.* from {schema}.%2$I t, {schema}.area_trabalho adt
+				where ST_Intersects(t.geometria, %3$L) and not St_Contains(adt.geometria, t.geometria) on conflict ON constraint %4$s_pkey do nothing', tabela_erro, tabela, sect, tabela || '_rg_5');
 		end if;
 	end loop;
 	return query select count_all as total, count_good as good, count_bad as bad;
