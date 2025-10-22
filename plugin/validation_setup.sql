@@ -137,7 +137,7 @@ begin
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tbl, _entity);
 		end if;		
 		execute format('delete from %s', tbl);
-		execute format('insert into %s %s', tbl, format(_report, _args));
+		execute format('insert into %s %s on conflict ON constraint %s_pkey do nothing', tbl, format(_report, _args), tblname || '_' || _code);
 	end if;
 end; $$;
 
@@ -1228,11 +1228,11 @@ begin
 		RAISE NOTICE 'All is % for table %', all_aux, tabela;
 		count_all := count_all + all_aux;
 	
-		execute format('select count(*) from {schema}.%I where validation.validcap_pt(nome)=true', tabela ) INTO good_aux;
+		execute format('select count(*) from {schema}.%I where nome is not null and validation.validcap_pt(nome)=true', tabela ) INTO good_aux;
 		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
 		count_good := count_good + good_aux;
 	
-		execute format('select count(*) from {schema}.%I where validation.validcap_pt(nome)<>true', tabela ) INTO bad_aux;
+		execute format('select count(*) from {schema}.%I where nome is not null and validation.validcap_pt(nome)<>true', tabela ) INTO bad_aux;
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
 
@@ -1243,7 +1243,7 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %s select * from {schema}.%I where validation.validcap_pt(nome)<>true', tabela_erro, tabela);
+			execute format('insert into %s select * from {schema}.%I where nome is not null and validation.validcap_pt(nome)<>true', tabela_erro, tabela);
 		end if;
 	end loop;
 return query select count_all as total, count_good as good, count_bad as bad;
@@ -1284,11 +1284,11 @@ begin
 		RAISE NOTICE 'All is % for table %', all_aux, tabela;
 		count_all := count_all + all_aux;
 	
-		execute format('select count(*) from {schema}.%I where validation.valid_noabbr(%s)=true', tabela, coluna) INTO good_aux;
+		execute format('select count(*) from {schema}.%1$I where %2$s is not null and validation.valid_noabbr(%2$s)=true', tabela, coluna) INTO good_aux;
 		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
 		count_good := count_good + good_aux;
 	
-		execute format('select count(*) from {schema}.%I where validation.valid_noabbr(%s)<>true', tabela, coluna) INTO bad_aux;
+		execute format('select count(*) from {schema}.%1$I where %2$s is not null and validation.valid_noabbr(%2$s)<>true', tabela, coluna) INTO bad_aux;
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
 
@@ -1903,6 +1903,7 @@ declare
 	tabela_erro text;
 	tabelas text[];
 	tipo_no text;
+	add_fltr text;
 begin
 	tabelas = array['queda_de_agua', 'zona_humida', 'barreira'];
 
@@ -1915,8 +1916,10 @@ begin
 
 		if tabela='barreira' then
 			tipo_no := '6';
+			add_fltr := 'valor_barreira=''1'' and';
 		else
 			tipo_no := '5';
+			add_fltr := '';
 		end if;
 
 		execute format('select count(t.*) from {schema}.%I t, {schema}.no_hidrografico nh
@@ -1926,10 +1929,10 @@ begin
 		count_good := count_good + good_aux;
 
 		execute format('select count(t.*) from {schema}.%1$I t
-			where (not (select ST_intersects(t.geometria, f.geometria) from 
+			where %3$s (not (select ST_intersects(t.geometria, f.geometria) from 
 					(select geom_col as geometria from validation.no_hidro) as f)
 				or t.identificador not in (select distinct ta.identificador from {schema}.%1$I ta, {schema}.no_hidrografico nh 
-					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no) INTO bad_aux;
+					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no, add_fltr) INTO bad_aux;
 	
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
@@ -1943,10 +1946,10 @@ begin
 
 			execute format('delete from %1$s', tabela_erro);
 			execute format('insert into %1$s select t.* from {schema}.%2$I t
-				where (not (select ST_intersects(t.geometria, f.geometria) from 
+				where %4$s (not (select ST_intersects(t.geometria, f.geometria) from 
 						(select geom_col as geometria from validation.no_hidro) as f)
 					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, {schema}.no_hidrografico nh 
-						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no);
+						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no, add_fltr);
 		end if;
 	end loop;
 	return query select count_all as total, count_good as good, count_bad as bad;
@@ -1965,6 +1968,7 @@ declare
 	tabela_erro text;
 	tabelas text[];
 	tipo_no text;
+	add_fltr text;
 begin
 	tabelas = array['queda_de_agua', 'zona_humida', 'barreira'];
 
@@ -1977,8 +1981,10 @@ begin
 
 		if tabela='barreira' then
 			tipo_no := '6';
+			add_fltr := 'valor_barreira=''1'' and';
 		else
 			tipo_no := '5';
+			add_fltr := '';
 		end if;
 
 		execute format('select count(t.*) from {schema}.%I t, {schema}.no_hidrografico nh
@@ -1988,10 +1994,10 @@ begin
 		count_good := count_good + good_aux;
 
 		execute format('select count(t.*) from {schema}.%1$I t
-			where ST_Intersects(geometria, %3$L) and (not (select ST_intersects(t.geometria, f.geometria) from 
+			where %4$s ST_Intersects(geometria, %3$L) and (not (select ST_intersects(t.geometria, f.geometria) from 
 					(select geom_col as geometria from validation.no_hidro) as f)
 				or t.identificador not in (select distinct ta.identificador from {schema}.%1$I ta, {schema}.no_hidrografico nh 
-					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no, sect) INTO bad_aux;
+					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no, sect, add_fltr) INTO bad_aux;
 	
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
@@ -2005,10 +2011,10 @@ begin
 
 			execute format('delete from %1$s', tabela_erro);
 			execute format('insert into %1$s select t.* from {schema}.%2$I t
-				where ST_Intersects(geometria, %4$L) and (not (select ST_intersects(t.geometria, f.geometria) from 
+				where %5$s ST_Intersects(geometria, %4$L) and (not (select ST_intersects(t.geometria, f.geometria) from 
 						(select geom_col as geometria from validation.no_hidro) as f)
 					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, {schema}.no_hidrografico nh 
-						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no, sect);
+						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no, sect, add_fltr);
 		end if;
 	end loop;
 	return query select count_all as total, count_good as good, count_bad as bad;
@@ -2253,8 +2259,8 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_3d (
 
 -- As copias desta tabela terão primary keys com o nome deste genero: intersecoes_3d_rg_4_3_2_pkey
 -- quando se cria a tabela com um LIKE INCLUDING ALL os nomes das restrições são gerados automaticamente
-ALTER TABLE validation.intersecoes_3d DROP CONSTRAINT IF EXISTS ponto_unico;
-ALTER TABLE validation.intersecoes_3d ADD CONSTRAINT ponto_unico PRIMARY KEY (geometria);
+ALTER TABLE validation.intersecoes_3d DROP CONSTRAINT IF EXISTS intersecoes_3d_pk;
+ALTER TABLE validation.intersecoes_3d ADD CONSTRAINT intersecoes_3d_pk PRIMARY KEY (geometria);
 
 CREATE TABLE IF NOT EXISTS validation.descontinuidades (
 	p1_id uuid NULL,

@@ -322,6 +322,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
                         fields.append(QgsField(c[0], QMetaType.Type.Bool))
                     elif c[1] == 'uuid':
                         fields.append(QgsField(c[0], QMetaType.Type.QUuid))
+                    else:
+                        fields.append(QgsField(c[0], QMetaType.Type.QString))
 
                 self.mFieldComboBox.setFields(fields)
                 self.changeField(fields.field(0).name())
@@ -935,7 +937,17 @@ class AddLayersProcess(QThread):
         self.actconn = self.pgutils.get_connection()
         try:
             tables = self.pgutils.run_query_with_conn(self.actconn,
-                'SELECT table_name FROM information_schema.tables WHERE table_schema = \'errors\'')
+                'WITH tbl AS (\
+	                SELECT Table_Schema, Table_Name FROM information_schema.Tables \
+	                WHERE Table_Schema IN (\'errors\')\
+                ),\
+                cnts as (\
+	                SELECT Table_Name,\
+                        (xpath(\'/row/c/text()\', query_to_xml(format(\
+                        \'SELECT count(*) AS c FROM %I.%I\', Table_Schema, Table_Name\
+                ), FALSE, TRUE, \'\')))[1]::text::int AS Records_Count \
+	                FROM tbl\
+                ) select Table_Name from cnts where Records_Count > 0')
 
             if ( tables ):
                 for tb in tables:
