@@ -2147,6 +2147,8 @@ from envelope;
 -- select (ST_Dump(geom)).geom As geometria from tin;
 
 create or replace function validation.create_tin() returns void as $$
+declare
+	atgr RECORD;
 begin
 	-- test if table exists and has rows
 	if (select count(*) from information_schema.tables where table_schema='validation' and table_name='curva_nivel_tin') = 0 then
@@ -2161,7 +2163,7 @@ begin
 		create table validation.curva_de_nivel_points_interval_v2 as
 			SELECT concat( identificador::text, '-', path[1]::text) as identificador, geom::geometry(POINTZ, 3763) as geometria
 			FROM (
-				SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, least(8.0/st_length(geometria), 1.0)))).*
+				SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, least(4.0/st_length(geometria), 1.0)))).*
 					from (select identificador, (ST_Dump(geometria)).geom as geometria from public.curva_de_nivel) as cdn
 			) as pontos
 			union SELECT concat( identificador::text, '-0') as identificador, ST_PointN(geometria, 1) as geometria
@@ -2169,11 +2171,14 @@ begin
 			union SELECT concat( identificador::text, '-', ST_NPoints(geometria)) as identificador, ST_PointN(geometria, -1) as geometria
 				from public.curva_de_nivel cdn;
 
-		insert into validation.curva_nivel_tin (geometria)
-		with tin as (
-			SELECT ST_DelaunayTriangles(st_union(geometria)) as geom
-			from validation.curva_de_nivel_points_interval_v2
-		) select (ST_Dump(geom)).geom As geometria from tin;
+		for atgr in select * from validation.area_trabalho_grid loop
+			insert into validation.curva_nivel_tin (geometria)
+			with tin as (
+				SELECT ST_DelaunayTriangles(st_union(geometria)) as geom
+				from validation.curva_de_nivel_points_interval_v2
+				where ST_Intersects(geometria, atgr.geometria)
+			) select (ST_Dump(geom)).geom As geometria from tin;
+		end loop;
 
 		CREATE INDEX curva_nivel_tin_geom_idx ON validation.curva_nivel_tin USING gist (geometria);
 	end if;
@@ -2259,8 +2264,8 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_3d (
 
 -- As copias desta tabela terão primary keys com o nome deste genero: intersecoes_3d_rg_4_3_2_pkey
 -- quando se cria a tabela com um LIKE INCLUDING ALL os nomes das restrições são gerados automaticamente
-ALTER TABLE validation.intersecoes_3d DROP CONSTRAINT IF EXISTS intersecoes_3d_pk;
-ALTER TABLE validation.intersecoes_3d ADD CONSTRAINT intersecoes_3d_pk PRIMARY KEY (geometria);
+ALTER TABLE validation.intersecoes_3d DROP CONSTRAINT IF EXISTS ponto_unico;
+ALTER TABLE validation.intersecoes_3d ADD CONSTRAINT ponto_unico PRIMARY KEY (geometria);
 
 CREATE TABLE IF NOT EXISTS validation.descontinuidades (
 	p1_id uuid NULL,
