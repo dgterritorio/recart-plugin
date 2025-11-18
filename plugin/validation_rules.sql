@@ -1930,6 +1930,20 @@ regulação de fluxo ("Barreira").$$,
 $$"Curso de água - eixo", "Curso de água - área", "Queda de água", "Zona
 húmida" e "Barreira".$$, 'curso_de_agua_eixo',
 $$with
+changes as (
+	select a.identificador from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
+		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
+		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
+				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
+				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
+				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
+				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
+				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
+				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
+				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
+				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
+				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
+				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))),
 total as (with multipontos as (
 	select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
 		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
@@ -1947,23 +1961,36 @@ good as (with multipontos as (
 	select count(distinct pontos.*)
 	from pontos, {schema}.curso_de_agua_eixo e
 	where pontos.geometria = ST_StartPoint(e.geometria) 
-		or pontos.geometria = ST_EndPoint(e.geometria)),
+		or pontos.geometria = ST_EndPoint(e.geometria) or e.identificador in (select identificador from changes)),
 bad as (with multipontos as (
 	select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
 		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
 		where ST_intersects(a.geometria, ST_Boundary(b.geometria))),
-	pontos as (select (ST_Dump(multipontos.geometria)).geom as geometria
+	pontos as (select multipontos.identificador, (ST_Dump(multipontos.geometria)).geom as geometria
 	from multipontos)
-	select count(distinct pontos.*)
-	from pontos
-	where not exists (select * 
+	select count(distinct pontos.*) from pontos
+	where pontos.identificador not in (select identificador from changes) and not exists (select * 
 		from {schema}.curso_de_agua_eixo e
 		where pontos.geometria = ST_StartPoint(e.geometria) 
 		or pontos.geometria = ST_EndPoint(e.geometria)))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 NULL,
-$$with multipontos as (
+$$with changes as (
+	select a.identificador from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
+		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
+		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
+				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
+				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
+				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
+				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
+				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
+				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
+				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
+				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
+				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
+				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))),
+multipontos as (
 select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
 	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
 	where ST_intersects(a.geometria, ST_Boundary(b.geometria))),
@@ -1971,7 +1998,7 @@ pontos as (select multipontos.identificador, (ST_Dump(multipontos.geometria)).ge
 from multipontos)
 select distinct c.*
 from pontos, {schema}.curso_de_agua_eixo c
-where pontos.identificador = c.identificador and not exists (select * 
+where pontos.identificador = c.identificador and c.identificador not in (select identificador from changes) and not exists (select * 
 	from {schema}.curso_de_agua_eixo e
 	where pontos.geometria = ST_StartPoint(e.geometria) 
 	or pontos.geometria = ST_EndPoint(e.geometria))$$ );
@@ -1989,6 +2016,20 @@ regulação de fluxo ("Barreira").$$,
 $$"Curso de água - eixo", "Curso de água - área", "Queda de água", "Zona
 húmida" e "Barreira".$$, 'curso_de_agua_eixo',
 $$with
+changes as (
+	select a.identificador from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
+		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
+		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
+				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
+				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
+				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
+				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
+				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
+				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
+				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
+				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
+				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
+				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))),
 total as (with multipontos as (
 	select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
 		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
@@ -2006,23 +2047,37 @@ good as (with multipontos as (
 	select count(distinct pontos.*)
 	from pontos, {schema}.curso_de_agua_eixo e
 	where pontos.geometria = ST_StartPoint(e.geometria) 
-		or pontos.geometria = ST_EndPoint(e.geometria)),
+		or pontos.geometria = ST_EndPoint(e.geometria) or e.identificador in (select identificador from changes)),
 bad as (with multipontos as (
 	select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
 		from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
 		where ST_Intersects(a.geometria, '%1$s') and ST_intersects(a.geometria, ST_Boundary(b.geometria))),
-	pontos as (select (ST_Dump(multipontos.geometria)).geom as geometria
+	pontos as (select multipontos.identificador, (ST_Dump(multipontos.geometria)).geom as geometria
 	from multipontos)
 	select count(distinct pontos.*)
 	from pontos
-	where not exists (select * 
+	where pontos.identificador not in (select identificador from changes) and not exists (select * 
 		from {schema}.curso_de_agua_eixo e
-		where ST_Intersects(e.geometria, '%1$s') and pontos.geometria = ST_StartPoint(e.geometria) 
-		or pontos.geometria = ST_EndPoint(e.geometria)))
+		where ST_Intersects(e.geometria, '%1$s') and (pontos.geometria = ST_StartPoint(e.geometria) 
+		or pontos.geometria = ST_EndPoint(e.geometria))))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 NULL,
-$$with multipontos as (
+$$with changes as (
+	select a.identificador from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
+		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
+		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
+				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
+				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
+				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
+				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
+				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
+				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
+				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
+				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
+				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
+				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))),
+multipontos as (
 select a.identificador, st_intersection(a.geometria, ST_Boundary(b.geometria)) as geometria
 	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_area b
 	where ST_Intersects(a.geometria, '%1$s') and ST_intersects(a.geometria, ST_Boundary(b.geometria))),
@@ -2030,10 +2085,10 @@ pontos as (select multipontos.identificador, (ST_Dump(multipontos.geometria)).ge
 from multipontos)
 select distinct c.*
 from pontos, {schema}.curso_de_agua_eixo c
-where pontos.identificador = c.identificador and not exists (select * 
+where pontos.identificador = c.identificador and c.identificador not in (select identificador from changes) and not exists (select * 
 	from {schema}.curso_de_agua_eixo e
-	where ST_Intersects(e.geometria, '%1$s') and pontos.geometria = ST_StartPoint(e.geometria) 
-	or pontos.geometria = ST_EndPoint(e.geometria))$$ );
+	where ST_Intersects(e.geometria, '%1$s') and (pontos.geometria = ST_StartPoint(e.geometria) 
+	or pontos.geometria = ST_EndPoint(e.geometria)))$$ );
 
 
 -- Regras semelhantes: re4_9_1, re5_2_3, re5_5_3

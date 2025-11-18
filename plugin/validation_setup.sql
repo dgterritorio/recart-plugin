@@ -518,8 +518,10 @@ declare
 	word varchar;
 	aux varchar;
 	res bool;
+	ini bool;
 begin
 	res = true;
+	ini = true;
 	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{}') into parts;
 
 	foreach word in array parts
@@ -527,17 +529,19 @@ begin
 		select word into aux;
 		if upper(word) <> word then
 			select upper(left(word, 1)) || right(word, -1) into aux;
-			select REGEXP_REPLACE(aux, 'D([aeo''])$', 'd\1', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'D([ao])s$', 'd\1s', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'O([s]*)$', 'o\1', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'A([s]*)$', 'a\1', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'N([oa]{{1}}[s]*)$', 'n\1', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'Com$', 'com', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'Para$', 'para', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'Em$', 'em', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'E$', 'e', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'A$', 'a', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'À$', 'à', 'g') into aux;
+			if ini is not true then
+				select REGEXP_REPLACE(aux, 'D([aeo''])$', 'd\1', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'D([ao])s$', 'd\1s', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'O([s]*)$', 'o\1', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'A([s]*)$', 'a\1', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'N([oa]{{1}}[s]*)$', 'n\1', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'Com$', 'com', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'Para$', 'para', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'Em$', 'em', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'E$', 'e', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'A$', 'a', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'À$', 'à', 'g') into aux;
+			end if;
 			select REGEXP_REPLACE(aux, 'Eb([123])$', 'EB\1', 'g') into aux;
 			select REGEXP_REPLACE(aux, 'Ji$', 'JI', 'g') into aux;
 			select REGEXP_REPLACE(aux, 'Sa$', 'SA', 'g') into aux;
@@ -548,6 +552,7 @@ begin
 				exit;
 			end if;
 		end if;
+		ini = false;
 	end loop;
 
 	return res;
@@ -926,11 +931,11 @@ begin
 	bad_rows AS (
 		INSERT INTO errors.ponto_cotado_rg_4_1
 	    SELECT pc.*
-	    FROM {schema}.ponto_cotado pc
+	    FROM {schema}.ponto_cotado pc, {schema}.area_trabalho adt
 	    WHERE pc.identificador IN (
 			SELECT identificador
 	        FROM min_z_distances
-	        WHERE min_z_distance > valor_equi)
+	        WHERE min_z_distance > valor_equi) or not St_Contains(adt.geometria, pc.geometria)
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_rows into count_bad;
@@ -995,11 +1000,11 @@ begin
 	bad_rows AS (
 		INSERT INTO errors.ponto_cotado_rg_4_1
 	    SELECT pc.*
-	    FROM {schema}.ponto_cotado pc
+	    FROM {schema}.ponto_cotado pc, {schema}.area_trabalho adt
 	    WHERE pc.identificador IN (
 			SELECT identificador
 	        FROM min_z_distances
-	        WHERE min_z_distance > valor_equi)
+	        WHERE min_z_distance > valor_equi) or not St_Contains(adt.geometria, pc.geometria)
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_rows into count_bad;
