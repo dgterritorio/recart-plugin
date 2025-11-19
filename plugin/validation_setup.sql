@@ -518,8 +518,10 @@ declare
 	word varchar;
 	aux varchar;
 	res bool;
+	ini bool;
 begin
 	res = true;
+	ini = true;
 	select coalesce(regexp_split_to_array(nome, '[\sºª]+'), '{}') into parts;
 
 	foreach word in array parts
@@ -527,17 +529,19 @@ begin
 		select word into aux;
 		if upper(word) <> word then
 			select upper(left(word, 1)) || right(word, -1) into aux;
-			select REGEXP_REPLACE(aux, 'D([aeo''])$', 'd\1', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'D([ao])s$', 'd\1s', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'O([s]*)$', 'o\1', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'A([s]*)$', 'a\1', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'N([oa]{{1}}[s]*)$', 'n\1', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'Com$', 'com', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'Para$', 'para', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'Em$', 'em', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'E$', 'e', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'A$', 'a', 'g') into aux;
-			select REGEXP_REPLACE(aux, 'À$', 'à', 'g') into aux;
+			if ini is not true then
+				select REGEXP_REPLACE(aux, 'D([aeo''])$', 'd\1', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'D([ao])s$', 'd\1s', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'O([s]*)$', 'o\1', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'A([s]*)$', 'a\1', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'N([oa]{{1}}[s]*)$', 'n\1', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'Com$', 'com', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'Para$', 'para', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'Em$', 'em', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'E$', 'e', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'A$', 'a', 'g') into aux;
+				select REGEXP_REPLACE(aux, 'À$', 'à', 'g') into aux;
+			end if;
 			select REGEXP_REPLACE(aux, 'Eb([123])$', 'EB\1', 'g') into aux;
 			select REGEXP_REPLACE(aux, 'Ji$', 'JI', 'g') into aux;
 			select REGEXP_REPLACE(aux, 'Sa$', 'SA', 'g') into aux;
@@ -548,6 +552,7 @@ begin
 				exit;
 			end if;
 		end if;
+		ini = false;
 	end loop;
 
 	return res;
@@ -926,11 +931,11 @@ begin
 	bad_rows AS (
 		INSERT INTO errors.ponto_cotado_rg_4_1
 	    SELECT pc.*
-	    FROM {schema}.ponto_cotado pc
+	    FROM {schema}.ponto_cotado pc, {schema}.area_trabalho adt
 	    WHERE pc.identificador IN (
 			SELECT identificador
 	        FROM min_z_distances
-	        WHERE min_z_distance > valor_equi)
+	        WHERE min_z_distance > valor_equi) or not St_Contains(adt.geometria, pc.geometria)
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_rows into count_bad;
@@ -995,11 +1000,11 @@ begin
 	bad_rows AS (
 		INSERT INTO errors.ponto_cotado_rg_4_1
 	    SELECT pc.*
-	    FROM {schema}.ponto_cotado pc
+	    FROM {schema}.ponto_cotado pc, {schema}.area_trabalho adt
 	    WHERE pc.identificador IN (
 			SELECT identificador
 	        FROM min_z_distances
-	        WHERE min_z_distance > valor_equi)
+	        WHERE min_z_distance > valor_equi) or not St_Contains(adt.geometria, pc.geometria)
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_rows into count_bad;
@@ -1472,6 +1477,62 @@ begin
 end;
 $$ language plpgsql;
 
+
+create or replace function validation.pq2_1_1_validation () returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+
+	all_aux integer := 0;
+	good_aux integer := 0;
+	bad_aux integer := 0;
+
+	rec_aux RECORD;
+
+	tabela text;
+	tabela_erro text;
+
+	p1_id uuid;
+	p2_id uuid;
+	dist_p1_p2 numeric;
+	p1_endpoint_geom geometry;
+begin
+	-- conformidade seg_via_rodov
+	select count(*) from {schema}.seg_via_rodov into count_all;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	tabela := 'conformidade';
+	tabela_erro := 'errors.' || tabela || '_pq2_1_1';
+	execute format('CREATE TABLE IF NOT exists %s (like validation.%I INCLUDING ALL)', tabela_erro, tabela);
+
+	execute format('delete from %s', tabela_erro);
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			select identificador, ''seg_via_rodov'', ''valor_tipo_circulacao'', geometria from {schema}.seg_via_rodov where identificador not in (select seg_via_rodov_id from {schema}.lig_valor_tipo_circulacao_seg_via_rodov)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into count_bad;
+
+	-- conformidade equip_util_coletiva
+	select count(*) from {schema}.equip_util_coletiva into all_aux;
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			select identificador, ''equip_util_coletiva'', ''valor_tipo_equipamento_coletivo'', NULL from public.equip_util_coletiva where identificador not in (select equip_util_coletiva_id from public.lig_valor_tipo_equipamento_coletivo_equip_util_coletiva)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	select (count_all - count_bad) into count_good;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
 
 create or replace function validation.pq2_4_1_validation () returns table (total int, good int, bad int) as $$
 declare
@@ -2266,6 +2327,13 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_3d (
 -- quando se cria a tabela com um LIKE INCLUDING ALL os nomes das restrições são gerados automaticamente
 ALTER TABLE validation.intersecoes_3d DROP CONSTRAINT IF EXISTS ponto_unico;
 ALTER TABLE validation.intersecoes_3d ADD CONSTRAINT ponto_unico PRIMARY KEY (geometria);
+
+CREATE TABLE IF NOT EXISTS validation.conformidade (
+	identificador uuid NULL,
+	entidade text NULL,
+	atributo text NULL,
+	geometria geometry(linestringz, 3763) NULL
+);
 
 CREATE TABLE IF NOT EXISTS validation.descontinuidades (
 	p1_id uuid NULL,
