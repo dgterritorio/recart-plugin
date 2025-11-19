@@ -61,6 +61,7 @@ displayList = {
     'inst_producao': {'index': 891, 'alias': 'Instalação de produção', 'name': '[08] INFRAESTRUTURAS E SERVIÇOS DE INTERESSE PÚBLICO', 'geom': []},
     'oleoduto_gasoduto_subtancias_quimicas': {'index': 892, 'alias': 'Oleoduto, gasoduto ou substâncias químicas', 'name': '[08] INFRAESTRUTURAS E SERVIÇOS DE INTERESSE PÚBLICO', 'geom': ['LINESTRING']},
     'mob_urbano_sinal': {'index': 910, 'alias': 'Mobiliário Urbano e sinalização', 'name': '[09] MOBILIÁRIO URBANO E SINALIZAÇÃO', 'geom': ['POINT', 'POLYGON']},
+    'conformidade': {'index': 1111, 'alias': 'Conformidade', 'name': '[11] AUXILIAR', 'geom': ['LINESTRINGZ']},
     'area_trabalho': {'index': 1110, 'alias': 'Área de trabalho', 'name': '[11] AUXILIAR', 'geom': ['POLYGON']}
 }
 
