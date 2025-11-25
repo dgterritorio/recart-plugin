@@ -1168,7 +1168,7 @@ class ValidateProcess(QThread):
                 os.path.join(base_dir, f)) and f.lower().endswith('.json')]
             for bfile in base_files:
                 try:
-                    if bfile.split('/')[-1] == 'relacoes.json':
+                    if os.path.basename(bfile) == 'relacoes.json':
                         continue
                     with open(bfile, encoding='utf-8') as base_file:
                         bfp = json.load(base_file)
