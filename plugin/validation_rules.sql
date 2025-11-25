@@ -2400,370 +2400,81 @@ $$select nh.* from {schema}.no_hidrografico nh
 				where St_intersects(nha.geometria, b.geometria))))$$ );
 
 
-delete from validation.rules where code = 're4_11_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('re4_11_1', 'Hierarquia dos nós hidrográficos (Parte 1 - Eixos)', 
+delete from validation.rules_area where code = 're4_11_1';
+delete from validation.rules_area where code = 're4_11_2';
+delete from validation.rules_area where code = 're4_11';
+insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+values ('re4_11', 'Hierarquia dos nós hidrográficos', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
-“Junção”.$$, 
-$$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
-$$with 
-total as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
+“Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó“.$$, 
+$$"Curso de água - eixo, Nó hidrográfico".$$, 'no_hidrografico',
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
+		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
+		group by st_intersection(l1.geometria, l2.geometria)
 ),
-good as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)
+total as (
+	select count(*) from inter where count > 2
 ),
-bad as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and not (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-$$with 
-total as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
+good as (
+	select count(*) from {schema}.no_hidrografico n1
+	where geometria in (select geom from inter where count > 2)
+		and geometria not in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
+		and valor_tipo_no_hidrografico = '3'
 ),
-good as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)
-),
-bad as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and not (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-$$select distinct on (a.identificador) a.*
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and not (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)$$ );
+bad as (
+	select count(*) from {schema}.no_hidrografico n1
+	where geometria in (select geom from inter where count > 2)
+		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
+			or valor_tipo_no_hidrografico <> '3')
+) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
+		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
+		group by st_intersection(l1.geometria, l2.geometria)
+) select * from {schema}.no_hidrografico n1
+	where geometria in (select geom from inter where count > 2)
+		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
+			or valor_tipo_no_hidrografico <> '3')$$ );
 
 delete from validation.rules_area where code = 're4_11_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('re4_11_1', 'Hierarquia dos nós hidrográficos (Parte 1 - Eixos)', 
+delete from validation.rules_area where code = 're4_11_2';
+delete from validation.rules_area where code = 're4_11';
+insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+values ('re4_11', 'Hierarquia dos nós hidrográficos (Parte 1 - Eixos)', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
-“Junção”.$$, 
-$$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
-$$with 
-total as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-		where ST_Intersects(a.geometria, '%1$s') and a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
+“Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó$$, 
+$$"Curso de água - eixo, Nó hidrográfico".$$, 'curso_de_agua_eixo',
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
+		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
+		group by st_intersection(l1.geometria, l2.geometria)
 ),
-good as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where ST_Intersects(a.geometria, '%1$s') and a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)
+total as (
+	select count(*) from inter where ST_Intersects(geom, '%1$s') and count > 2
 ),
-bad as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where ST_Intersects(a.geometria, '%1$s') and a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and not (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-$$with 
-total as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-		where ST_Intersects(a.geometria, '%1$s') and a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
+good as (
+	select count(*) from {schema}.no_hidrografico n1
+	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
+		and geometria not in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
+		and valor_tipo_no_hidrografico = '3'
 ),
-good as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where ST_Intersects(a.geometria, '%1$s') and a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)
-),
-bad as (select count(a.*) from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where ST_Intersects(a.geometria, '%1$s') and a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and not (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-$$select distinct on (a.identificador) a.*
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b, validation.no_hidro_juncao j, validation.interrupcao_fluxo i
-		where ST_Intersects(a.geometria, '%1$s') and a.identificador<>b.identificador and st_intersects(a.geometria, b.geometria)
-		and not (coalesce(a.nome, '') = coalesce(b.nome, '') and
-				coalesce(a.delimitacao_conhecida, false) = coalesce(b.delimitacao_conhecida, false) and
-				coalesce(a.ficticio, false) = coalesce(b.ficticio, false) and
-				coalesce(a.largura, 0) = coalesce(b.largura, 0) and
-				coalesce(a.id_hidrografico, '') = coalesce(b.id_hidrografico, '') and
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') = coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') and
-				coalesce(a.ordem_hidrologica, '') = coalesce(b.ordem_hidrologica, '') and
-				coalesce(a.origem_natural, false) = coalesce(b.origem_natural, false) and
-				coalesce(a.valor_curso_de_agua, '') = coalesce(b.valor_curso_de_agua, '') and
-				coalesce(a.valor_persistencia_hidrologica, '') = coalesce(b.valor_persistencia_hidrologica, '') and
-				coalesce(a.valor_posicao_vertical, '') = coalesce(b.valor_posicao_vertical, ''))
-		and not (st_intersects(a.geometria, j.geom_col) is true or ST_intersects(a.geometria, i.geom_col) is true)$$ );
-
-
-delete from validation.rules where code = 're4_11_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('re4_11_2', 'Hierarquia dos nós hidrográficos (Parte 2 - Nós)', 
-$$Apenas é inserido um nó que assume o valor "Junção" prevalecendo este sobre o valor "Pseudo-nó".$$, 
-$$"Nó hidrográfico".$$, 'no_hidrografico',
-$$with 
-total as (select count(*) from {schema}.no_hidrografico t
-	where (t.valor_tipo_no_hidrografico='3' or t.valor_tipo_no_hidrografico='4') and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-),
-good as (select count(t.*)
-	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='3' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-),
-bad as (select count(t.*)
-	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='4' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-$$with 
-total as (select count(*) from {schema}.no_hidrografico t
-	where (t.valor_tipo_no_hidrografico='3' or t.valor_tipo_no_hidrografico='4') and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-),
-good as (select count(t.*)
-	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='3' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-),
-bad as (select count(t.*)
-	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='4' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-$$select t.*
-	from {schema}.no_hidrografico t
-	where t.valor_tipo_no_hidrografico='4' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )$$ );
-
-delete from validation.rules_area where code = 're4_11_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('re4_11_2', 'Hierarquia dos nós hidrográficos (Parte 2 - Nós)', 
-$$Apenas é inserido um nó que assume o valor "Junção" prevalecendo este sobre o valor "Pseudo-nó".$$, 
-$$"Nó hidrográfico".$$, 'no_hidrografico',
-$$with 
-total as (select count(*) from {schema}.no_hidrografico t
-	where ST_Intersects(geometria, '%1$s') and (t.valor_tipo_no_hidrografico='3' or t.valor_tipo_no_hidrografico='4') and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-),
-good as (select count(t.*)
-	from {schema}.no_hidrografico t
-	where ST_Intersects(geometria, '%1$s') and t.valor_tipo_no_hidrografico='3' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-),
-bad as (select count(t.*)
-	from {schema}.no_hidrografico t
-	where ST_Intersects(geometria, '%1$s') and t.valor_tipo_no_hidrografico='4' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-$$with 
-total as (select count(*) from {schema}.no_hidrografico t
-	where ST_Intersects(geometria, '%1$s') and (t.valor_tipo_no_hidrografico='3' or t.valor_tipo_no_hidrografico='4') and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-),
-good as (select count(t.*)
-	from {schema}.no_hidrografico t
-	where ST_Intersects(geometria, '%1$s') and t.valor_tipo_no_hidrografico='3' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-),
-bad as (select count(t.*)
-	from {schema}.no_hidrografico t
-	where ST_Intersects(geometria, '%1$s') and t.valor_tipo_no_hidrografico='4' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-$$select t.*
-	from {schema}.no_hidrografico t
-	where ST_Intersects(geometria, '%1$s') and t.valor_tipo_no_hidrografico='4' and exists (
-            select 1 
-            from validation.juncao_fluxo_dattr f
-            where st_intersects(t.geometria, f.geom_col)
-        )$$ );
+bad as (
+	select count(*) from {schema}.no_hidrografico n1
+	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
+		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
+			or valor_tipo_no_hidrografico <> '3')
+) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
+		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
+		group by st_intersection(l1.geometria, l2.geometria)
+) select * from {schema}.no_hidrografico n1
+	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
+		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
+			or valor_tipo_no_hidrografico <> '3')$$ );
 
 -- pseudo-nós
 -- Entre dois nós só pode haver um segmento

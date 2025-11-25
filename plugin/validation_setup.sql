@@ -2279,23 +2279,6 @@ CREATE TABLE IF NOT EXISTS validation.interrupcao_fluxo AS (
 );
 
 CREATE INDEX IF NOT EXISTS idx_val_curso_de_agua_eixo_geometria ON {schema}.curso_de_agua_eixo USING GIST (geometria);
-CREATE TABLE IF NOT EXISTS validation.juncao_fluxo_dattr AS (
-	select st_intersection(a.geometria, b.geometria) as geom_col
-		from {schema}.curso_de_agua_eixo a
-		inner join {schema}.curso_de_agua_eixo b ON a.identificador <> b.identificador AND ST_Intersects(a.geometria, b.geometria)
-		where not (coalesce(a.nome, '')<>coalesce(b.nome, '') or
-				coalesce(a.delimitacao_conhecida, false)<>coalesce(b.delimitacao_conhecida, false) or
-				coalesce(a.ficticio, false)<>coalesce(b.ficticio, false) or
-				coalesce(a.largura, 0)<>coalesce(b.largura, 0) or
-				coalesce(a.id_hidrografico, '')<>coalesce(b.id_hidrografico, '') or
-				coalesce(a.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')<>coalesce(b.id_curso_de_agua_area, 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa') or
-				coalesce(a.ordem_hidrologica, '')<>coalesce(b.ordem_hidrologica, '') or
-				coalesce(a.origem_natural, false)<>coalesce(b.origem_natural, false) or
-				coalesce(a.valor_curso_de_agua, '')<>coalesce(b.valor_curso_de_agua, '') or
-				coalesce(a.valor_persistencia_hidrologica, '')<>coalesce(b.valor_persistencia_hidrologica, '') or
-				coalesce(a.valor_posicao_vertical, '')<>coalesce(b.valor_posicao_vertical, ''))
-);
-CREATE INDEX IF NOT EXISTS idx_val_juncao_fluxo_dattr_geom ON validation.juncao_fluxo_dattr USING GIST (geom_col);
 
 -- drop index IF EXISTS validation.tin_geom_idx;
 -- create index tin_geom_idx ON validation.tin using gist(geometria);
