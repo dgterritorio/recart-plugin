@@ -2400,9 +2400,9 @@ $$select nh.* from {schema}.no_hidrografico nh
 				where St_intersects(nha.geometria, b.geometria))))$$ );
 
 
-delete from validation.rules_area where code = 're4_11_1';
-delete from validation.rules_area where code = 're4_11_2';
-delete from validation.rules_area where code = 're4_11';
+delete from validation.rules where code = 're4_11_1';
+delete from validation.rules where code = 're4_11_2';
+delete from validation.rules where code = 're4_11';
 insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
 values ('re4_11', 'Hierarquia dos nós hidrográficos', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
@@ -2453,7 +2453,7 @@ $$with inter as (
 		group by st_intersection(l1.geometria, l2.geometria)
 ),
 total as (
-	select count(*) from inter where ST_Intersects(geom, '%1$s') and count > 2
+	select count(*) from inter where count > 2
 ),
 good as (
 	select count(*) from {schema}.no_hidrografico n1
@@ -3112,6 +3112,130 @@ $$ select *
 	union
 	select ST_EndPoint(geometria) from {schema}.seg_via_ferrea)$$ );
 	
+
+-- RE5.2.4
+delete from validation.rules where code = 're5_2_4';
+insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+values ('re5_2_4', 'Nós terminais da via-férrea', 
+$$Quando um “Segmento da via-férrea” tem o seu fim numa “Infraestrutura de transporte ferroviário” é colocado um “Nó de transporte ferroviário” 
+correspondente ao fim da via e um outro “Nó de transporte ferroviário” correspondente à infraestrutura. 
+Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via-férrea” em conformidade com a topologia implícita.$$, 
+$$"Segmento da via-férrea, Infraestrutura de transporte ferroviário, Nó de transporte ferroviário".$$, 'no_trans_ferrov',
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
+		join {schema}.infra_trans_ferrov l2 on st_intersects(l1.geometria, l2.geometria)
+		group by st_intersection(l1.geometria, l2.geometria)
+), total as (
+	select count(*) from inter
+), good as (
+	select count(*) from inter where (select count(*) from {schema}.no_trans_ferrov where geom=geometria) = 2
+), bad as (
+	select count(*) from inter where (select count(*) from {schema}.no_trans_ferrov where geom=geometria) <> 2
+) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
+		join {schema}.infra_trans_ferrov l2 on st_intersects(l1.geometria, l2.geometria)
+		group by st_intersection(l1.geometria, l2.geometria)
+) select * from {schema}.no_trans_ferrov where geometria in (select geom from inter where (select count(*) from {schema}.no_trans_ferrov where geom=geometria) <> 2)$$ );
+
+
+delete from validation.rules_area where code = 're5_2_4';
+insert into validation.rules_area ( code, name, rule, scope, entity, query, report )
+values ('re5_2_4', 'Nós terminais da via-férrea',
+$$Quando um “Segmento da via-férrea” tem o seu fim numa “Infraestrutura de transporte ferroviário” é colocado um “Nó de transporte ferroviário”
+correspondente ao fim da via e um outro “Nó de transporte ferroviário” correspondente à infraestrutura.
+Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via-férrea” em conformidade com a topologia implícita.$$,
+$$"Segmento da via-férrea, Infraestrutura de transporte ferroviário, Nó de transporte ferroviário".$$, 'no_trans_ferrov',
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
+		join {schema}.infra_trans_ferrov l2 on st_intersects(l1.geometria, l2.geometria)
+		group by st_intersection(l1.geometria, l2.geometria)
+), total as (
+	select count(*) from inter
+), good as (
+	select count(*) from inter where ST_Intersects(geom, '%1$s') and (select count(*) from {schema}.no_trans_ferrov where geom=geometria) = 2
+), bad as (
+	select count(*) from inter where ST_Intersects(geom, '%1$s') and (select count(*) from {schema}.no_trans_ferrov where geom=geometria) <> 2
+) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
+		join {schema}.infra_trans_ferrov l2 on st_intersects(l1.geometria, l2.geometria)
+		group by st_intersection(l1.geometria, l2.geometria)
+) select * from {schema}.no_trans_ferrov n1 where ST_Intersects(n1.geometria, '%1$s') and n1.geometria in (select geom from inter where (select count(*) from {schema}.no_trans_ferrov n2 where geom=n2geometria) <> 2)$$ );
+
+
+-- RE5.2.5
+delete from validation.rules where code = 're5_2_5';
+insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+values ('re5_2_5', 'Hierarquia dos nós da via-férrea', 
+$$Quando um “Segmento da via-férrea” interseta outro e, simultaneamente, observa-se uma alteração de atributos, o “Nó de transporte ferroviário” 
+assume o valor “Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó“.$$, 
+$$"Segmento da via-férrea, Nó de transporte ferroviário".$$, 'no_trans_ferrov',
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
+		join {schema}.seg_via_ferrea l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
+		group by st_intersection(l1.geometria, l2.geometria)
+),
+total as (
+	select count(*) from inter where count > 2
+),
+good as (
+	select count(*) from {schema}.no_trans_ferrov n1
+	where geometria in (select geom from inter where count > 2)
+		and geometria not in (select geometria from {schema}.no_trans_ferrov n2 where n1.identificador <> n2.identificador)
+		and valor_tipo_no_trans_ferrov = '1'
+),
+bad as (
+	select count(*) from {schema}.no_trans_ferrov n1
+	where geometria in (select geom from inter where count > 2)
+		and (geometria in (select geometria from {schema}.no_trans_ferrov n2 where n1.identificador <> n2.identificador)
+			or valor_tipo_no_trans_ferrov <> '1')
+) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
+		join {schema}.seg_via_ferrea l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
+		group by st_intersection(l1.geometria, l2.geometria)
+) select * from {schema}.no_trans_ferrov n1
+	where geometria in (select geom from inter where count > 2)
+		and (geometria in (select geometria from {schema}.no_trans_ferrov n2 where n1.identificador <> n2.identificador)
+			or valor_tipo_no_trans_ferrov <> '1')$$ );
+
+
+delete from validation.rules_area where code = 're5_2_5';
+insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+values ('re5_2_5', 'Hierarquia dos nós da via-férrea', 
+$$Quando um “Segmento da via-férrea” interseta outro e, simultaneamente, observa-se uma alteração de atributos, o “Nó de transporte ferroviário” 
+assume o valor “Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó“.$$, 
+$$"Segmento da via-férrea, Nó de transporte ferroviário".$$, 'no_trans_ferrov',
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
+		join {schema}.seg_via_ferrea l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
+		group by st_intersection(l1.geometria, l2.geometria)
+),
+total as (
+	select count(*) from inter where count > 2
+),
+good as (
+	select count(*) from {schema}.no_trans_ferrov n1
+	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
+		and geometria not in (select geometria from {schema}.no_trans_ferrov n2 where n1.identificador <> n2.identificador)
+		and valor_tipo_no_trans_ferrov = '1'
+),
+bad as (
+	select count(*) from {schema}.no_trans_ferrov n1
+	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
+		and (geometria in (select geometria from {schema}.no_trans_ferrov n2 where n1.identificador <> n2.identificador)
+			or valor_tipo_no_trans_ferrov <> '1')
+) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
+$$with inter as (
+	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
+		join {schema}.seg_via_ferrea l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
+		group by st_intersection(l1.geometria, l2.geometria)
+) select * from {schema}.no_trans_ferrov n1
+	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
+		and (geometria in (select geometria from {schema}.no_trans_ferrov n2 where n1.identificador <> n2.identificador)
+			or valor_tipo_no_trans_ferrov <> '1')$$ );
+
 
 -- RE5.2.6
 -- Regras semelhantes: re5_1_1, re_5_2_6, re_5_5_7
