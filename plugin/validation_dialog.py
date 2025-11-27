@@ -1168,7 +1168,7 @@ class ValidateProcess(QThread):
                 os.path.join(base_dir, f)) and f.lower().endswith('.json')]
             for bfile in base_files:
                 try:
-                    if bfile.split('/')[-1] == 'relacoes.json':
+                    if os.path.basename(bfile) == 'relacoes.json':
                         continue
                     with open(bfile, encoding='utf-8') as base_file:
                         bfp = json.load(base_file)
@@ -1300,7 +1300,17 @@ class ValidateProcess(QThread):
 
             # SELECT f_table_name, f_geometry_column, "type" FROM geometry_columns WHERE f_table_schema = 'errors';
             tables = self.pgutils.run_query_with_conn(self.actconn,
-                'SELECT table_name FROM information_schema.tables WHERE table_schema = \'errors\'')
+                'WITH tbl AS (\
+	                SELECT Table_Schema, Table_Name FROM information_schema.Tables \
+	                WHERE Table_Schema IN (\'errors\')\
+                ),\
+                cnts as (\
+	                SELECT Table_Name,\
+                        (xpath(\'/row/c/text()\', query_to_xml(format(\
+                        \'SELECT count(*) AS c FROM %I.%I\', Table_Schema, Table_Name\
+                ), FALSE, TRUE, \'\')))[1]::text::int AS Records_Count \
+	                FROM tbl\
+                ) select Table_Name from cnts where Records_Count > 0')
             if ( tables ):
                 if len(tables) > 0:
                     self.write(
