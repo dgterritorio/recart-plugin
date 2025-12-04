@@ -3684,13 +3684,13 @@ total as (
 ),
 good as (
 	select count(*) from {schema}.no_trans_rodov n1
-	where valor_tipo_no_trans_rodov = '1' and geometria in (select geom from inter where count > 2)
+	where (valor_tipo_no_trans_rodov = '1' or valor_tipo_no_trans_rodov = '5') and geometria in (select geom from inter where count > 2)
 		and geometria not in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador)
 ),
 bad as (
 	select count(*) from {schema}.no_trans_rodov n1
 	where geometria in (select geom from inter where count > 2)
-		and (valor_tipo_no_trans_rodov <> '1' or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))
+		and ((valor_tipo_no_trans_rodov <> '1' and valor_tipo_no_trans_rodov <> '5') or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))
 ) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
 $$with inter as (
 	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
@@ -3699,7 +3699,7 @@ $$with inter as (
 		group by st_intersection(l1.geometria, l2.geometria)
 )select * from {schema}.no_trans_rodov n1
 	where geometria in (select geom from inter where count > 2)
-		and (valor_tipo_no_trans_rodov <> '1' or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))$$ );
+		and ((valor_tipo_no_trans_rodov <> '1' or valor_tipo_no_trans_rodov <> '5') or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))$$ );
 
 
 delete from validation.rules_area where code = 're5_5_5';
@@ -3720,13 +3720,13 @@ total as (
 ),
 good as (
 	select count(*) from {schema}.no_trans_rodov n1
-	where ST_Intersects(n1.geometria, '%1$s') and valor_tipo_no_trans_rodov = '1' and geometria in (select geom from inter where count > 2)
+	where ST_Intersects(n1.geometria, '%1$s') and (valor_tipo_no_trans_rodov = '1' or valor_tipo_no_trans_rodov = '5') and geometria in (select geom from inter where count > 2)
 		and geometria not in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador)
 ),
 bad as (
 	select count(*) from {schema}.no_trans_rodov n1
 	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and (valor_tipo_no_trans_rodov <> '1' or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))
+		and ((valor_tipo_no_trans_rodov <> '1' and valor_tipo_no_trans_rodov <> '5') or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))
 ) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
 $$with inter as (
 	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
@@ -3735,7 +3735,7 @@ $$with inter as (
 		group by st_intersection(l1.geometria, l2.geometria)
 )select * from {schema}.no_trans_rodov n1
 	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and (valor_tipo_no_trans_rodov <> '1' or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))$$ );
+		and ((valor_tipo_no_trans_rodov <> '1' and valor_tipo_no_trans_rodov <> '5')+ or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))$$ );
 
 
 -- RE5.5.7

@@ -182,11 +182,11 @@ def get_geom_type(type):
 
 def read_post_process(base, lyr, schema, save_src, pp, frst, vrs = None):
     bp = os.path.dirname(os.path.realpath(__file__))
-    vrs_path = vrs+'/' if vrs is not None else ''
+    vrs_path = vrs if vrs is not None else ''
     try:
         # print(pp)
         if pp['type'] == 'sql':
-            with open(bp + '/processing/' + vrs_path + pp['path']) as pp_file:
+            with open(os.path.join(bp, 'processing', vrs_path, pp['path'])) as pp_file:
                 pp_src = pp_file.read()
                 cols = [f['nome'] for f in base[lyr].get_fields(
                 ) if f['nome'] != 'identificador' and f['nome'] != 'geometria']
