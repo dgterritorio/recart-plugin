@@ -2,6 +2,8 @@ alter table {schema}.edificio add column if not exists nome varchar(255);
 alter table {schema}.edificio add column if not exists numero_policia varchar(255);
 alter table {schema}.edificio add column if not exists valor_utilizacao_atual varchar(255);
 
+alter table {schema}.edificio add column if not exists import_ref varchar(255);
+
 insert into {schema}.nome_edificio(edificio_id, nome)
 select identificador as edificio_id, nome from {schema}.edificio where nome is not null;
 

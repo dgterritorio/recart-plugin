@@ -24,8 +24,8 @@ class CartImporter:
         self.srsid = srsid
 
         self.vrs = kwargs.get('vrs', 'v2.0.2')
-        self.base_dir = kwargs.get('base_dir', os.path.dirname(
-            os.path.realpath(__file__))+'/base/'+self.vrs)
+        self.base_dir = kwargs.get('base_dir', os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), 'base', self.vrs))
         self.input_dir = kwargs.get('input_dir', './input')
         self.ulink_type = kwargs.get('ulink_type', '6549')
         self.cod_field = kwargs.get('cod_field', 'ulink')
@@ -125,7 +125,7 @@ class CartImporter:
             os.path.join(self.base_dir, f)) and f.lower().endswith('.json')]
         for bfile in base_files:
             try:
-                if bfile.split('/')[-1] == 'relacoes.json':
+                if os.path.basename(bfile) == 'relacoes.json':
                     continue
                 with open(bfile, encoding='utf-8') as base_file:
                     bfp = json.load(base_file)
