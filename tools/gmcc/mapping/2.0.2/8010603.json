@@ -27,7 +27,7 @@
                     "src": "",
                     "dst": "valor_posicao_vertical",
                     "op": "set",
-                    "value": "1"
+                    "value": "0"
                 }
             ]
         }

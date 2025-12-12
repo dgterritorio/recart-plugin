@@ -7827,7 +7827,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_areas_agricolas_florestais_matos",
                         "op": "set",
-                        "value": "888"
+                        "value": "1"
                     }
                 ]
             }
@@ -32545,7 +32545,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_posicao_vertical",
                         "op": "set",
-                        "value": "1"
+                        "value": "0"
                     }
                 ]
             }
@@ -32580,7 +32580,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_posicao_vertical",
                         "op": "set",
-                        "value": "1"
+                        "value": "0"
                     }
                 ]
             }
@@ -32615,7 +32615,7 @@ cmap = {
                         "src": "",
                         "dst": "valor_posicao_vertical",
                         "op": "set",
-                        "value": "1"
+                        "value": "0"
                     }
                 ]
             }
