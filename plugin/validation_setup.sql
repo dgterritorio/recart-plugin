@@ -1478,6 +1478,195 @@ end;
 $$ language plpgsql;
 
 
+create or replace function validation.pq1_1_validation () returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+
+	all_aux integer := 0;
+	bad_aux integer := 0;
+
+	tabelas_2d text[];
+	tabelas_3d text[];
+
+	tabela text;
+	tabela_erro text;
+begin
+	tabelas_2d = array['area_agricola_florestal_mato', 'area_infra_trans_aereo', 'area_infra_trans_ferrov',
+	 'area_infra_trans_rodov', 'area_infra_trans_via_navegavel', 'area_trabalho', 'areas_artificializadas',
+	 'barreira', 'cabo_electrico', 'conduta_de_agua', 'constru_linear', 'constru_polig', 'designacao_local',
+	 'edificio', 'elem_assoc_agua', 'elem_assoc_eletricidade', 'elem_assoc_pgq', 'elem_assoc_telecomunicacoes',
+	 'fronteira', 'infra_trans_aereo', 'infra_trans_ferrov', 'infra_trans_rodov', 'infra_trans_via_navegavel',
+	 'margem', 'mob_urbano_sinal', 'oleoduto_gasoduto_subtancias_quimicas', 'ponto_interesse', 'seg_via_cabo',
+	 'sinal_geodesico'];
+
+	tabelas_3d = array['agua_lentica', 'curso_de_agua_area', 'curso_de_agua_eixo', 'no_hidrografico',
+	 'curva_de_nivel', 'fronteira_terra_agua', 'linha_de_quebra', 'nascente', 'no_trans_ferrov', 'obra_arte',
+	 'ponto_cotado', 'queda_de_agua', 'seg_via_ferrea', 'seg_via_rodov', 'via_rodov_limite', 'zona_humida'];
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	tabela := 'comissao';
+	tabela_erro := 'errors.' || tabela || '_pq1_1';
+	execute format('CREATE TABLE IF NOT exists %s (like validation.%I INCLUDING ALL)', tabela_erro, tabela);
+
+	for tabela in select unnest(tabelas_2d)
+	loop
+		execute format('select count(*) from {schema}.%I', tabela) into all_aux;
+		execute format('SELECT COUNT(*) FROM (SELECT ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ''%1$s'' as ft
+			FROM %1$I GROUP BY geometria HAVING COUNT(*) > 1)', tabela) into bad_aux;
+
+		execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
+		SELECT ''%1$s'', %2$s, %3$s, ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ST_Force3D(geometria)
+			FROM %1$I GROUP BY geometria HAVING COUNT(*) > 1', tabela, all_aux, bad_aux, tabela_erro);
+
+		count_all := count_all + all_aux;
+		count_bad := count_bad + bad_aux;
+	end loop;
+
+	for tabela in select unnest(tabelas_3d)
+	loop
+		execute format('select count(*) from {schema}.%I', tabela) into all_aux;
+		execute format('SELECT COUNT(*) FROM (SELECT ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ''%1$s'' as ft
+			FROM {schema}.%1$I GROUP BY geometria HAVING COUNT(*) > 1)', tabela) into bad_aux;
+
+		execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
+		SELECT ''%1$s'', %2$s, %3$s, ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, geometria
+			FROM {schema}.%1$I GROUP BY geometria HAVING COUNT(*) > 1', tabela, all_aux, bad_aux, tabela_erro);
+
+		count_all := count_all + all_aux;
+		count_bad := count_bad + bad_aux;
+	end loop;
+
+	tabela := 'no_trans_rodov';
+	execute format('select count(*) from {schema}.%I', tabela) into all_aux;
+	execute format('SELECT COUNT(*) FROM (select geom, ids, ft from
+		(SELECT ST_AsText(geometria) AS geom,
+			array_agg(identificador) AS ids,
+       		array_agg(valor_tipo_no_trans_rodov) AS valor,
+       		''no_trans_rodov'' as ft
+		FROM no_trans_rodov
+		GROUP BY geom HAVING COUNT(*) > 1) sub
+			where not((array_position(valor, ''4'') = 1 and array_position(valor, ''5'') = 2) or 
+				(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2)))') into bad_aux;
+
+	execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
+	SELECT ''%1$s'', %2$s, %3$s, geom, ids, geometria
+		FROM (SELECT ST_AsText(geometria) AS geom,
+       			array_agg(identificador) AS ids,
+       			array_agg(valor_tipo_no_trans_rodov) AS valor,
+       			''no_trans_rodov'' as ft,
+				geometria
+			FROM no_trans_rodov
+			GROUP BY geom, geometria
+			HAVING COUNT(*) > 1) sub
+				where not((array_position(valor, ''4'') = 1 and array_position(valor, ''5'') = 2) or 
+					(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2))', tabela, all_aux, bad_aux, tabela_erro);
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	select (count_all - count_bad) into count_good;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.pq1_1_validation_v2 () returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+
+	all_aux integer := 0;
+	bad_aux integer := 0;
+
+	tabelas_2d text[];
+	tabelas_3d text[];
+
+	tabela text;
+	tabela_erro text;
+begin
+	tabelas_2d = array['area_agricola_florestal_mato', 'area_infra_trans_aereo', 'area_infra_trans_ferrov',
+	 'area_infra_trans_rodov', 'area_infra_trans_via_navegavel', 'area_trabalho', 'areas_artificializadas',
+	 'barreira', 'cabo_electrico', 'conduta_de_agua', 'constru_linear', 'constru_polig', 'designacao_local',
+	 'edificio', 'elem_assoc_agua', 'elem_assoc_eletricidade', 'elem_assoc_pgq', 'elem_assoc_telecomunicacoes',
+	 'fronteira', 'infra_trans_aereo', 'infra_trans_ferrov', 'infra_trans_rodov', 'infra_trans_via_navegavel',
+	 'terreno_marginal', 'mob_urbano_sinal', 'oleoduto_gasoduto_subtancias_quimicas', 'ponto_interesse', 'seg_via_cabo',
+	 'constru_na_margem', 'numero_policia', 'sinal_geodesico'];
+
+	tabelas_3d = array['agua_lentica', 'curso_de_agua_area', 'curso_de_agua_eixo', 'no_hidrografico',
+	 'curva_de_nivel', 'fronteira_terra_agua', 'linha_de_quebra', 'nascente', 'no_trans_ferrov', 'obra_arte',
+	 'ponto_cotado', 'queda_de_agua', 'seg_via_ferrea', 'seg_via_rodov', 'via_rodov_limite', 'zona_humida'];
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	tabela := 'comissao';
+	tabela_erro := 'errors.' || tabela || '_pq1_1';
+	execute format('CREATE TABLE IF NOT exists %s (like validation.%I INCLUDING ALL)', tabela_erro, tabela);
+
+	for tabela in select unnest(tabelas_2d)
+	loop
+		execute format('select count(*) from {schema}.%I', tabela) into all_aux;
+		execute format('SELECT COUNT(*) FROM (SELECT ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ''%1$s'' as ft
+			FROM %1$I GROUP BY geometria HAVING COUNT(*) > 1)', tabela) into bad_aux;
+
+		execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
+		SELECT ''%1$s'', %2$s, %3$s, ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ST_Force3D(geometria)
+			FROM %1$I GROUP BY geometria HAVING COUNT(*) > 1', tabela, all_aux, bad_aux, tabela_erro);
+
+		count_all := count_all + all_aux;
+		count_bad := count_bad + bad_aux;
+	end loop;
+
+	for tabela in select unnest(tabelas_3d)
+	loop
+		execute format('select count(*) from {schema}.%I', tabela) into all_aux;
+		execute format('SELECT COUNT(*) FROM (SELECT ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ''%1$s'' as ft
+			FROM {schema}.%1$I GROUP BY geometria HAVING COUNT(*) > 1)', tabela) into bad_aux;
+
+		execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
+		SELECT ''%1$s'', %2$s, %3$s, ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, geometria
+			FROM {schema}.%1$I GROUP BY geometria HAVING COUNT(*) > 1', tabela, all_aux, bad_aux, tabela_erro);
+
+		count_all := count_all + all_aux;
+		count_bad := count_bad + bad_aux;
+	end loop;
+
+	tabela := 'no_trans_rodov';
+	execute format('select count(*) from {schema}.%I', tabela) into all_aux;
+	execute format('SELECT COUNT(*) FROM (select geom, ids, ft from
+		(SELECT ST_AsText(geometria) AS geom,
+			array_agg(identificador) AS ids,
+       		array_agg(valor_tipo_no_trans_rodov) AS valor,
+       		''no_trans_rodov'' as ft
+		FROM no_trans_rodov
+		GROUP BY geom HAVING COUNT(*) > 1) sub
+			where not((array_position(valor, ''4'') = 1 and array_position(valor, ''5'') = 2) or 
+				(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2)))') into bad_aux;
+
+	execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
+	SELECT ''%1$s'', %2$s, %3$s, geom, ids, geometria
+		FROM (SELECT ST_AsText(geometria) AS geom,
+       			array_agg(identificador) AS ids,
+       			array_agg(valor_tipo_no_trans_rodov) AS valor,
+       			''no_trans_rodov'' as ft,
+				geometria
+			FROM no_trans_rodov
+			GROUP BY geom, geometria
+			HAVING COUNT(*) > 1) sub
+				where not((array_position(valor, ''4'') = 1 and array_position(valor, ''5'') = 2) or 
+					(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2))', tabela, all_aux, bad_aux, tabela_erro);
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	select (count_all - count_bad) into count_good;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
 create or replace function validation.pq2_1_1_validation () returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
@@ -2551,6 +2740,15 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_3d (
 -- quando se cria a tabela com um LIKE INCLUDING ALL os nomes das restrições são gerados automaticamente
 ALTER TABLE validation.intersecoes_3d DROP CONSTRAINT IF EXISTS ponto_unico;
 ALTER TABLE validation.intersecoes_3d ADD CONSTRAINT ponto_unico PRIMARY KEY (geometria);
+
+CREATE TABLE IF NOT EXISTS validation.comissao (
+	entidade text NULL,
+	entidade_total integer NULL,
+	entidade_duplicados integer NULL,
+	geom text NULL,
+	ids text NULL,
+	geometria geometry(GEOMETRYZ, 3763) NULL
+);
 
 CREATE TABLE IF NOT EXISTS validation.conformidade (
 	identificador uuid NULL,
