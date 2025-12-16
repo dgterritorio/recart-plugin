@@ -2289,6 +2289,7 @@ CREATE TABLE IF NOT EXISTS validation.consistencia_valores_def (
 	valores text[] NULL
 );
 
+DELETE FROM validation.consistencia_valores_def;
 INSERT INTO validation.consistencia_valores_def (entidade, atributo, versao, ndd, valores) VALUES
 ('adm_publica', 'valor_tipo_adm_publica', '{v1.1.2,v2.0.1,v2.0.2}', '1', '{1,2,3,4,5}'),
 ('adm_publica', 'valor_tipo_adm_publica', '{v1.1.2,v2.0.1,v2.0.2}', '2', '{1,2,3,4,5}'),
@@ -2484,6 +2485,41 @@ INSERT INTO validation.consistencia_valores_def (entidade, atributo, versao, ndd
 ('via_rodov_limite', 'valor_tipo_limite', '{v1.1.2,v2.0.1,v2.0.2}', '2', '{1,2}'),
 ('zona_humida', 'valor_zona_humida', '{v1.1.2,v2.0.1,v2.0.2}', '1', '{1,2,3}'),
 ('zona_humida', 'valor_zona_humida', '{v1.1.2,v2.0.1,v2.0.2}', '2', '{1,2,3}');
+
+
+CREATE TABLE IF NOT EXISTS validation.consistencia_valores_report (
+	tabela text NULL,
+	atributo text NULL,
+	valor text NULL,
+	numero integer NULL
+);
+
+create or replace function validation.atualiza_consistencia_valores_report(_ndd text, _versao text) returns void language plpgsql as $$
+declare
+	tbl text;
+	attr text;
+	vals text[];
+
+	tables cursor for
+		select entidade, atributo, valores from validation.consistencia_valores_def
+		where ndd = _ndd and versao::text like '%' || _versao || '%';
+begin
+	delete from validation.consistencia_valores_report;
+
+	open tables;
+	loop
+		fetch tables into tbl, attr, vals;
+		exit when not found;
+
+		EXECUTE format('
+			insert into validation.consistencia_valores_report (tabela, atributo, valor, numero)
+			select ''%1$s'' as tabela, ''%2$s'' as atributo, %2$I as valor, count(*) as numero
+				from {schema}.%1$I where %2$s<>all(''%3$s'')
+				group by %2$s
+		', tbl, attr, vals);
+	end loop;
+	close tables;
+end; $$;
 
 -- drop index IF EXISTS validation.tin_geom_idx;
 -- create index tin_geom_idx ON validation.tin using gist(geometria);

@@ -472,6 +472,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     def createTable(self, layout, offsetx, offsety, size, columns, rows):
         table = QgsLayoutItemTextTable(layout)
+        table.setWrapBehavior(1)
         layout.addMultiFrame(table)
 
         table.setColumns(columns)
@@ -517,6 +518,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
             rq = rq + " (REGEXP_MATCHES(relname, '[a-z_0-9]+_(rg[0-9_]*)|[a-z_0-9]+_(re[0-9_]*)'))[1] as codigo1, (REGEXP_MATCHES(relname, '[a-z_0-9]+_(rg[0-9_]*)|[a-z_0-9]+_(re[0-9_]*)'))[2] as codigo2, n_live_tup"
             rq = rq + " FROM pg_stat_user_tables where schemaname = 'errors' and n_live_tup > 0 ORDER BY codigo1, codigo2, n_live_tup DESC;"
             report = self.pgutils.run_query_with_conn(self.actconn, rq)
+            
+            vq = "select tabela, atributo, valor, numero from validation.consistencia_valores_report order by tabela, atributo, valor;"
+            vreport = self.pgutils.run_query_with_conn(self.actconn, vq)
 
             times = datetime.now()
             footnote = times.strftime("%Y-%m-%d %H:%M:%S") +\
@@ -646,9 +650,11 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
                     layout.addItem(section)
 
-                    cols = [QgsLayoutTableColumn()]
+                    cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn()]
                     cols[0].setHeading("Tabela")
-                    cols[0].setWidth(150)
+                    cols[0].setWidth(80)
+                    cols[1].setHeading("Campos esperados")
+                    cols[1].setWidth(160)
 
                     self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
                                     cols, self.structure_errors)
@@ -684,6 +690,41 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
                     self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
                                     cols, self.value_list_errors)
+
+                    time = QgsLayoutItemLabel(layout)
+                    time.setText(footnote)
+                    time.setFont(QFont('Arial', 10, 25))
+                    time.adjustSizeToText()
+                    time.attemptMove(QgsLayoutPoint(8, 230+tabOff))
+                    layout.addItem(time)
+
+                    tabOff = tabOff + 220
+
+                if vreport is not None and len(vreport) > 0:
+                    npage = QgsLayoutItemPage(layout)
+                    npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
+                    pages.addPage(npage)
+
+                    section = QgsLayoutItemLabel(layout)
+                    section.setText('Erros de Consistência de Domínio')
+                    section.setFont(QFont('Arial', 14, 75))
+                    section.adjustSizeToText()
+                    section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
+                    layout.addItem(section)
+
+                    cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn(),
+                            QgsLayoutTableColumn(), QgsLayoutTableColumn()]
+                    cols[0].setHeading("Objeto")
+                    cols[0].setWidth(80)
+                    cols[1].setHeading("Atributo")
+                    cols[1].setWidth(85)
+                    cols[2].setHeading("Erro")
+                    cols[2].setWidth(30)
+                    cols[3].setHeading("Número de Ocorrências")
+                    cols[3].setWidth(50)
+
+                    self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
+                                    cols, vreport)
 
                     time = QgsLayoutItemLabel(layout)
                     time.setText(footnote)
@@ -1245,6 +1286,11 @@ class ValidateProcess(QThread):
             validated = {}
             interrupt = False
 
+            # validate values
+            vndd = '1' if self.ndd1 == 'NdD1' else '2'
+            res = self.pgutils.run_query_with_conn(self.actconn,
+                            'select validation.atualiza_consistencia_valores_report(\'{}\', \'{}\');'.format(vndd, self.vrs))
+
             # validate structure
             base_dir = os.path.dirname(os.path.realpath(__file__))+'/convert/base/'+self.vrs
             base_files = [os.path.join(base_dir, f) for f in os.listdir(base_dir) if os.path.isfile(
@@ -1285,7 +1331,7 @@ class ValidateProcess(QThread):
                         res = self.pgutils.run_query_with_conn(self.actconn,
                             'select validation.validate_table_columns(\'{}\', \'{}\');'.format(ccname, camposFrmt))
                         if res and len(res) > 0 and res[0][0] == False:
-                            self.structure_errors.append([ccname])
+                            self.structure_errors.append([ccname, ' | '.join([x['nome'] for x in campos])])
                             interrupt = True
                             raise Exception(
                                 "A tabela {} não tem os campos esperados:\n\t{}\nFuncionamento correto das validações não está assegurado.".format(ccname, camposFrmt))
