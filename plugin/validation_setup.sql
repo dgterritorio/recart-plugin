@@ -640,13 +640,13 @@ begin
 	for tabela in execute tabelas
 	loop 
 		-- RAISE NOTICE '-------------------------- table % -------------------------------------------------', rec.f_table_name;
-		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON''', tabela ) INTO all_aux;
+		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' or geometrytype(geometria) = ''LINESTRING''', tabela ) INTO all_aux;
 		-- RAISE NOTICE 'All is % for table %', all_aux, rec.f_table_name;
 		count_all := count_all + all_aux;
-		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) >= %s', tabela, cvalue) INTO good_aux;
+		execute format('select count(*) from {schema}.%I where (geometrytype(geometria) = ''POLYGON'' and st_area(geometria) >= %s) or (geometrytype(geometria) = ''LINESTRING'' and st_3dlength(geometria) >= 0.2)', tabela, cvalue) INTO good_aux;
 		-- RAISE NOTICE 'Good is % for table %', good_aux, rec.f_table_name;
 		count_good := count_good + good_aux;
-		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela, cvalue) INTO bad_aux;
+		execute format('select count(*) from {schema}.%I where (geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s) or (geometrytype(geometria) = ''LINESTRING'' and st_3dlength(geometria) < 0.2)', tabela, cvalue) INTO bad_aux;
 		-- RAISE NOTICE 'Bad is % for table %', bad_aux, rec.f_table_name;
 		count_bad := count_bad + bad_aux;
 	
@@ -899,7 +899,7 @@ begin
 
 	delete from errors.ponto_cotado_rg_4_1;
 
-	select count(*) from {schema}.ponto_cotado into count_all;
+	select count(*) from {schema}.ponto_cotado pc, {schema}.area_trabalho adt where St_Contains(adt.geometria, pc.geometria) into count_all;
 
 	WITH dumped_points AS (
 		select
@@ -932,10 +932,10 @@ begin
 		INSERT INTO errors.ponto_cotado_rg_4_1
 	    SELECT pc.*
 	    FROM {schema}.ponto_cotado pc, {schema}.area_trabalho adt
-	    WHERE pc.identificador IN (
+	    WHERE St_Contains(adt.geometria, pc.geometria) and pc.identificador IN (
 			SELECT identificador
 	        FROM min_z_distances
-	        WHERE min_z_distance > valor_equi) or not St_Contains(adt.geometria, pc.geometria)
+	        WHERE min_z_distance > valor_equi)
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_rows into count_bad;
@@ -967,7 +967,7 @@ begin
 
 	delete from errors.ponto_cotado_rg_4_1;
 
-	select count(*) from {schema}.ponto_cotado into count_all;
+	select count(*) from {schema}.ponto_cotado pc, {schema}.area_trabalho adt where St_Contains(adt.geometria, pc.geometria) into count_all;
 
 	WITH dumped_points AS (
 		select
@@ -1001,10 +1001,10 @@ begin
 		INSERT INTO errors.ponto_cotado_rg_4_1
 	    SELECT pc.*
 	    FROM {schema}.ponto_cotado pc, {schema}.area_trabalho adt
-	    WHERE pc.identificador IN (
+	    WHERE St_Contains(adt.geometria, pc.geometria) and pc.identificador IN (
 			SELECT identificador
 	        FROM min_z_distances
-	        WHERE min_z_distance > valor_equi) or not St_Contains(adt.geometria, pc.geometria)
+	        WHERE min_z_distance > valor_equi)
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_rows into count_bad;
@@ -2414,19 +2414,24 @@ begin
 			SELECT concat( identificador::text, '-', path[1]::text) as identificador, geom::geometry(POINTZ, 3763) as geometria
 			FROM (
 				SELECT cdn.identificador, (ST_DumpPoints(ST_LineInterpolatePoints(geometria, least(4.0/st_length(geometria), 1.0)))).*
-					from (select identificador, (ST_Dump(geometria)).geom as geometria from public.curva_de_nivel) as cdn
+					from (select identificador, (ST_Dump(geometria)).geom as geometria from {schema}.curva_de_nivel) as cdn
 			) as pontos
 			union SELECT concat( identificador::text, '-0') as identificador, ST_PointN(geometria, 1) as geometria
-				from public.curva_de_nivel cdn
+				from {schema}.curva_de_nivel cdn
 			union SELECT concat( identificador::text, '-', ST_NPoints(geometria)) as identificador, ST_PointN(geometria, -1) as geometria
-				from public.curva_de_nivel cdn;
+				from {schema}.curva_de_nivel cdn;
 
 		for atgr in select * from validation.area_trabalho_grid loop
 			insert into validation.curva_nivel_tin (geometria)
 			with tin as (
 				SELECT ST_DelaunayTriangles(st_union(geometria)) as geom
-				from validation.curva_de_nivel_points_interval_v2
-				where ST_Intersects(geometria, atgr.geometria)
+				from (
+					select geometria from validation.curva_de_nivel_points_interval_v2
+						where ST_Intersects(geometria, atgr.geometria)
+					union
+					select geometria from {schema}.ponto_cotado
+						where ST_Intersects(geometria, atgr.geometria)
+				)
 			) select (ST_Dump(geom)).geom As geometria from tin;
 		end loop;
 
