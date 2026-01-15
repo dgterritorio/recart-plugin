@@ -3974,6 +3974,37 @@ $$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$
 $$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$s'::json->>'re7_8_ndd2')::int, '%1$s'::geometry)$$ );
 
 
+delete from validation.rules where code = 'pq1_1';
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('pq1_1', '{v1.1.2}', 'Comissão de objetos',
+$$Avalia o excesso e a duplicação de objetos.$$,
+$$Todos os objetos.$$,
+$$select * from validation.pq1_1_validation ()$$,
+$$select * from validation.pq1_1_validation ()$$ );
+
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('pq1_1', '{v2.0.1,v2.0.2}', 'Comissão de objetos',
+$$Avalia o excesso e a duplicação de objetos.$$,
+$$Todos os objetos.$$,
+$$select * from validation.pq1_1_validation_v2 ()$$,
+$$select * from validation.pq1_1_validation_v2 ()$$ );
+
+delete from validation.rules_area where code = 'pq1_1';
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2, is_global )
+values ('pq1_1', '{v1.1.2}', 'Comissão de objetos',
+$$Avalia o excesso e a duplicação de objetos.$$,
+$$Todos os objetos.$$,
+$$select * from validation.pq1_1_validation ()$$,
+$$select * from validation.pq1_1_validation ()$$, true );
+
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2, is_global )
+values ('pq1_1', '{v2.0.1,v2.0.2}', 'Comissão de objetos',
+$$Avalia o excesso e a duplicação de objetos.$$,
+$$Todos os objetos.$$,
+$$select * from validation.pq1_1_validation_v2 ()$$,
+$$select * from validation.pq1_1_validation_v2 ()$$, true );
+
+
 delete from validation.rules where code = 'pq2_1_1';
 insert into validation.rules ( code, name, rule, scope, query, query_nd2 )
 values ('pq2_1_1', 'Conformidade dos dados',

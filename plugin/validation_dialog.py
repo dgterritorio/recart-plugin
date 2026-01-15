@@ -66,6 +66,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.validateProcess = None
         self.createProcess = None
 
+        self.structure_errors = []
+        self.value_list_errors = []
+
         self.pgutils = None
         self.ruleSetup = False
         self.baseSetup = False
@@ -469,6 +472,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     def createTable(self, layout, offsetx, offsety, size, columns, rows):
         table = QgsLayoutItemTextTable(layout)
+        table.setWrapBehavior(1)
         layout.addMultiFrame(table)
 
         table.setColumns(columns)
@@ -514,6 +518,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
             rq = rq + " (REGEXP_MATCHES(relname, '[a-z_0-9]+_(rg[0-9_]*)|[a-z_0-9]+_(re[0-9_]*)'))[1] as codigo1, (REGEXP_MATCHES(relname, '[a-z_0-9]+_(rg[0-9_]*)|[a-z_0-9]+_(re[0-9_]*)'))[2] as codigo2, n_live_tup"
             rq = rq + " FROM pg_stat_user_tables where schemaname = 'errors' and n_live_tup > 0 ORDER BY codigo1, codigo2, n_live_tup DESC;"
             report = self.pgutils.run_query_with_conn(self.actconn, rq)
+            
+            vq = "select tabela, atributo, valor, numero from validation.consistencia_valores_report order by tabela, atributo, valor;"
+            vreport = self.pgutils.run_query_with_conn(self.actconn, vq)
 
             times = datetime.now()
             footnote = times.strftime("%Y-%m-%d %H:%M:%S") +\
@@ -584,13 +591,27 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.createTable(layout, 12, sp, QgsLayoutSize(
                 270, 210), cols, summary[:25])
             self.createTable(layout, 12, 210+20, QgsLayoutSize(
-                270, 210), cols, summary[25:])
+                270, 210), cols, summary[25:50])
 
             time = QgsLayoutItemLabel(layout)
             time.setText(footnote)
             time.setFont(QFont('Arial', 10, 25))
             time.adjustSizeToText()
             time.attemptMove(QgsLayoutPoint(8, 220+page.pageSize().height()-8))
+            layout.addItem(time)
+
+            page3 = QgsLayoutItemPage(layout)
+            page3.setPageSize('A4', QgsLayoutItemPage.Landscape)
+            pages.addPage(page3)
+
+            self.createTable(layout, 12, 420+20, QgsLayoutSize(
+                270, 210), cols, summary[50:])
+
+            time = QgsLayoutItemLabel(layout)
+            time.setText(footnote)
+            time.setFont(QFont('Arial', 10, 25))
+            time.adjustSizeToText()
+            time.attemptMove(QgsLayoutPoint(8, 440+page.pageSize().height()-8))
             layout.addItem(time)
 
             # protect case where there is nothing to report
@@ -616,7 +637,104 @@ class ValidationDialog(QDialog, FORM_CLASS):
                         else:
                             themes[key].append(linha)
 
-                tabOff = 420
+                tabOff = 630
+                if len(self.structure_errors) > 0:
+                    npage = QgsLayoutItemPage(layout)
+                    npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
+                    pages.addPage(npage)
+
+                    section = QgsLayoutItemLabel(layout)
+                    section.setText('Erros de Estrutura da Base de Dados')
+                    section.setFont(QFont('Arial', 14, 75))
+                    section.adjustSizeToText()
+                    section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
+                    layout.addItem(section)
+
+                    cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn()]
+                    cols[0].setHeading("Tabela")
+                    cols[0].setWidth(80)
+                    cols[1].setHeading("Campos esperados")
+                    cols[1].setWidth(160)
+
+                    self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
+                                    cols, self.structure_errors)
+
+                    time = QgsLayoutItemLabel(layout)
+                    time.setText(footnote)
+                    time.setFont(QFont('Arial', 10, 25))
+                    time.adjustSizeToText()
+                    time.attemptMove(QgsLayoutPoint(8, 230+tabOff))
+                    layout.addItem(time)
+
+                    tabOff = tabOff + 220
+
+                if len(self.value_list_errors) > 0:
+                    npage = QgsLayoutItemPage(layout)
+                    npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
+                    pages.addPage(npage)
+
+                    section = QgsLayoutItemLabel(layout)
+                    section.setText('Erros nas Listas de Valores')
+                    section.setFont(QFont('Arial', 14, 75))
+                    section.adjustSizeToText()
+                    section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
+                    layout.addItem(section)
+
+                    cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn(), QgsLayoutTableColumn()]
+                    cols[0].setHeading("Tabela")
+                    cols[0].setWidth(80)
+                    cols[1].setHeading("Identificador esperado")
+                    cols[1].setWidth(40)
+                    cols[2].setHeading("Descrição esperada")
+                    cols[2].setWidth(120)
+
+                    self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
+                                    cols, self.value_list_errors)
+
+                    time = QgsLayoutItemLabel(layout)
+                    time.setText(footnote)
+                    time.setFont(QFont('Arial', 10, 25))
+                    time.adjustSizeToText()
+                    time.attemptMove(QgsLayoutPoint(8, 230+tabOff))
+                    layout.addItem(time)
+
+                    tabOff = tabOff + 220
+
+                if vreport is not None and len(vreport) > 0:
+                    npage = QgsLayoutItemPage(layout)
+                    npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
+                    pages.addPage(npage)
+
+                    section = QgsLayoutItemLabel(layout)
+                    section.setText('Erros de Consistência de Domínio')
+                    section.setFont(QFont('Arial', 14, 75))
+                    section.adjustSizeToText()
+                    section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
+                    layout.addItem(section)
+
+                    cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn(),
+                            QgsLayoutTableColumn(), QgsLayoutTableColumn()]
+                    cols[0].setHeading("Objeto")
+                    cols[0].setWidth(80)
+                    cols[1].setHeading("Atributo")
+                    cols[1].setWidth(85)
+                    cols[2].setHeading("Erro")
+                    cols[2].setWidth(30)
+                    cols[3].setHeading("Número de Ocorrências")
+                    cols[3].setWidth(50)
+
+                    self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
+                                    cols, vreport)
+
+                    time = QgsLayoutItemLabel(layout)
+                    time.setText(footnote)
+                    time.setFont(QFont('Arial', 10, 25))
+                    time.adjustSizeToText()
+                    time.attemptMove(QgsLayoutPoint(8, 230+tabOff))
+                    layout.addItem(time)
+
+                    tabOff = tabOff + 220
+
                 for thm in sorted(themes):
                     npage = QgsLayoutItemPage(layout)
                     npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
@@ -626,7 +744,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     section.setText('Erros no Tema ' + str(thm))
                     section.setFont(QFont('Arial', 14, 75))
                     section.adjustSizeToText()
-                    section.attemptMove(QgsLayoutPoint(8, 30 + tabOff))
+                    section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
                     layout.addItem(section)
 
                     cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn(),
@@ -640,14 +758,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     cols[3].setHeading("Erros")
                     cols[3].setWidth(20)
 
-                    self.createTable(layout, 12, 30 + tabOff, QgsLayoutSize(270, 190),
+                    self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
                                     cols, themes[thm])
 
                     time = QgsLayoutItemLabel(layout)
                     time.setText(footnote)
                     time.setFont(QFont('Arial', 10, 25))
                     time.adjustSizeToText()
-                    time.attemptMove(QgsLayoutPoint(8, 220+tabOff))
+                    time.attemptMove(QgsLayoutPoint(8, 230+tabOff))
                     layout.addItem(time)
 
                     tabOff = tabOff + 220
@@ -699,6 +817,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.updateTable()
         self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
         self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
+
+        self.structure_errors = self.validateProcess.structure_errors
+        self.value_list_errors = self.validateProcess.value_list_errors
 
         if not self.validateProcess.cancel is True:
             # conString = qgis_configs.getConnString(self, self.getConnection())
@@ -1129,6 +1250,9 @@ class ValidateProcess(QThread):
         self.ndd1 = ndd1
         self.vrs = vrs
         
+        self.structure_errors = []
+        self.value_list_errors = []
+        
         self.is_sections = is_sections
         self.areaTable = areaTable
         self.args = args if args is not None else {}
@@ -1161,6 +1285,11 @@ class ValidateProcess(QThread):
 
             validated = {}
             interrupt = False
+
+            # validate values
+            vndd = '1' if self.ndd1 == 'NdD1' else '2'
+            res = self.pgutils.run_query_with_conn(self.actconn,
+                            'select validation.atualiza_consistencia_valores_report(\'{}\', \'{}\');'.format(vndd, self.vrs))
 
             # validate structure
             base_dir = os.path.dirname(os.path.realpath(__file__))+'/convert/base/'+self.vrs
@@ -1202,9 +1331,10 @@ class ValidateProcess(QThread):
                         res = self.pgutils.run_query_with_conn(self.actconn,
                             'select validation.validate_table_columns(\'{}\', \'{}\');'.format(ccname, camposFrmt))
                         if res and len(res) > 0 and res[0][0] == False:
+                            self.structure_errors.append([ccname, ' | '.join([x['nome'] for x in campos])])
                             interrupt = True
                             raise Exception(
-                                "A tabela {} não tem os campos esperados:\n\t{}".format(ccname, camposFrmt))
+                                "A tabela {} não tem os campos esperados:\n\t{}\nFuncionamento correto das validações não está assegurado.".format(ccname, camposFrmt))
 
                         for lista in objecto['listas de códigos']:
                             ltnome = re.sub(r'(?<!^)(?=[A-Z])', '_', lista['nome']).lower()
@@ -1217,6 +1347,8 @@ class ValidateProcess(QThread):
                             res = self.pgutils.run_query_with_conn(self.actconn,
                                 'select validation.validate_table_rows(\'{}\', \'{}\');'.format(ltnome, valores))
                             if res and len(res) > 0 and res[0][0] != []:
+                                for err in res[0][0]:
+                                    self.value_list_errors.append([ltnome, err['identificador'], err['descricao']])
                                 interrupt = True
                                 raise Exception(
                                     "A lista de valores {} não tem os valores esperados para as seguintes linhas:\n\t{}".format(ltnome, res[0][0]))
