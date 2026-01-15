@@ -69,6 +69,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.displayLayerList = displayList
         # para se adivinhar o CRS da fonte de dados
         self.srs = ''
+        self.postgisUtils = None
 
     def showEvent(self, event):
         super(MainDialog, self).showEvent(event)
@@ -135,9 +136,9 @@ class MainDialog(QDialog, FORM_CLASS):
                     self.fillDataSources()
                     return
 
-                utils = PostgisUtils(self, conString)
+                self.postgisUtils = PostgisUtils(self, conString)
                 try:
-                    schemas = utils.read_db_schemas()
+                    schemas = self.postgisUtils.read_db_schemas_keep_conn()
                     if not len(schemas) > 0:
                         self.plainTextEdit.appendPlainText(
                             "[Aviso] {0}\n".format("Conexão inválida"))
@@ -262,7 +263,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.exportLayersProcess = ExportLayersProcess(
             self.loadLayersProcess.conString, self.loadLayersProcess.schema,
             self.dataSource, layerList, outFormat, outEncoding, self.mQgsFileWidget.filePath(), self.aliasCheckBox.isChecked(), 
-            srsid.postgisSrid(), self.vrs)
+            srsid.postgisSrid(), self.vrs, self.postgisUtils)
 
         self.exportLayersProcess.signal.connect(self.writeText)
         self.exportLayersProcess.addLayer.connect(self.addLayer)
@@ -409,7 +410,7 @@ class ExportLayersProcess(QThread):
     addLayer = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject',
                           'PyQt_PyObject', 'PyQt_PyObject')
 
-    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid, vrs):
+    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid, vrs, postgisUtils):
         QThread.__init__(self)
 
         self.conn = connection
@@ -422,6 +423,7 @@ class ExportLayersProcess(QThread):
         self.exportAlias = exportAlias
         self.exportSrsId = srsid
         self.vrs = vrs
+        self.postgisUtils = postgisUtils
 
         if not self.outDir:
             self.outDir = str(Path.home())
@@ -474,24 +476,28 @@ class ExportLayersProcess(QThread):
         # Injetar layer_styles.sql na BD
 
         bp = os.path.dirname(os.path.realpath(__file__))
-        utils = PostgisUtils(self, self.conn)
-        try:
-            with open(bp + '/convert/processing/{0}/layer_styles.sql'.format(self.vrs), encoding='utf-8') as pp_file:
-                pp_src = pp_file.read()
-                styles = re.sub(r"{schema}", self.schema, pp_src)
-                utils.run_query(styles)
-        except Exception as e:
-            self.write(
-                'Erro a inserir os estilos em base de dados: \'' + str(e) + '\'')
+        if self.schema in self.postgisUtils.permissions and self.postgisUtils.permissions[self.schema]['create'] is True:
+            self.actconn = self.postgisUtils.get_or_create_connection()
+            try:
+                with open(bp + '/convert/processing/{0}/layer_styles.sql'.format(self.vrs), encoding='utf-8') as pp_file:
+                    pp_src = pp_file.read()
+                    styles = re.sub(r"{schema}", self.schema, pp_src)
+                    self.postgisUtils.run_query_with_conn(self.actconn, styles)
+            except Exception as e:
+                self.write(
+                    'Erro a inserir os estilos em base de dados: \'' + str(e) + '\'')
 
-        try:
-            with open(bp + '/convert/processing/aux_views.sql', encoding='utf-8') as av_file:
-                av_src = av_file.read()
-                views = re.sub(r"{schema}", self.schema, av_src)
-                utils.run_query(views, None, True)
-        except Exception as e:
+            try:
+                with open(bp + '/convert/processing/aux_views.sql', encoding='utf-8') as av_file:
+                    av_src = av_file.read()
+                    views = re.sub(r"{schema}", self.schema, av_src)
+                    self.postgisUtils.run_query_with_conn(self.actconn, views, None, True)
+            except Exception as e:
+                self.write(
+                    'Erro a criar views auxiliares: \'' + str(e) + '\'')
+        else:
             self.write(
-                'Erro a criar views auxiliares: \'' + str(e) + '\'')
+                'Aviso: o utilizador não tem permissões para criar estilos e views auxiliares na base de dados')
 
 
         layer_was_added_spy = QSignalSpy(QgsProject.instance().layerWasAdded)

@@ -161,7 +161,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     # a checkbox está disabled na UI, pelo que este método nunca é invocado
     def validate3dChange(self, state):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         if state is False and self.ruleSetup:
             try:
                 self.pgutils.run_query_with_conn(self.actconn,
@@ -175,7 +175,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.tabWidget.setCurrentIndex(1)
 
     def validateAllChange(self, state):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         if state is True and self.ruleSetup:
             try:
                 self.pgutils.run_query_with_conn(self.actconn,
@@ -206,7 +206,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.tabWidget.setCurrentIndex(1)
 
     def setRuleState(self, state):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         rcode = self.sender().property("code")
         rstate = 'true' if state else 'false'
 
@@ -224,7 +224,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.tabWidget.setCurrentIndex(1)
 
     def updateTable(self):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         try:
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             report = self.pgutils.run_query_with_conn(self.actconn,
@@ -262,7 +262,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.tabWidget.setCurrentIndex(1)
 
     def getAreaTables(self):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         tables = []
 
         self.areaComboBox.clear()
@@ -296,7 +296,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.comboBoxOps.addItems(['Igual', 'Diferente'])
 
     def areaTableChange(self, text):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         try:
             aux = text.split('.')
             if len(aux) != 2:
@@ -336,7 +336,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.tabWidget.setCurrentIndex(1)
 
     def testDbVersion(self):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         finddbquery = 'select count(*) from {schema}.valor_construcao_linear;'
         
         self.schema = str(self.schemaName.currentText())
@@ -371,7 +371,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.vrsCombo.setEnabled(True)
 
     def testValidationRules(self):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         self.writeText("A carregar a versão das regras {}...".format(self.vrs if self.vrs is not None else 'Desconhecida'))
         try:
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
@@ -438,10 +438,16 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     #     "New connection to: {0}\n".format(conString))
                     self.pgutils = PostgisUtils(self, self.conString)
                 
-                    schemas = self.pgutils.read_db_schemas()
+                    schemas = self.pgutils.read_db_schemas_keep_conn()
                     # self.plainTextEdit.appendPlainText(
                     #     "Schemas: {0}\n".format(','.join(schemas)))
                     # self.schemaName.clear()
+                    if not len(schemas) > 0:
+                        self.plainTextEdit.appendPlainText("[Aviso] {0}\n".format("Conexão inválida"))
+                        self.fillDataSources()
+                        self.tabWidget.setCurrentIndex(1)
+                        return
+
                     self.schemaName.addItems(schemas)
                     self.schemaName.setCurrentIndex(schemas.index('public') if 'public' in schemas else 0)
 
@@ -503,7 +509,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         return fn
 
     def exportRel(self):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         if not self.ruleSetup:
             self.writeText("[Aviso] Não é possível imprimir relatório")
             return
@@ -797,7 +803,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.testDbVersion()
 
     def setupRules(self):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         self.bp = os.path.dirname(os.path.realpath(__file__))
         self.schema = str(self.schemaName.currentText())
         try:
@@ -867,7 +873,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
             schema = str(self.schemaName.currentText())
             # self.vrs = self.createProcess.vrs
             self.baseSetup = True
-            
+
+            if self.createProcess.success is True:
+                self.pgutils.permissions['validation'] = {'create': True, 'read': True}
+
             args = {
                 'rg1_ndd1': self.rg1_ndd1.text(),
                 'rg1_ndd2': self.rg1_ndd2.text(),
@@ -887,7 +896,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 fltr = "{} {} '{}'".format(self.mFieldComboBox.currentText(), self.getOp(self.comboBoxOps.currentText()),
                                            self.fltrValue.text())
 
-            self.validateProcess = ValidateProcess(self.conString, schema, self.ndCombo.currentText(), self.vrs, self.is_sections, self.areaComboBox.currentText(), args, fltr)
+            self.validateProcess = ValidateProcess(self.conString, schema, self.ndCombo.currentText(), self.vrs, self.is_sections, self.areaComboBox.currentText(), args, fltr, self.pgutils)
 
             self.validateProcess.signal.connect(self.writeText)
             self.validateProcess.finished.connect(self.finishedValidate)
@@ -988,7 +997,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
             valid3d = True #self.checkBox.isChecked()
 
-            self.createProcess = CreateProcess(self.conString, schema, valid3d, self.srsid, self.vrs, self.baseSetup)
+            self.createProcess = CreateProcess(self.conString, schema, valid3d, self.srsid, self.vrs, self.baseSetup, self.pgutils)
 
             self.createProcess.signal.connect(self.writeText)
             self.createProcess.finished.connect(self.finishedCreate)
@@ -1055,7 +1064,7 @@ class AddLayersProcess(QThread):
         self.signal.emit('{} {}'.format(formated, text))
 
     def run(self):
-        self.actconn = self.pgutils.get_connection()
+        self.actconn = self.pgutils.get_or_create_connection()
         try:
             tables = self.pgutils.run_query_with_conn(self.actconn,
                 'WITH tbl AS (\
@@ -1151,7 +1160,7 @@ class ResetProcess(QThread):
             cnt = re.sub(r"{schema}", self.schema, cnt)
             cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-            self.actconn = self.pgutils.get_connection()
+            self.actconn = self.pgutils.get_or_create_connection()
             self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
 
             if file is not None:
@@ -1165,7 +1174,7 @@ class ResetProcess(QThread):
 class CreateProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, conn, schema, valid3d, srsid, vrs, baseSetup=False):
+    def __init__(self, conn, schema, valid3d, srsid, vrs, baseSetup=False, pgutils=None):
         QThread.__init__(self)
 
         self.conn = conn
@@ -1174,12 +1183,13 @@ class CreateProcess(QThread):
         self.srsid = srsid
         
         self.baseSetup = baseSetup
+        self.success = False
 
         self.bp = os.path.dirname(os.path.realpath(__file__))
 
         self.cancel = False
 
-        self.pgutils = PostgisUtils(self, conn)
+        self.pgutils = pgutils if pgutils is not None else PostgisUtils(self, conn)
 
         self.actconn = None
         self.vrs = vrs
@@ -1201,7 +1211,7 @@ class CreateProcess(QThread):
 
     def run(self):
         try:
-            self.actconn = self.pgutils.get_connection()
+            self.actconn = self.pgutils.get_or_create_connection()
 
             # test database version
             # finddbquery = 'select count(*) from {schema}.valor_construcao_linear;'
@@ -1215,24 +1225,29 @@ class CreateProcess(QThread):
             self.write("\tBase de dados com versão " + self.vrs)
 
             if self.baseSetup is not True:
-                file = None
-                # if self.valid3d is True:
-                with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
-                    cnt = f.read()
-                cnt = re.sub(r"{schema}", self.schema, cnt)
-                cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
+                if ('validation' not in self.pgutils.permissions and len([x for x in self.pgutils.permissions.values() if 'create' in x and x['create']]) > 0) or (
+                        'validation' in self.pgutils.permissions and self.pgutils.permissions['validation']['create'] is True):
+                    file = None
+                    # if self.valid3d is True:
+                    with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:
+                        cnt = f.read()
+                    cnt = re.sub(r"{schema}", self.schema, cnt)
+                    cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-                self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
-                # else:
-                #     file = open(self.bp + '/validation_setup_no3d.sql', "r", encoding='utf-8')
-                #     cnt = file.read()
-                #     cnt = re.sub(r"{schema}", self.schema, cnt)
-                #     cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
+                    self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
+                    # else:
+                    #     file = open(self.bp + '/validation_setup_no3d.sql', "r", encoding='utf-8')
+                    #     cnt = file.read()
+                    #     cnt = re.sub(r"{schema}", self.schema, cnt)
+                    #     cnt = re.sub(r", 3763", ', ' + str(self.srsid), cnt)
 
-                #     self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
+                    #     self.pgutils.run_query_with_conn(self.actconn, cnt, None, True)
 
-                if file is not None:
-                    file.close()
+                    if file is not None:
+                        file.close()
+                    self.success = True
+                else:
+                    self.write("\t[Erro] Sem permissões para criar o esquema de validação.")
         except Exception as e:
             if not self.cancel:
                 self.write("[Erro 10]")
@@ -1242,7 +1257,7 @@ class CreateProcess(QThread):
 class ValidateProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, conn, schema, ndd1, vrs, is_sections=False, areaTable=None, args=None, fltrValue=None):
+    def __init__(self, conn, schema, ndd1, vrs, is_sections=False, areaTable=None, args=None, fltrValue=None, pgutils=None):
         QThread.__init__(self)
 
         self.conn = conn
@@ -1258,7 +1273,7 @@ class ValidateProcess(QThread):
         self.args = args if args is not None else {}
         self.fltrValue = fltrValue
 
-        self.pgutils = PostgisUtils(self, conn)
+        self.pgutils = pgutils if pgutils is not None else PostgisUtils(self, conn)
 
         self.actconn = None
 
@@ -1281,7 +1296,12 @@ class ValidateProcess(QThread):
 
     def run(self):
         try:
-            self.actconn = self.pgutils.get_connection()
+            if 'validation' not in self.pgutils.permissions or ('validation' in self.pgutils.permissions
+                    and self.pgutils.permissions['validation']['create'] is not True):
+                self.write("\t[Erro] Sem permissões para executar as validações.")
+                return
+
+            self.actconn = self.pgutils.get_or_create_connection()
 
             validated = {}
             interrupt = False
