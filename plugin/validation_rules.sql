@@ -1608,7 +1608,7 @@ $$"Curso de água - eixo" e "Curso de água - área".$$, 'curso_de_agua_area' );
 -- O âmbito de aplicação são duas tabelas e não uma
 -- O exemplo de estarreja2020 tem uma curso_de_agua_area com três fluxos diferentes. É excelente para desenvolver um teste.
 -- Para já, neste teste limitado não se testa se os eixos são fictícios
--- Testar fictícios dentro e ausência de fisctícios fora.
+-- Testar fictícios dentro e ausência de fictícios fora.
 delete from validation.rules where code = 're4_5_1';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_5_1', 'Representação do eixo do curso de água (Parte 1)', 
@@ -1661,28 +1661,70 @@ from total, good, bad $$,
 $$select * from {schema}.curso_de_agua_area cdaa 
 where st_intersects(geometria, '%1$s') and not exists (select * from {schema}.curso_de_agua_eixo cdae where st_within( cdae.geometria, cdaa.geometria))$$ );
 
--- TODO
 -- Garantir a monotonia de uma LineString
--- As LineString estão orientadas?
--- Percorrer todos os vértices da geometria, ou seja, todos os pontos da LineString
 delete from validation.rules where code = 're4_5_2';
-insert into validation.rules ( code, name, rule, scope, entity ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_5_2', 'Representação do eixo do curso de água (Parte 2 - Vértices)', 
 $$Todos os vértices do "Curso de água - eixo" devem ser coerentes entre si
 também na componente tridimensional.$$,
-$$"Curso de água - eixo".$$, 'curso_de_agua_area' );
+$$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
+$$with
+aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
+pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
+teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+total as (select count(*) from {schema}.curso_de_agua_eixo),
+good as (select count(*) from teste where comparacao),
+bad as (select count(*) from teste where not comparacao)
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$with
+aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
+pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
+teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+total as (select count(*) from {schema}.curso_de_agua_eixo),
+good as (select count(*) from teste where comparacao),
+bad as (select count(*) from teste where not comparacao)
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$with
+aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
+pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
+teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+bad as (select identificador from teste where not comparacao)
+select * from {schema}.curso_de_agua_eixo where identificador in (select * from bad) $$ );
 
 delete from validation.rules_area where code = 're4_5_2';
-insert into validation.rules_area ( code, name, rule, scope, entity ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
 values ('re4_5_2', 'Representação do eixo do curso de água (Parte 2 - Vértices)', 
 $$Todos os vértices do "Curso de água - eixo" devem ser coerentes entre si
 também na componente tridimensional.$$,
-$$"Curso de água - eixo".$$, 'curso_de_agua_area' );
+$$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
+$$with
+aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
+pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
+teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+total as (select count(*) from {schema}.curso_de_agua_eixo),
+good as (select count(*) from teste where comparacao),
+bad as (select count(*) from teste where not comparacao)
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$with
+aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
+pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
+teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+total as (select count(*) from {schema}.curso_de_agua_eixo),
+good as (select count(*) from teste where comparacao),
+bad as (select count(*) from teste where not comparacao)
+select total.count as total, good.count as good, bad.count as bad
+from total, good, bad $$,
+$$with
+aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
+pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
+teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+bad as (select identificador from teste where not comparacao)
+select * from {schema}.curso_de_agua_eixo where identificador in (select * from bad) $$ );
 
 -- TODO
--- O que podemos testar? Se há eixos a chegar ou a sair de uma água lêntica?
--- Testar se há águas lênticas isoladas...
--- Assumir que tem que ter
 delete from validation.rules where code = 're4_6';
 insert into validation.rules ( code, name, rule, scope, entity ) 
 values ('re4_6', 'Representação do curso de água quando atravessa uma massa de água', 
@@ -1702,9 +1744,6 @@ eixo" (Figura 29).$$,
 $$"Curso de água - eixo" e "Água lêntica".$$, 'curso_de_agua_eixo' );
 
 -- TODO
--- Tem alaguma coisa a ver com a verificação em re4_5_1
--- Eventualmente usar o pgRouting para estabelecer a rede entre os pontos de entrada e de saída
--- E depois, confirmar que todos os troços estão dentro
 delete from validation.rules where code = 're4_7';
 insert into validation.rules ( code, name, rule, scope, entity ) 
 values ('re4_7', 'Traçado do eixo do curso de água quando atravessa uma massa de água', 
