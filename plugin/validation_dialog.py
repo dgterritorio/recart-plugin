@@ -30,7 +30,7 @@ from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QHeaderV
 from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QMetaType
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QFont
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
+from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
 from qgis.utils import iface
 
 from . import qgis_configs
@@ -332,12 +332,12 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.changeField(fields.field(0).name())
         except Exception as e:
             self.writeText("[Erro 14]")
-            self.writeText(("\tException: {}".format(e)))
+            self.writeText(("\tException: {} {}".format( Qgis.QGIS_VERSION, e)))
             self.tabWidget.setCurrentIndex(1)
 
     def testDbVersion(self):
         self.actconn = self.pgutils.get_or_create_connection()
-        finddbquery = 'select count(*) from {schema}.valor_construcao_linear;'
+        finddbquery = 'select count(*), substring( version() from \'P\\w+ \\w+\') as versao from {schema}.valor_construcao_linear;'
         
         self.schema = str(self.schemaName.currentText())
         
@@ -354,7 +354,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     self.vrs = 'v2.0.2'
                 else:
                     self.vrs = 'Desconhecida'                
-                self.writeText("[Sucesso] {0}: {1}\n".format("Versão das regras: ", self.vrs))
+                self.writeText("[Sucesso] Versão das regras: {0} Versão {1}\n".format(self.vrs, result[0][1]))
                 self.vrsCombo.setCurrentText(self.vrs)
             else:
                 self.writeText("[Aviso] {0}\n".format("Não foi possível detetar a versão das regras"))
@@ -372,6 +372,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     def testValidationRules(self):
         self.actconn = self.pgutils.get_or_create_connection()
+        self.writeText("recartDGT v{}".format( self.iface.pluginManagerInterface().pluginMetadata('recartDGT')['version_installed'] ))
         self.writeText("A carregar a versão das regras {}...".format(self.vrs if self.vrs is not None else 'Desconhecida'))
         try:
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
