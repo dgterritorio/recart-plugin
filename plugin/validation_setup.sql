@@ -2431,7 +2431,7 @@ begin
 					union
 					select geometria from {schema}.ponto_cotado
 						where ST_Intersects(geometria, atgr.geometria)
-				)
+				) as foo
 			) select (ST_Dump(geom)).geom As geometria from tin;
 		end loop;
 
@@ -2472,8 +2472,7 @@ CREATE TABLE IF NOT EXISTS validation.interrupcao_fluxo AS (
 	) AS f
 );
 
-CREATE INDEX IF NOT EXISTS idx_val_curso_de_agua_eixo_geometria ON {schema}.curso_de_agua_eixo USING GIST (geometria);
-
+-- CREATE INDEX IF NOT EXISTS idx_val_curso_de_agua_eixo_geometria ON {schema}.curso_de_agua_eixo USING GIST (geometria);
 
 CREATE TABLE IF NOT EXISTS validation.consistencia_valores_def (
 	entidade text NULL,

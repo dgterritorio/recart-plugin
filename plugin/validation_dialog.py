@@ -874,8 +874,6 @@ class ValidationDialog(QDialog, FORM_CLASS):
             # self.vrs = self.createProcess.vrs
             self.baseSetup = True
 
-            if self.createProcess.success is True:
-                self.pgutils.permissions['validation'] = {'create': True, 'read': True}
 
             args = {
                 'rg1_ndd1': self.rg1_ndd1.text(),
@@ -1225,8 +1223,8 @@ class CreateProcess(QThread):
             self.write("\tBase de dados com versão " + self.vrs)
 
             if self.baseSetup is not True:
-                if ('validation' not in self.pgutils.permissions and len([x for x in self.pgutils.permissions.values() if 'create' in x and x['create']]) > 0) or (
-                        'validation' in self.pgutils.permissions and self.pgutils.permissions['validation']['create'] is True):
+                if ( len([x for x in self.pgutils.permissions.values() if 'createschema' in x and x['createschema']]) > 0 ):
+                    # self.write("\t[Info] Com permissões para criar o esquema de validação.")
                     file = None
                     # if self.valid3d is True:
                     with open(self.bp + '/validation_setup.sql', 'r', encoding='utf-8') as f:

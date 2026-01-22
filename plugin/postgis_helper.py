@@ -11,43 +11,45 @@ class PostgisUtils:
         self.permissions = {}
         self.conn = None
 
-    def read_db_schemas(self):
-        """Create, open and read schemas from database
-        and close connection"""
-        conn = None
-        schemas = []
-        try:
-            conn = psycopg2.connect(self.conString)
-            cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            getSchemas = """WITH "names"("name") AS (
-                          SELECT n.nspname AS "name"
-                            FROM pg_catalog.pg_namespace n
-                              WHERE n.nspname !~ '^pg_'
-                                AND n.nspname <> 'information_schema'
-                        ) SELECT "name",
-                          pg_catalog.has_schema_privilege(current_user, "name", 'CREATE') AS "create",
-                          pg_catalog.has_schema_privilege(current_user, "name", 'USAGE') AS "usage"
-                            FROM "names"
-                         where pg_catalog.has_schema_privilege(current_user, "name", 'USAGE')
-                         order by 1;"""
-            cur.execute(getSchemas)
-            rows = cur.fetchall()
-            for row in rows:
-                schemas.append(row["name"])
-                self.permissions[row["name"]] = {
-                    "create": row["create"],
-                    "usage": row["usage"]
-                }
-                # self.parent.plainTextEdit.appendPlainText(
-                #     "Schema: {0}\n".format(row["Name"]))
-        except (Exception, psycopg2.Error) as error:
-            raise ValueError(
-                "Error while connecting to PostgreSQL {0}".format(error))
-        finally:
-            if (conn):
-                cur.close()
-                conn.close()
-            return schemas
+    # def read_db_schemas(self):
+    #     """Create, open and read schemas from database
+    #     and close connection"""
+    #     conn = None
+    #     schemas = []
+    #     try:
+    #         conn = psycopg2.connect(self.conString)
+    #         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    #         getSchemas = """WITH "names"("name") AS (
+    #                       SELECT n.nspname AS "name"
+    #                         FROM pg_catalog.pg_namespace n
+    #                           WHERE n.nspname !~ '^pg_'
+    #                             AND n.nspname <> 'information_schema'
+    #                     ) SELECT "name",
+    #                       pg_catalog.has_schema_privilege(current_user, "name", 'CREATE') AS "create",
+    #                       pg_catalog.has_schema_privilege(current_user, "name", 'USAGE') AS "usage",
+    #                       has_database_privilege(current_database(), 'CREATE') AS "createschema"
+    #                         FROM "names"
+    #                      where pg_catalog.has_schema_privilege(current_user, "name", 'USAGE')
+    #                      order by 1;"""
+    #         cur.execute(getSchemas)
+    #         rows = cur.fetchall()
+    #         for row in rows:
+    #             schemas.append(row["name"])
+    #             self.permissions[row["name"]] = {
+    #                 "create": row["create"],
+    #                 "usage": row["usage"],
+    #                 "createschema": row["createschema"]
+    #             }
+    #             # self.parent.plainTextEdit.appendPlainText(
+    #             #     "Schema: {0}\n".format(row["Name"]))
+    #     except (Exception, psycopg2.Error) as error:
+    #         raise ValueError(
+    #             "Error while connecting to PostgreSQL {0}".format(error))
+    #     finally:
+    #         if (conn):
+    #             cur.close()
+    #             conn.close()
+    #         return schemas
 
     def read_db_schemas_keep_conn(self):
         """Create, open and read schemas from database"""
@@ -66,7 +68,8 @@ class PostgisUtils:
                                 AND n.nspname <> 'information_schema'
                         ) SELECT "name",
                           pg_catalog.has_schema_privilege(current_user, "name", 'CREATE') AS "create",
-                          pg_catalog.has_schema_privilege(current_user, "name", 'USAGE') AS "usage"
+                          pg_catalog.has_schema_privilege(current_user, "name", 'USAGE') AS "usage",
+                          has_database_privilege(current_database(), 'CREATE') AS "createschema"
                             FROM "names"
                          where pg_catalog.has_schema_privilege(current_user, "name", 'USAGE')
                          order by 1;"""
@@ -76,7 +79,8 @@ class PostgisUtils:
                 schemas.append(row["name"])
                 self.permissions[row["name"]] = {
                     "create": row["create"],
-                    "usage": row["usage"]
+                    "usage": row["usage"],
+                    "createschema": row["createschema"]
                 }
                 # self.parent.plainTextEdit.appendPlainText(
                 #     "Schema: {0}\n".format(row["Name"]))
