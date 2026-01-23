@@ -372,7 +372,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     def testValidationRules(self):
         self.actconn = self.pgutils.get_or_create_connection()
-        self.writeText("recartDGT v{}".format( self.iface.pluginManagerInterface().pluginMetadata('recartDGT')['version_installed'] ))
+
+        if self.iface.pluginManagerInterface().pluginMetadata('recartDGT') is not None:
+            self.writeText("recartDGT v{}".format(self.iface.pluginManagerInterface().pluginMetadata('recartDGT')['version_installed']))
+
         self.writeText("A carregar a versão das regras {}...".format(self.vrs if self.vrs is not None else 'Desconhecida'))
         try:
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"

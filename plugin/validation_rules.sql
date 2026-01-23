@@ -3378,13 +3378,13 @@ inexistentes as (
 		union
 		select st_endpoint(geometria) from {schema}.seg_via_rodov
 	)),
-segmentos as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, inexistentes i where st_contains(svf.geometria, i.geom))),
+segmentos as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, inexistentes i where st_contains(svf.geometria, i.geom)) as foo),
 linhas_duplicadas as (
 	select count(cf1.*) from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
 		where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
 			and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-total as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, all_intersecoes i where st_contains(svf.geometria, i.geom))),
-good as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, existentes i where st_contains(svf.geometria, i.geom))),
+total as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, all_intersecoes i where st_contains(svf.geometria, i.geom)) as foo),
+good as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, existentes i where st_contains(svf.geometria, i.geom)) as foo),
 bad as (select segmentos.count + linhas_duplicadas.count as count
 	from segmentos, linhas_duplicadas)
 select total.count as total, good.count as good, bad.count as bad
@@ -3449,13 +3449,13 @@ inexistentes as (
 		union
 		select st_endpoint(geometria) from {schema}.seg_via_rodov
 	)),
-segmentos as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, inexistentes i where ST_Intersects(svf.geometria, '%1$s'::geometry) and  st_contains(svf.geometria, i.geom))),
+segmentos as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, inexistentes i where ST_Intersects(svf.geometria, '%1$s'::geometry) and  st_contains(svf.geometria, i.geom)) as foo),
 linhas_duplicadas as (
 	select count(cf1.*) from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
 		where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
 			and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-total as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, all_intersecoes i where st_contains(svf.geometria, i.geom))),
-good as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, existentes i where st_contains(svf.geometria, i.geom))),
+total as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, all_intersecoes i where st_contains(svf.geometria, i.geom)) as foo),
+good as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, existentes i where st_contains(svf.geometria, i.geom)) as foo),
 bad as (select segmentos.count + linhas_duplicadas.count as count
 	from segmentos, linhas_duplicadas)
 select total.count as total, good.count as good, bad.count as bad
