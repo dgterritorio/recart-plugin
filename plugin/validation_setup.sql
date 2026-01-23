@@ -1514,7 +1514,7 @@ begin
 	loop
 		execute format('select count(*) from {schema}.%I', tabela) into all_aux;
 		execute format('SELECT COUNT(*) FROM (SELECT ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ''%1$s'' as ft
-			FROM %1$I GROUP BY geometria HAVING COUNT(*) > 1)', tabela) into bad_aux;
+			FROM %1$I GROUP BY geometria HAVING COUNT(*) > 1) as foo', tabela) into bad_aux;
 
 		execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
 		SELECT ''%1$s'', %2$s, %3$s, ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ST_Force3D(geometria)
@@ -1528,7 +1528,7 @@ begin
 	loop
 		execute format('select count(*) from {schema}.%I', tabela) into all_aux;
 		execute format('SELECT COUNT(*) FROM (SELECT ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ''%1$s'' as ft
-			FROM {schema}.%1$I GROUP BY geometria HAVING COUNT(*) > 1)', tabela) into bad_aux;
+			FROM {schema}.%1$I GROUP BY geometria HAVING COUNT(*) > 1) as foo', tabela) into bad_aux;
 
 		execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
 		SELECT ''%1$s'', %2$s, %3$s, ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, geometria
@@ -1548,7 +1548,7 @@ begin
 		FROM no_trans_rodov
 		GROUP BY geom HAVING COUNT(*) > 1) sub
 			where not((array_position(valor, ''4'') = 1 and array_position(valor, ''5'') = 2) or 
-				(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2)))') into bad_aux;
+				(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2))) as foo') into bad_aux;
 
 	execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
 	SELECT ''%1$s'', %2$s, %3$s, geom, ids, geometria
@@ -1608,7 +1608,7 @@ begin
 	loop
 		execute format('select count(*) from {schema}.%I', tabela) into all_aux;
 		execute format('SELECT COUNT(*) FROM (SELECT ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ''%1$s'' as ft
-			FROM %1$I GROUP BY geometria HAVING COUNT(*) > 1)', tabela) into bad_aux;
+			FROM %1$I GROUP BY geometria HAVING COUNT(*) > 1) as foo', tabela) into bad_aux;
 
 		execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
 		SELECT ''%1$s'', %2$s, %3$s, ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ST_Force3D(geometria)
@@ -1622,7 +1622,7 @@ begin
 	loop
 		execute format('select count(*) from {schema}.%I', tabela) into all_aux;
 		execute format('SELECT COUNT(*) FROM (SELECT ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, ''%1$s'' as ft
-			FROM {schema}.%1$I GROUP BY geometria HAVING COUNT(*) > 1)', tabela) into bad_aux;
+			FROM {schema}.%1$I GROUP BY geometria HAVING COUNT(*) > 1) as foo', tabela) into bad_aux;
 
 		execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
 		SELECT ''%1$s'', %2$s, %3$s, ST_AsText(geometria) AS geom, array_agg(identificador) AS ids, geometria
@@ -1642,7 +1642,7 @@ begin
 		FROM no_trans_rodov
 		GROUP BY geom HAVING COUNT(*) > 1) sub
 			where not((array_position(valor, ''4'') = 1 and array_position(valor, ''5'') = 2) or 
-				(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2)))') into bad_aux;
+				(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2))) as foo') into bad_aux;
 
 	execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
 	SELECT ''%1$s'', %2$s, %3$s, geom, ids, geometria
