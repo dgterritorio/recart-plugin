@@ -60,8 +60,7 @@ class MainDialog(QDialog, FORM_CLASS):
 
         self.iface = iface
         self.treeView.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
-        self.exportFormat.addItems(
-            ['Projeto QGIS', 'GeoPackage', 'Shapefile', 'GeoJSON'])
+        self.exportFormat.addItems(['GeoPackage', 'Shapefile', 'GeoJSON'])
         self.exportEncoding.addItems(
             ['utf-8', 'iso-8859-1'])
         self.vrsCombo.addItems(['Desconhecida', 'v1.1.2', 'v2.0.1', 'v2.0.2'])
@@ -255,15 +254,64 @@ class MainDialog(QDialog, FORM_CLASS):
         outEncoding = self.exportEncoding.currentText()
         layerList = []
 
+        if self.treeView.selectionModel() is None:
+            self.writeText( '[Aviso] Nenhuma camada selecionada para carregar' )
+            self.progressBar.setVisible(False)
+            return
+
         seli = self.treeView.selectionModel().selectedIndexes()
         for index in seli:
             name = index.data(Qt.ItemDataRole.DisplayRole)
             layerList.append(name)
 
+        if len(layerList) == 0:
+            self.writeText("[Aviso] Nenhuma camada selecionada para exportação")
+            self.progressBar.setVisible(False)
+            return
+
         self.exportLayersProcess = ExportLayersProcess(
             self.loadLayersProcess.conString, self.loadLayersProcess.schema,
             self.dataSource, layerList, outFormat, outEncoding, self.mQgsFileWidget.filePath(), self.aliasCheckBox.isChecked(), 
             srsid.postgisSrid(), self.vrs, self.postgisUtils)
+
+        self.exportLayersProcess.signal.connect(self.writeText)
+        self.exportLayersProcess.addLayer.connect(self.addLayer)
+        self.exportLayersProcess.finished.connect(self.finishedExportLayers)
+
+        self.exportLayersProcess.start()
+
+    def doLoadLayersQGIS(self):
+        self.iface.messageBar().pushMessage("Carregar camadas.")
+        self.writeText("A carregar camadas ...")
+        self.progressBar.setVisible(True)
+
+        srsid = self.mQgsProjectionSelectionWidget.crs()
+        # self.writeText( 'Exportar no SRS {}'.format( srsid.authid() ) )
+        self.writeText( 'Carregar no SRS {}'.format( srsid.postgisSrid() ) )
+
+        outFormat = self.exportFormat.currentText()
+        outEncoding = self.exportEncoding.currentText()
+        layerList = []
+
+        if self.treeView.selectionModel() is None:
+            self.writeText( '[Aviso] Nenhuma camada selecionada para carregar' )
+            self.progressBar.setVisible(False)
+            return
+
+        seli = self.treeView.selectionModel().selectedIndexes()
+        for index in seli:
+            name = index.data(Qt.ItemDataRole.DisplayRole)
+            layerList.append(name)
+
+        if len(layerList) == 0:
+            self.writeText( '[Aviso] Nenhuma camada selecionada para carregar' )
+            self.progressBar.setVisible(False)
+            return
+
+        self.exportLayersProcess = ExportLayersProcess(
+            self.loadLayersProcess.conString, self.loadLayersProcess.schema,
+            self.dataSource, layerList, outFormat, outEncoding, self.mQgsFileWidget.filePath(), self.aliasCheckBox.isChecked(), 
+            srsid.postgisSrid(), self.vrs, self.postgisUtils, True)
 
         self.exportLayersProcess.signal.connect(self.writeText)
         self.exportLayersProcess.addLayer.connect(self.addLayer)
@@ -284,7 +332,7 @@ class MainDialog(QDialog, FORM_CLASS):
     def finishedExportLayers(self):
         self.progressBar.setVisible(False)
 
-        if self.exportFormat.currentText() == 'Projeto QGIS':
+        if self.exportLayersProcess.loadQGIS:
             project = QgsProject.instance()
             manager = project.relationManager()
             relations = manager.relations()
@@ -410,7 +458,7 @@ class ExportLayersProcess(QThread):
     addLayer = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject',
                           'PyQt_PyObject', 'PyQt_PyObject')
 
-    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid, vrs, postgisUtils):
+    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid, vrs, postgisUtils, loadQGIS=False):
         QThread.__init__(self)
 
         self.conn = connection
@@ -424,6 +472,7 @@ class ExportLayersProcess(QThread):
         self.exportSrsId = srsid
         self.vrs = vrs
         self.postgisUtils = postgisUtils
+        self.loadQGIS = loadQGIS
 
         if not self.outDir:
             self.outDir = str(Path.home())
@@ -436,14 +485,14 @@ class ExportLayersProcess(QThread):
 
     def run(self):
         try:
-            if self.outFormat == 'GeoPackage':
+            if self.loadQGIS:
+                self.exportQGISProject()
+            elif self.outFormat == 'GeoPackage':
                 self.exportGeoPackage()
             elif self.outFormat == 'GeoJSON':
                 self.exportGeoJSON()
             elif self.outFormat == 'Shapefile':
                 self.exportShapefile()
-            elif self.outFormat == 'Projeto QGIS':
-                self.exportQGISProject()
             else:
                 raise ValueError('Formato de exportação desconhecido')
 
