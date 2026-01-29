@@ -31,6 +31,7 @@ from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QMetaType
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QFont
 
 from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
+from qgis.gui import QgsFileWidget
 from qgis.utils import iface
 
 from . import qgis_configs
@@ -101,6 +102,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.mQgsProjectionSelectionWidget.setCrs( crs )
             
             self.comboBoxOps.addItems(['Igual', 'Diferente', 'Maior', 'Menor', 'Maior ou igual', 'Menor ou igual'])
+
+            self.mQgsFileWidget.setStorageMode(QgsFileWidget.GetDirectory)
 
             self.isRunning = False
             self.initialized = True
@@ -372,6 +375,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     def testValidationRules(self):
         self.actconn = self.pgutils.get_or_create_connection()
+        allChecked = True
 
         if self.iface.pluginManagerInterface().pluginMetadata('recartDGT') is not None:
             self.writeText("recartDGT v{}".format(self.iface.pluginManagerInterface().pluginMetadata('recartDGT')['version_installed']))
@@ -412,7 +416,13 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 cb.setChecked(state)
                 cb.toggled.connect(self.setRuleState)
                 self.tableView.setIndexWidget(model.index(rn, 5), cb)
+
+                if not state:
+                    allChecked = False
+
                 rn = rn + 1
+
+            self.checkBoxAll.setChecked(allChecked)
 
             self.ruleSetup = True
             self.relButton.setEnabled(True)
@@ -781,8 +791,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     tabOff = tabOff + 220
 
             title = self.lineEdit.text() if self.lineEdit.text() else "report"
-            filepath = os.getcwd() + "/" + self.sanitize_filename(title) + \
-                times.strftime("%Y%m%d%H%M%S") + ".pdf"
+
+            filepath = os.path.join(os.getcwd(), self.sanitize_filename(title) + \
+                times.strftime("%Y%m%d%H%M%S") + ".pdf")
+
+            if self.mQgsFileWidget.filePath() != "":
+                filepath = os.path.join(self.mQgsFileWidget.filePath(), self.sanitize_filename(title) + \
+                    times.strftime("%Y%m%d%H%M%S") + ".pdf")
+
             exporter = QgsLayoutExporter(layout)
             exporter.exportToPdf(
                 filepath, QgsLayoutExporter.PdfExportSettings())

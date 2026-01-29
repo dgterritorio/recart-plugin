@@ -23,15 +23,39 @@
       <string>Camadas</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QTreeView" name="treeView"/>
       </item>
-      <item row="0" column="0" alignment="Qt::AlignRight">
-       <widget class="QCheckBox" name="selectACheckBox">
-        <property name="text">
-         <string>Selecionar todos</string>
-        </property>
-       </widget>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QPushButton" name="loadQGIS">
+          <property name="text">
+           <string>Carregar camadas no QGIS</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="selectACheckBox">
+          <property name="text">
+           <string>Selecionar todos</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -317,11 +341,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>loadQGIS</sender>
+   <signal>clicked()</signal>
+   <receiver>MainDialog</receiver>
+   <slot>doLoadLayersQGIS()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>202</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>497</x>
+     <y>366</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changeConn(QString)</slot>
   <slot>doLoadLayers()</slot>
   <slot>doExportLayers()</slot>
+  <slot>doLoadLayersQGIS()</slot>
   <slot>selectAll(int)</slot>
   <slot>onChangeFormat(QString)</slot>
  </slots>
