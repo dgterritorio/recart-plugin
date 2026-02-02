@@ -925,12 +925,14 @@ total as (select count(*) from {schema}.curva_de_nivel),
 good as (select count(cdn.identificador)
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) or (ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria)))
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true and
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true))
 ),
 bad as (select count(cdn.identificador) 
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria)) is not true
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true)
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
@@ -939,19 +941,22 @@ total as (select count(*) from {schema}.curva_de_nivel),
 good as (select count(cdn.identificador)
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) or (ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria)))
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true))
 ),
 bad as (select count(cdn.identificador) 
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria)) is not true
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true)
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select cdn.*
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria)) is not true$$ );
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true)$$ );
 
 delete from validation.rules_area where code = 're3_1_1';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
@@ -963,13 +968,15 @@ total as (select count(*) from {schema}.curva_de_nivel),
 good as (select count(cdn.identificador)
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) or (ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria))
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true)
 		and ST_Intersects(cdn.geometria, '%1$s'::geometry))
 ),
 bad as (select count(cdn.identificador) 
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria)) is not true and ST_Intersects(cdn.geometria, '%1$s'::geometry)
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true) and ST_Intersects(cdn.geometria, '%1$s'::geometry)
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
@@ -978,13 +985,15 @@ total as (select count(*) from {schema}.curva_de_nivel),
 good as (select count(cdn.identificador)
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) or (ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria))
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true)
 		and ST_Intersects(cdn.geometria, '%1$s'::geometry))
 ),
 bad as (select count(cdn.identificador) 
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria)) is not true
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true)
 		and ST_Intersects(cdn.geometria, '%1$s'::geometry)
 )
 select total.count as total, good.count as good, bad.count as bad
@@ -992,7 +1001,8 @@ from total, good, bad $$,
 $$select cdn.*
 	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 	where ST_IsClosed(cdn.geometria) is not true
-		and st_intersects(cdn.geometria, ST_Boundary(adt.geometria)) is not true and ST_Intersects(cdn.geometria, '%1$s'::geometry)$$ );
+		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
+			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true) and ST_Intersects(cdn.geometria, '%1$s'::geometry)$$ );
 
 
 delete from validation.rules where code = 're3_1_2';
