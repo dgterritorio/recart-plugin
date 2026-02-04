@@ -162,10 +162,7 @@
           <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="1" colspan="2">
-           <widget class="QLineEdit" name="lineEdit"/>
-          </item>
-          <item row="7" column="0" colspan="2">
+          <item row="8" column="0" colspan="2">
            <widget class="QGroupBox" name="groupBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -232,37 +229,7 @@
             </layout>
            </widget>
           </item>
-          <item row="8" column="0">
-           <widget class="QCheckBox" name="checkBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="visible">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Validar 3D ?</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Ligação</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Esquema</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <widget class="QCheckBox" name="is_sections">
             <property name="text">
              <string>Validar por secções</string>
@@ -270,9 +237,49 @@
            </widget>
           </item>
           <item row="2" column="1" colspan="2">
-           <widget class="QComboBox" name="schemaName"/>
+           <widget class="QComboBox" name="connCombo"/>
           </item>
-          <item row="5" column="0" colspan="2">
+          <item row="0" column="1" colspan="2">
+           <widget class="QLineEdit" name="lineEdit"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Coordenadas</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Título relatório</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Ligação</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0" colspan="2">
            <widget class="QGroupBox" name="groupBox_11">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -356,36 +363,46 @@
             </layout>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_2">
+          <item row="3" column="1" colspan="2">
+           <widget class="QComboBox" name="schemaName"/>
+          </item>
+          <item row="9" column="0">
+           <widget class="QCheckBox" name="checkBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="visible">
+             <bool>false</bool>
+            </property>
             <property name="text">
-             <string>Coordenadas</string>
+             <string>Validar 3D ?</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget">
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Esquema</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QgsFileWidget" name="mQgsFileWidget">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
            </widget>
           </item>
-          <item row="1" column="1" colspan="2">
-           <widget class="QComboBox" name="connCombo"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_12">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_21">
             <property name="text">
-             <string>Título</string>
+             <string>Caminho relatório</string>
             </property>
            </widget>
           </item>
@@ -809,6 +826,11 @@
    <class>QgsFieldComboBox</class>
    <extends>QComboBox</extends>
    <header>qgsfieldcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsFileWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsfilewidget.h</header>
   </customwidget>
   <customwidget>
    <class>QgsProjectionSelectionWidget</class>
