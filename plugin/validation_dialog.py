@@ -1314,7 +1314,7 @@ class ValidateProcess(QThread):
 
     def run(self):
         try:
-            if ( len([x for x in self.pgutils.permissions.values() if 'createschema' in x and x['createschema']]) > 0 ):
+            if ( len([x for x in self.pgutils.permissions.values() if 'createschema' in x and x['createschema']]) == 0 ):
                 self.write("\t[Erro] Sem permissões para executar as validações.")
                 return
 
