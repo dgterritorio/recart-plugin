@@ -2778,7 +2778,17 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_2d (
 ALTER TABLE validation.intersecoes_2d DROP CONSTRAINT IF EXISTS intersecoes_2d_pk;
 ALTER TABLE validation.intersecoes_2d ADD CONSTRAINT intersecoes_2d_pk PRIMARY KEY (p1_id, p2_id);
 
-create or replace function validation.sort(p_input double precision[]) 
+create or replace function validation.sort_asc(p_input double precision[]) 
+  returns double precision[]
+as
+$$
+  select array_agg(i order by i asc)
+  from unnest(p_input) as a(i);
+$$
+language sql
+immutable;
+
+create or replace function validation.sort_desc(p_input double precision[]) 
   returns double precision[]
 as
 $$
