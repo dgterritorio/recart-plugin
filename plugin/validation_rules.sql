@@ -1681,7 +1681,7 @@ $$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
 $$with
 aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
 pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
 total as (select count(*) from {schema}.curso_de_agua_eixo),
 good as (select count(*) from teste where comparacao),
 bad as (select count(*) from teste where not comparacao)
@@ -1690,7 +1690,7 @@ from total, good, bad $$,
 $$with
 aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
 pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
 total as (select count(*) from {schema}.curso_de_agua_eixo),
 good as (select count(*) from teste where comparacao),
 bad as (select count(*) from teste where not comparacao)
@@ -1699,7 +1699,7 @@ from total, good, bad $$,
 $$with
 aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
 pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
 bad as (select identificador from teste where not comparacao)
 select * from {schema}.curso_de_agua_eixo where identificador in (select * from bad) $$ );
 
@@ -1712,7 +1712,7 @@ $$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
 $$with
 aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
 pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
 total as (select count(*) from {schema}.curso_de_agua_eixo),
 good as (select count(*) from teste where comparacao),
 bad as (select count(*) from teste where not comparacao)
@@ -1721,7 +1721,7 @@ from total, good, bad $$,
 $$with
 aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
 pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
 total as (select count(*) from {schema}.curso_de_agua_eixo),
 good as (select count(*) from teste where comparacao),
 bad as (select count(*) from teste where not comparacao)
@@ -1730,7 +1730,7 @@ from total, good, bad $$,
 $$with
 aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
 pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, validation.sort(pontos_arr), pontos_arr = validation.sort(pontos_arr) as comparacao from pontos),
+teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
 bad as (select identificador from teste where not comparacao)
 select * from {schema}.curso_de_agua_eixo where identificador in (select * from bad) $$ );
 
