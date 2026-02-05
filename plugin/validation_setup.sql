@@ -2457,20 +2457,20 @@ CREATE TABLE IF NOT EXISTS validation.no_hidro AS (
 	) AS f
 );
 
-CREATE TABLE IF NOT EXISTS validation.no_hidro_juncao AS (
-	SELECT ST_Collect(f.geometria) AS geom_col FROM (
-		SELECT geometria FROM {schema}.no_hidrografico n where n.valor_tipo_no_hidrografico='3'
-	) AS f
-);
+-- CREATE TABLE IF NOT EXISTS validation.no_hidro_juncao AS (
+-- 	SELECT ST_Collect(f.geometria) AS geom_col FROM (
+-- 		SELECT geometria FROM {schema}.no_hidrografico n where n.valor_tipo_no_hidrografico='3'
+-- 	) AS f
+-- );
 
 -- barreira é 2D apenas
-CREATE TABLE IF NOT EXISTS validation.interrupcao_fluxo AS (
-	SELECT ST_Collect(f.geometria) AS geom_col FROM (
-		SELECT geometria FROM {schema}.queda_de_agua union all
-		SELECT geometria FROM {schema}.zona_humida -- union all
-		-- SELECT geometria FROM {schema}.barreira
-	) AS f
-);
+-- CREATE TABLE IF NOT EXISTS validation.interrupcao_fluxo AS (
+-- 	SELECT ST_Collect(f.geometria) AS geom_col FROM (
+-- 		SELECT geometria FROM {schema}.queda_de_agua union all
+-- 		SELECT geometria FROM {schema}.zona_humida -- union all
+-- 		-- SELECT geometria FROM {schema}.barreira
+-- 	) AS f
+-- );
 
 -- CREATE INDEX IF NOT EXISTS idx_val_curso_de_agua_eixo_geometria ON {schema}.curso_de_agua_eixo USING GIST (geometria);
 

@@ -134,7 +134,7 @@ $$Todas as entidades representadas através de objetos de geometria linha.$$ );
 --
 delete from validation.rules where code = 'ra_3_1';
 insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
-values ('ra_3_1', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+values ('ra_3_1', 'Tolerância de conetividade - Curso de água',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
 'curso_de_agua_eixo',
@@ -148,7 +148,7 @@ $$select a.* from {schema}.curso_de_agua_eixo a where not st_isvalid(a.geometria
 
 delete from validation.rules_area where code = 'ra_3_1';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
-values ('ra_3_1', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+values ('ra_3_1', 'Tolerância de conetividade - Curso de água',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
 'curso_de_agua_eixo',
@@ -163,7 +163,7 @@ $$select a.* from {schema}.curso_de_agua_eixo a where not st_isvalid(a.geometria
 
 delete from validation.rules where code = 'ra_3_2';
 insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
-values ('ra_3_2', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+values ('ra_3_2', 'Tolerância de conetividade - Segmento de via rodoviária',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
 'seg_via_rodov',
@@ -177,7 +177,7 @@ $$select a.* from {schema}.seg_via_rodov a where not st_isvalid(a.geometria)$$ )
 
 delete from validation.rules_area where code = 'ra_3_2';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
-values ('ra_3_2', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+values ('ra_3_2', 'Tolerância de conetividade - Segmento de via rodoviária',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
 'seg_via_rodov',
@@ -192,7 +192,7 @@ $$select a.* from {schema}.seg_via_rodov a where not st_isvalid(a.geometria) and
 
 delete from validation.rules where code = 'ra_3_3';
 insert into validation.rules ( code, name, rule, scope, entity,  query, report ) 
-values ('ra_3_3', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+values ('ra_3_3', 'Tolerância de conetividade - Segmento de via ferroviária',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
 'seg_via_ferrea',
@@ -206,7 +206,7 @@ $$select a.* from {schema}.seg_via_ferrea a where not st_isvalid(a.geometria)$$ 
 
 delete from validation.rules_area where code = 'ra_3_3';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
-values ('ra_3_3', 'Tolerância de conetividade - Seção 6.3 EIXOS E CONETIVIDADE',
+values ('ra_3_3', 'Tolerância de conetividade - Segmento de via ferroviária',
 $$Os eixos de futuras redes não devem ter comprimento 0.$$,
 $$Todas as entidades que representam futuras redes (hidrográfica, ferroviária e rodoviária).$$,
 'seg_via_ferrea',
@@ -346,7 +346,7 @@ SELECT a.identificador
 --
 delete from validation.rules where code = 'rg_4_2_2';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('rg_4_2_2', 'Consistência tridimensional (Transportes)',
+values ('rg_4_2_2', 'Consistência tridimensional (Transportes Rodov.)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_trans_rodov',
@@ -392,7 +392,7 @@ SELECT a.identificador
 
 delete from validation.rules_area where code = 'rg_4_2_2';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('rg_4_2_2', 'Consistência tridimensional (Transportes)',
+values ('rg_4_2_2', 'Consistência tridimensional (Transportes Rodov.)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_trans_rodov',
@@ -440,7 +440,7 @@ SELECT a.identificador
 --
 delete from validation.rules where code = 'rg_4_2_3';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('rg_4_2_3', 'Consistência tridimensional (Transportes)',
+values ('rg_4_2_3', 'Consistência tridimensional (Transportes Ferrov.)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_trans_ferrov',
@@ -486,7 +486,7 @@ SELECT a.identificador
 
 delete from validation.rules_area where code = 'rg_4_2_3';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('rg_4_2_3', 'Consistência tridimensional (Transportes)',
+values ('rg_4_2_3', 'Consistência tridimensional (Transportes Ferrov.)',
 $$Todos os objetos tridimensionais (3D) são consistentes entre si.
 Quando os objetos se intersectam no espaço essa interseção está materializada através de vértices coincidentes e tridimensionalmente coerentes.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'no_trans_ferrov',
@@ -535,7 +535,7 @@ SELECT a.identificador
 
 delete from validation.rules where code = 'rg_4_3_2';
 insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
-values ('rg_4_3_2', 'Consistência tridimensional entre Altimetria e Hidrografia',
+values ('rg_4_3_2', 'Consistência tridimensional entre Altimetria e Hidrografia (Nível do solo)',
 $$As curva_de_nivel e curso_de_agua_eixo, quando se cruzam, têm que ter o mesmo valor Z. 
 Estas só se devem cruzar quando o curso_de_agua_eixo.valor_posicao_vertical tem valor '0'.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
@@ -602,7 +602,7 @@ select * from bad$$ );
 
 delete from validation.rules_area where code = 'rg_4_3_2';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
-values ('rg_4_3_2', 'Consistência tridimensional entre Altimetria e Hidrografia',
+values ('rg_4_3_2', 'Consistência tridimensional entre Altimetria e Hidrografia (Nível do solo)',
 $$As curva_de_nivel e curso_de_agua_eixo, quando se cruzam, têm que ter o mesmo valor Z. 
 Estas só se devem cruzar quando o curso_de_agua_eixo.valor_posicao_vertical tem valor '0'.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
@@ -673,7 +673,7 @@ select * from bad$$ );
 
 delete from validation.rules where code = 'rg_4_3_3';
 insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
-values ('rg_4_3_3', 'Consistência tridimensional entre Altimetria e Hidrografia',
+values ('rg_4_3_3', 'Consistência tridimensional entre Altimetria e Hidrografia (Outras)',
 $$As curva_de_nivel e curso_de_agua_eixo não se podem cruzar quando o 
 curso_de_agua_eixo.valor_posicao_vertical tem valor diferente de '0' (acima ou abaixo do solo).$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
@@ -740,7 +740,7 @@ select * from bad$$ );
 
 delete from validation.rules_area where code = 'rg_4_3_3';
 insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
-values ('rg_4_3_3', 'Consistência tridimensional entre Altimetria e Hidrografia',
+values ('rg_4_3_3', 'Consistência tridimensional entre Altimetria e Hidrografia (Outras)',
 $$As curva_de_nivel e curso_de_agua_eixo não se podem cruzar quando o 
 curso_de_agua_eixo.valor_posicao_vertical tem valor diferente de '0' (acima ou abaixo do solo).$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
@@ -1896,7 +1896,7 @@ $$select a.*
 
 delete from validation.rules where code = 're4_8_1';
 insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report ) 
-values ('re4_8_1', 'Interrupção do curso de água', 
+values ('re4_8_1', 'Interrupção do curso de água (topologia)', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
  - Existe uma interceção com outro curso de água;
@@ -1930,7 +1930,7 @@ $$select distinct a.*
 
 delete from validation.rules_area where code = 're4_8_1';
 insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2, report ) 
-values ('re4_8_1', 'Interrupção do curso de água', 
+values ('re4_8_1', 'Interrupção do curso de água (topologia)', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
  - Existe uma interceção com outro curso de água;
@@ -1968,7 +1968,7 @@ $$select distinct a.*
 
 delete from validation.rules where code = 're4_8_2';
 insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report ) 
-values ('re4_8_2', 'Interrupção do curso de água', 
+values ('re4_8_2', 'Interrupção do curso de água (atributos)', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
  - Existe uma interceção com outro curso de água;
@@ -2054,7 +2054,7 @@ where pontos.identificador = c.identificador and c.identificador not in (select 
 
 delete from validation.rules_area where code = 're4_8_2';
 insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2, report ) 
-values ('re4_8_2', 'Interrupção do curso de água', 
+values ('re4_8_2', 'Interrupção do curso de água (atributos)', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
  - Existe uma interceção com outro curso de água;
@@ -2491,7 +2491,7 @@ delete from validation.rules_area where code = 're4_11_1';
 delete from validation.rules_area where code = 're4_11_2';
 delete from validation.rules_area where code = 're4_11';
 insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
-values ('re4_11', 'Hierarquia dos nós hidrográficos (Parte 1 - Eixos)', 
+values ('re4_11', 'Hierarquia dos nós hidrográficos', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
 “Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó$$, 
