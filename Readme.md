@@ -1,6 +1,6 @@
 ## A aplicação informática recartDGT
 
-A aplicação recartDGT oferece algumas funcionalidades para se tirar o melhor partido do modelo CartTop. Esta última versão v1.6.3 do plugin QGIS (ainda em fase de testes), suporta todas as versões do modelo CartTop (v1.1.2, v2.0.1 e v2.0.2) que pode encontrar em https://github.com/dgterritorio/RECART. 
+A aplicação recartDGT oferece algumas funcionalidades para se tirar o melhor partido do modelo CartTop. O plugin suporta todas as versões do modelo CartTop (v1.1.2, v2.0.1 e v2.0.2) e está em contínuo desenvolvimento. Pode encontrar todas as versões do plugin em https://github.com/dgterritorio/RECART. 
 
 ### recartDGT: um módulo QGIS
 
