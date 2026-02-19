@@ -17635,24 +17635,26 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
 </StyledLayerDescriptor>
 ', true, 'Default style for Nó de transporte rodoviário', 'Point');
 INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name, f_geometry_column, stylename, styleqml, stylesld, useasdefault, description, type) VALUES ( current_database(), '{schema}', 'no_hidrografico', 'geometria', 'Nó hidrográfico', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
-<qgis version="3.40.5-Bratislava" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Rendering|Relations" maxScale="0" autoRefreshMode="Disabled" autoRefreshTime="0" simplifyDrawingTol="1" minScale="100000000" simplifyDrawingHints="1" simplifyLocal="1" readOnly="0" simplifyAlgorithm="0" simplifyMaxScale="1" symbologyReferenceScale="-1">
+<qgis autoRefreshMode="Disabled" autoRefreshTime="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" layerType="Vector" maxScale="0" minScale="100000000" readOnly="0" simplifyAlgorithm="0" simplifyDrawingHints="0" simplifyDrawingTol="1" simplifyLocal="1" simplifyMaxScale="1" styleCategories="LayerConfiguration|Symbology|Labeling|Fields|Rendering|Relations" symbologyReferenceScale="-1" version="3.99.0-Master">
  <flags>
   <Identifiable>1</Identifiable>
   <Removable>1</Removable>
   <Searchable>1</Searchable>
   <Private>0</Private>
  </flags>
- <renderer-v2 enableorderby="0" referencescale="-1" symbollevels="0" type="RuleRenderer" forceraster="0">
+ <renderer-v2 enableorderby="0" forceraster="0" referencescale="-1" symbollevels="0" type="RuleRenderer">
   <rules key="{336b55b2-a831-4940-9dfb-655e2b73f27a}">
-   <rule scalemaxdenom="25000" filter="&quot;valor_tipo_no_hidrografico&quot; = ''1''" label="Início" scalemindenom="1" key="{23619b9e-76b5-4516-9f22-471591165671}" symbol="0"/>
-   <rule scalemaxdenom="25000" filter="&quot;valor_tipo_no_hidrografico&quot; = ''2''" label="Fim" scalemindenom="1" key="{b693f711-ea87-4b96-8da6-9c88c6a38385}" symbol="1"/>
-   <rule scalemaxdenom="25000" filter="&quot;valor_tipo_no_hidrografico&quot; = ''3''" label="Junção" scalemindenom="1" key="{80351f07-af26-485f-88cd-910281bfb7e7}" symbol="2"/>
-   <rule scalemaxdenom="25000" filter="&quot;valor_tipo_no_hidrografico&quot; = ''4''" label="Pseudo-nó" scalemindenom="1" key="{5d59758e-b3a6-4930-8806-c2a7dc59ba6c}" symbol="3"/>
-   <rule scalemaxdenom="25000" filter="&quot;valor_tipo_no_hidrografico&quot; = ''5''" label="Variação de fluxo" scalemindenom="1" key="{78adbb76-f65e-493e-b474-829fbe817911}" symbol="4"/>
-   <rule scalemaxdenom="25000" filter="&quot;valor_tipo_no_hidrografico&quot; = ''6''" label="Regulação de fluxo" scalemindenom="1" key="{eef8394b-6a48-46c6-8e3a-81be914fbb67}" symbol="5"/>
+   <rule filter="&quot;valor_tipo_no_hidrografico&quot; = ''1''" key="{23619b9e-76b5-4516-9f22-471591165671}" label="Início" scalemaxdenom="25000" scalemindenom="1" symbol="0"/>
+   <rule filter="&quot;valor_tipo_no_hidrografico&quot; = ''2''" key="{b693f711-ea87-4b96-8da6-9c88c6a38385}" label="Fim" scalemaxdenom="25000" scalemindenom="1" symbol="1"/>
+   <rule filter="&quot;valor_tipo_no_hidrografico&quot; = ''3''" key="{80351f07-af26-485f-88cd-910281bfb7e7}" label="Junção" scalemaxdenom="25000" scalemindenom="1" symbol="2"/>
+   <rule filter="&quot;valor_tipo_no_hidrografico&quot; = ''4''" key="{5d59758e-b3a6-4930-8806-c2a7dc59ba6c}" label="Pseudo-nó" scalemaxdenom="25000" scalemindenom="1" symbol="3"/>
+   <rule filter="&quot;valor_tipo_no_hidrografico&quot; = ''5''" key="{78adbb76-f65e-493e-b474-829fbe817911}" label="Variação de fluxo" scalemaxdenom="25000" scalemindenom="1" symbol="4"/>
+   <rule filter="&quot;valor_tipo_no_hidrografico&quot; = ''6''" key="{ae752dec-1bf7-4325-86fe-705bbd3f91b3}" label="Regulação de fluxo" scalemaxdenom="25000" scalemindenom="1" symbol="5"/>
+   <rule filter="&quot;valor_tipo_no_hidrografico&quot; = ''7''" key="{ef7979eb-1006-4651-9691-1ff0b3b98938}" label="Fronteira" scalemaxdenom="25000" scalemindenom="1" symbol="6"/>
+   <rule filter="&quot;valor_tipo_no_hidrografico&quot; = ''8''" key="{eef8394b-6a48-46c6-8e3a-81be914fbb67}" label="Limite do Trabalho" scalemaxdenom="25000" scalemindenom="1" symbol="7"/>
   </rules>
   <symbols>
-   <symbol name="0" clip_to_extent="1" alpha="0.8" is_animated="0" frame_rate="10" type="marker" force_rhr="0">
+   <symbol alpha="0.8" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="0" type="marker">
     <data_defined_properties>
      <Option type="Map">
       <Option name="name" type="QString" value=""/>
@@ -17660,18 +17662,18 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <Option name="type" type="QString" value="collection"/>
      </Option>
     </data_defined_properties>
-    <layer pass="0" class="SimpleMarker" enabled="1" id="{91d4c757-4990-47e8-9ef3-7ec8c37e0769}" locked="0">
+    <layer class="SimpleMarker" enabled="1" id="{91d4c757-4990-47e8-9ef3-7ec8c37e0769}" locked="0" pass="0">
      <Option type="Map">
       <Option name="angle" type="QString" value="0"/>
       <Option name="cap_style" type="QString" value="square"/>
-      <Option name="color" type="QString" value="0,0,204,255,rgb:0,0,0.80000000000000004,1"/>
+      <Option name="color" type="QString" value="0,0,204,255,rgb:0,0,0.8,1"/>
       <Option name="horizontal_anchor_point" type="QString" value="1"/>
       <Option name="joinstyle" type="QString" value="bevel"/>
       <Option name="name" type="QString" value="circle"/>
       <Option name="offset" type="QString" value="0,0"/>
       <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
       <Option name="offset_unit" type="QString" value="Pixel"/>
-      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
       <Option name="outline_style" type="QString" value="solid"/>
       <Option name="outline_width" type="QString" value="0"/>
       <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
@@ -17691,7 +17693,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
      </data_defined_properties>
     </layer>
    </symbol>
-   <symbol name="1" clip_to_extent="1" alpha="0.8" is_animated="0" frame_rate="10" type="marker" force_rhr="0">
+   <symbol alpha="0.8" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="1" type="marker">
     <data_defined_properties>
      <Option type="Map">
       <Option name="name" type="QString" value=""/>
@@ -17699,18 +17701,18 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <Option name="type" type="QString" value="collection"/>
      </Option>
     </data_defined_properties>
-    <layer pass="0" class="SimpleMarker" enabled="1" id="{76c6984d-ce82-470a-bb9d-be6baaad063e}" locked="0">
+    <layer class="SimpleMarker" enabled="1" id="{76c6984d-ce82-470a-bb9d-be6baaad063e}" locked="0" pass="0">
      <Option type="Map">
       <Option name="angle" type="QString" value="0"/>
       <Option name="cap_style" type="QString" value="square"/>
-      <Option name="color" type="QString" value="252,0,63,255,rgb:0.9882352941176471,0,0.24705882352941178,1"/>
+      <Option name="color" type="QString" value="252,0,63,255,rgb:0.9882353,0,0.2470588,1"/>
       <Option name="horizontal_anchor_point" type="QString" value="1"/>
       <Option name="joinstyle" type="QString" value="bevel"/>
       <Option name="name" type="QString" value="circle"/>
       <Option name="offset" type="QString" value="0,0"/>
       <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
       <Option name="offset_unit" type="QString" value="Pixel"/>
-      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
       <Option name="outline_style" type="QString" value="solid"/>
       <Option name="outline_width" type="QString" value="0"/>
       <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
@@ -17730,7 +17732,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
      </data_defined_properties>
     </layer>
    </symbol>
-   <symbol name="2" clip_to_extent="1" alpha="0.8" is_animated="0" frame_rate="10" type="marker" force_rhr="0">
+   <symbol alpha="0.8" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="2" type="marker">
     <data_defined_properties>
      <Option type="Map">
       <Option name="name" type="QString" value=""/>
@@ -17738,18 +17740,18 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <Option name="type" type="QString" value="collection"/>
      </Option>
     </data_defined_properties>
-    <layer pass="0" class="SimpleMarker" enabled="1" id="{ebb7af66-e9ed-47f2-8cb0-33cddd55ab6f}" locked="0">
+    <layer class="SimpleMarker" enabled="1" id="{ebb7af66-e9ed-47f2-8cb0-33cddd55ab6f}" locked="0" pass="0">
      <Option type="Map">
       <Option name="angle" type="QString" value="0"/>
       <Option name="cap_style" type="QString" value="square"/>
-      <Option name="color" type="QString" value="63,236,28,255,rgb:0.24705882352941178,0.92549019607843142,0.10980392156862745,1"/>
+      <Option name="color" type="QString" value="63,236,28,255,rgb:0.2470588,0.9254902,0.1098039,1"/>
       <Option name="horizontal_anchor_point" type="QString" value="1"/>
       <Option name="joinstyle" type="QString" value="bevel"/>
       <Option name="name" type="QString" value="circle"/>
       <Option name="offset" type="QString" value="0,0"/>
       <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
       <Option name="offset_unit" type="QString" value="Pixel"/>
-      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
       <Option name="outline_style" type="QString" value="solid"/>
       <Option name="outline_width" type="QString" value="0"/>
       <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
@@ -17769,7 +17771,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
      </data_defined_properties>
     </layer>
    </symbol>
-   <symbol name="3" clip_to_extent="1" alpha="0.8" is_animated="0" frame_rate="10" type="marker" force_rhr="0">
+   <symbol alpha="0.8" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="3" type="marker">
     <data_defined_properties>
      <Option type="Map">
       <Option name="name" type="QString" value=""/>
@@ -17777,18 +17779,18 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <Option name="type" type="QString" value="collection"/>
      </Option>
     </data_defined_properties>
-    <layer pass="0" class="SimpleMarker" enabled="1" id="{6b3529b0-9150-4aa9-8d0f-5bdb5f34305b}" locked="0">
+    <layer class="SimpleMarker" enabled="1" id="{6b3529b0-9150-4aa9-8d0f-5bdb5f34305b}" locked="0" pass="0">
      <Option type="Map">
       <Option name="angle" type="QString" value="0"/>
       <Option name="cap_style" type="QString" value="square"/>
-      <Option name="color" type="QString" value="248,24,196,255,rgb:0.97254901960784312,0.09411764705882353,0.7686274509803922,1"/>
+      <Option name="color" type="QString" value="248,24,196,255,rgb:0.972549,0.0941176,0.7686275,1"/>
       <Option name="horizontal_anchor_point" type="QString" value="1"/>
       <Option name="joinstyle" type="QString" value="bevel"/>
       <Option name="name" type="QString" value="circle"/>
       <Option name="offset" type="QString" value="0,0"/>
       <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
       <Option name="offset_unit" type="QString" value="Pixel"/>
-      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
       <Option name="outline_style" type="QString" value="solid"/>
       <Option name="outline_width" type="QString" value="0"/>
       <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
@@ -17808,7 +17810,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
      </data_defined_properties>
     </layer>
    </symbol>
-   <symbol name="4" clip_to_extent="1" alpha="0.8" is_animated="0" frame_rate="10" type="marker" force_rhr="0">
+   <symbol alpha="0.8" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="4" type="marker">
     <data_defined_properties>
      <Option type="Map">
       <Option name="name" type="QString" value=""/>
@@ -17816,18 +17818,18 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <Option name="type" type="QString" value="collection"/>
      </Option>
     </data_defined_properties>
-    <layer pass="0" class="SimpleMarker" enabled="1" id="{d2c10354-b91d-439c-92c8-70bb5648b9c9}" locked="0">
+    <layer class="SimpleMarker" enabled="1" id="{d2c10354-b91d-439c-92c8-70bb5648b9c9}" locked="0" pass="0">
      <Option type="Map">
       <Option name="angle" type="QString" value="0"/>
       <Option name="cap_style" type="QString" value="square"/>
-      <Option name="color" type="QString" value="30,120,180,255,rgb:0.11764705882352941,0.47058823529411764,0.70588235294117652,1"/>
+      <Option name="color" type="QString" value="30,120,180,255,rgb:0.1176471,0.4705882,0.7058824,1"/>
       <Option name="horizontal_anchor_point" type="QString" value="1"/>
       <Option name="joinstyle" type="QString" value="bevel"/>
       <Option name="name" type="QString" value="circle"/>
       <Option name="offset" type="QString" value="0,0"/>
       <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
       <Option name="offset_unit" type="QString" value="Pixel"/>
-      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
       <Option name="outline_style" type="QString" value="solid"/>
       <Option name="outline_width" type="QString" value="0"/>
       <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
@@ -17847,7 +17849,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
      </data_defined_properties>
     </layer>
    </symbol>
-   <symbol name="5" clip_to_extent="1" alpha="0.8" is_animated="0" frame_rate="10" type="marker" force_rhr="0">
+   <symbol alpha="0.8" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="5" type="marker">
     <data_defined_properties>
      <Option type="Map">
       <Option name="name" type="QString" value=""/>
@@ -17855,18 +17857,96 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <Option name="type" type="QString" value="collection"/>
      </Option>
     </data_defined_properties>
-    <layer pass="0" class="SimpleMarker" enabled="1" id="{e27c65b1-8c98-4c5a-88bd-2b36ad65214d}" locked="0">
+    <layer class="SimpleMarker" enabled="1" id="{e27c65b1-8c98-4c5a-88bd-2b36ad65214d}" locked="0" pass="0">
      <Option type="Map">
       <Option name="angle" type="QString" value="0"/>
       <Option name="cap_style" type="QString" value="square"/>
-      <Option name="color" type="QString" value="160,204,204,255,rgb:0.62745098039215685,0.80000000000000004,0.80000000000000004,1"/>
+      <Option name="color" type="QString" value="160,204,204,255,rgb:0.627451,0.8,0.8,1"/>
       <Option name="horizontal_anchor_point" type="QString" value="1"/>
       <Option name="joinstyle" type="QString" value="bevel"/>
       <Option name="name" type="QString" value="circle"/>
       <Option name="offset" type="QString" value="0,0"/>
       <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
       <Option name="offset_unit" type="QString" value="Pixel"/>
-      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.13725490196078433,0.13725490196078433,0.13725490196078433,1"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
+      <Option name="outline_style" type="QString" value="solid"/>
+      <Option name="outline_width" type="QString" value="0"/>
+      <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="outline_width_unit" type="QString" value="Pixel"/>
+      <Option name="scale_method" type="QString" value="diameter"/>
+      <Option name="size" type="QString" value="6"/>
+      <Option name="size_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="size_unit" type="QString" value="Pixel"/>
+      <Option name="vertical_anchor_point" type="QString" value="1"/>
+     </Option>
+     <data_defined_properties>
+      <Option type="Map">
+       <Option name="name" type="QString" value=""/>
+       <Option name="properties"/>
+       <Option name="type" type="QString" value="collection"/>
+      </Option>
+     </data_defined_properties>
+    </layer>
+   </symbol>
+   <symbol alpha="0.8" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="6" type="marker">
+    <data_defined_properties>
+     <Option type="Map">
+      <Option name="name" type="QString" value=""/>
+      <Option name="properties"/>
+      <Option name="type" type="QString" value="collection"/>
+     </Option>
+    </data_defined_properties>
+    <layer class="SimpleMarker" enabled="1" id="{e27c65b1-8c98-4c5a-88bd-2b36ad65214d}" locked="0" pass="0">
+     <Option type="Map">
+      <Option name="angle" type="QString" value="0"/>
+      <Option name="cap_style" type="QString" value="square"/>
+      <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
+      <Option name="horizontal_anchor_point" type="QString" value="1"/>
+      <Option name="joinstyle" type="QString" value="bevel"/>
+      <Option name="name" type="QString" value="circle"/>
+      <Option name="offset" type="QString" value="0,0"/>
+      <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="offset_unit" type="QString" value="Pixel"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
+      <Option name="outline_style" type="QString" value="solid"/>
+      <Option name="outline_width" type="QString" value="0"/>
+      <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="outline_width_unit" type="QString" value="Pixel"/>
+      <Option name="scale_method" type="QString" value="diameter"/>
+      <Option name="size" type="QString" value="6"/>
+      <Option name="size_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="size_unit" type="QString" value="Pixel"/>
+      <Option name="vertical_anchor_point" type="QString" value="1"/>
+     </Option>
+     <data_defined_properties>
+      <Option type="Map">
+       <Option name="name" type="QString" value=""/>
+       <Option name="properties"/>
+       <Option name="type" type="QString" value="collection"/>
+      </Option>
+     </data_defined_properties>
+    </layer>
+   </symbol>
+   <symbol alpha="0.8" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="7" type="marker">
+    <data_defined_properties>
+     <Option type="Map">
+      <Option name="name" type="QString" value=""/>
+      <Option name="properties"/>
+      <Option name="type" type="QString" value="collection"/>
+     </Option>
+    </data_defined_properties>
+    <layer class="SimpleMarker" enabled="1" id="{e27c65b1-8c98-4c5a-88bd-2b36ad65214d}" locked="0" pass="0">
+     <Option type="Map">
+      <Option name="angle" type="QString" value="0"/>
+      <Option name="cap_style" type="QString" value="square"/>
+      <Option name="color" type="QString" value="107,107,107,255,hsv:0.5,0,0.42061492800712585,1"/>
+      <Option name="horizontal_anchor_point" type="QString" value="1"/>
+      <Option name="joinstyle" type="QString" value="bevel"/>
+      <Option name="name" type="QString" value="circle"/>
+      <Option name="offset" type="QString" value="0,0"/>
+      <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="offset_unit" type="QString" value="Pixel"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
       <Option name="outline_style" type="QString" value="solid"/>
       <Option name="outline_width" type="QString" value="0"/>
       <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
@@ -17897,69 +17977,97 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
  </renderer-v2>
  <selection mode="Default">
   <selectionColor invalid="1"/>
+  <selectionSymbol>
+   <symbol alpha="1" clip_to_extent="1" force_rhr="0" frame_rate="10" is_animated="0" name="" type="marker">
+    <data_defined_properties>
+     <Option type="Map">
+      <Option name="name" type="QString" value=""/>
+      <Option name="properties"/>
+      <Option name="type" type="QString" value="collection"/>
+     </Option>
+    </data_defined_properties>
+    <layer class="SimpleMarker" enabled="1" id="{e97d720d-d458-466c-b3e1-f58074f2bbba}" locked="0" pass="0">
+     <Option type="Map">
+      <Option name="angle" type="QString" value="0"/>
+      <Option name="cap_style" type="QString" value="square"/>
+      <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
+      <Option name="horizontal_anchor_point" type="QString" value="1"/>
+      <Option name="joinstyle" type="QString" value="bevel"/>
+      <Option name="name" type="QString" value="circle"/>
+      <Option name="offset" type="QString" value="0,0"/>
+      <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="offset_unit" type="QString" value="MM"/>
+      <Option name="outline_color" type="QString" value="35,35,35,255,rgb:0.1372549,0.1372549,0.1372549,1"/>
+      <Option name="outline_style" type="QString" value="solid"/>
+      <Option name="outline_width" type="QString" value="0"/>
+      <Option name="outline_width_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="outline_width_unit" type="QString" value="MM"/>
+      <Option name="scale_method" type="QString" value="diameter"/>
+      <Option name="size" type="QString" value="2"/>
+      <Option name="size_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
+      <Option name="size_unit" type="QString" value="MM"/>
+      <Option name="vertical_anchor_point" type="QString" value="1"/>
+     </Option>
+     <data_defined_properties>
+      <Option type="Map">
+       <Option name="name" type="QString" value=""/>
+       <Option name="properties"/>
+       <Option name="type" type="QString" value="collection"/>
+      </Option>
+     </data_defined_properties>
+    </layer>
+   </symbol>
+  </selectionSymbol>
  </selection>
  <blendMode>0</blendMode>
  <featureBlendMode>0</featureBlendMode>
  <layerOpacity>1</layerOpacity>
  <referencedLayers>
-  <relation strength="Association" layerName="valor_tipo_no_hidrografico" name="valor_tipo_no_hidrografico_id" referencingLayer="N__hidrogr_fico_9f1ddc84_c8c1_478d_9768_4bb39deb45ec" referencedLayer="valor_tipo_no_hidrografico_9ce22eb6_fd31_4090_be95_e31b41430d60" layerId="valor_tipo_no_hidrografico_9ce22eb6_fd31_4090_be95_e31b41430d60" providerKey="postgres" dataSource="service=''5378_carttop2_povoa_varzim_20250303'' key=''identificador'' checkPrimaryKeyUnicity=''1'' table=&quot;public&quot;.&quot;valor_tipo_no_hidrografico&quot;" id="N__hidrogr_fico_9f1ddc84_c8c1_478d_9768_4bb39deb45ec_valor_tipo_no_hidrografico_valor_tipo_no_hidrografico_9ce22eb6_fd31_4090_be95_e31b41430d60_identificador">
-   <fieldRef referencingField="valor_tipo_no_hidrografico" referencedField="identificador"/>
+  <relation dataSource="service=''homologacao_2025_5448_1'' key=''identificador'' checkPrimaryKeyUnicity=''1'' table=&quot;public&quot;.&quot;valor_tipo_no_hidrografico&quot;" id="N__hidrogr_fico_07e60ed9_57b7_490c_a1d9_96cf13b967fb_valor_tipo_no_hidrografico_valor_tipo_no_hidrografico_dbbb9f35_4dc0_424f_b807_6aeecd3acfcf_identificador" layerId="valor_tipo_no_hidrografico_dbbb9f35_4dc0_424f_b807_6aeecd3acfcf" layerName="valor_tipo_no_hidrografico" name="valor_tipo_no_hidrografico_id" providerKey="postgres" referencedLayer="valor_tipo_no_hidrografico_dbbb9f35_4dc0_424f_b807_6aeecd3acfcf" referencingLayer="N__hidrogr_fico_07e60ed9_57b7_490c_a1d9_96cf13b967fb" strength="Association">
+   <fieldRef referencedField="identificador" referencingField="valor_tipo_no_hidrografico"/>
   </relation>
  </referencedLayers>
+ <referencingLayers/>
  <fieldConfiguration>
-  <field name="identificador" configurationFlags="NoFlag"/>
-  <field name="inicio_objeto" configurationFlags="NoFlag"/>
-  <field name="fim_objeto" configurationFlags="NoFlag"/>
-  <field name="id_hidrografico" configurationFlags="NoFlag"/>
-  <field name="valor_tipo_no_hidrografico" configurationFlags="NoFlag"/>
+  <field configurationFlags="NoFlag" name="identificador"/>
+  <field configurationFlags="NoFlag" name="inicio_objeto"/>
+  <field configurationFlags="NoFlag" name="fim_objeto"/>
+  <field configurationFlags="NoFlag" name="id_hidrografico"/>
+  <field configurationFlags="NoFlag" name="valor_tipo_no_hidrografico"/>
  </fieldConfiguration>
  <aliases>
-  <alias name="" field="identificador" index="0"/>
-  <alias name="" field="inicio_objeto" index="1"/>
-  <alias name="" field="fim_objeto" index="2"/>
-  <alias name="" field="id_hidrografico" index="3"/>
-  <alias name="" field="valor_tipo_no_hidrografico" index="4"/>
+  <alias field="identificador" index="0" name=""/>
+  <alias field="inicio_objeto" index="1" name=""/>
+  <alias field="fim_objeto" index="2" name=""/>
+  <alias field="id_hidrografico" index="3" name=""/>
+  <alias field="valor_tipo_no_hidrografico" index="4" name=""/>
  </aliases>
- <splitPolicies>
-  <policy field="identificador" policy="Duplicate"/>
-  <policy field="inicio_objeto" policy="Duplicate"/>
-  <policy field="fim_objeto" policy="Duplicate"/>
-  <policy field="id_hidrografico" policy="Duplicate"/>
-  <policy field="valor_tipo_no_hidrografico" policy="Duplicate"/>
- </splitPolicies>
- <duplicatePolicies>
-  <policy field="identificador" policy="Duplicate"/>
-  <policy field="inicio_objeto" policy="Duplicate"/>
-  <policy field="fim_objeto" policy="Duplicate"/>
-  <policy field="id_hidrografico" policy="Duplicate"/>
-  <policy field="valor_tipo_no_hidrografico" policy="Duplicate"/>
- </duplicatePolicies>
  <defaults>
-  <default expression="" applyOnUpdate="0" field="identificador"/>
-  <default expression="" applyOnUpdate="0" field="inicio_objeto"/>
-  <default expression="" applyOnUpdate="0" field="fim_objeto"/>
-  <default expression="" applyOnUpdate="0" field="id_hidrografico"/>
-  <default expression="" applyOnUpdate="0" field="valor_tipo_no_hidrografico"/>
+  <default applyOnUpdate="0" expression="" field="identificador"/>
+  <default applyOnUpdate="0" expression="" field="inicio_objeto"/>
+  <default applyOnUpdate="0" expression="" field="fim_objeto"/>
+  <default applyOnUpdate="0" expression="" field="id_hidrografico"/>
+  <default applyOnUpdate="0" expression="" field="valor_tipo_no_hidrografico"/>
  </defaults>
  <constraints>
-  <constraint unique_strength="1" exp_strength="0" notnull_strength="1" field="identificador" constraints="3"/>
-  <constraint unique_strength="0" exp_strength="0" notnull_strength="1" field="inicio_objeto" constraints="1"/>
-  <constraint unique_strength="0" exp_strength="0" notnull_strength="0" field="fim_objeto" constraints="0"/>
-  <constraint unique_strength="0" exp_strength="0" notnull_strength="0" field="id_hidrografico" constraints="0"/>
-  <constraint unique_strength="0" exp_strength="0" notnull_strength="1" field="valor_tipo_no_hidrografico" constraints="1"/>
+  <constraint constraints="3" exp_strength="0" field="identificador" notnull_strength="1" unique_strength="1"/>
+  <constraint constraints="1" exp_strength="0" field="inicio_objeto" notnull_strength="1" unique_strength="0"/>
+  <constraint constraints="0" exp_strength="0" field="fim_objeto" notnull_strength="0" unique_strength="0"/>
+  <constraint constraints="0" exp_strength="0" field="id_hidrografico" notnull_strength="0" unique_strength="0"/>
+  <constraint constraints="1" exp_strength="0" field="valor_tipo_no_hidrografico" notnull_strength="1" unique_strength="0"/>
  </constraints>
  <constraintExpressions>
-  <constraint desc="" field="identificador" exp=""/>
-  <constraint desc="" field="inicio_objeto" exp=""/>
-  <constraint desc="" field="fim_objeto" exp=""/>
-  <constraint desc="" field="id_hidrografico" exp=""/>
-  <constraint desc="" field="valor_tipo_no_hidrografico" exp=""/>
+  <constraint desc="" exp="" field="identificador"/>
+  <constraint desc="" exp="" field="inicio_objeto"/>
+  <constraint desc="" exp="" field="fim_objeto"/>
+  <constraint desc="" exp="" field="id_hidrografico"/>
+  <constraint desc="" exp="" field="valor_tipo_no_hidrografico"/>
  </constraintExpressions>
  <expressionfields/>
  <previewExpression>"identificador"</previewExpression>
  <layerGeometryType>0</layerGeometryType>
 </qgis>
-', '<StyledLayerDescriptor xmlns="http://www.opengis.net/sld" version="1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/StyledLayerDescriptor.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:se="http://www.opengis.net/se" xmlns:ogc="http://www.opengis.net/ogc">
+', '<StyledLayerDescriptor xmlns="http://www.opengis.net/sld" version="1.1.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:se="http://www.opengis.net/se" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.1.0/StyledLayerDescriptor.xsd">
  <NamedLayer>
   <se:Name>Nó hidrográfico</se:Name>
   <UserStyle>
@@ -18129,6 +18237,64 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <se:WellKnownName>circle</se:WellKnownName>
         <se:Fill>
          <se:SvgParameter name="fill">#a0cccc</se:SvgParameter>
+        </se:Fill>
+        <se:Stroke>
+         <se:SvgParameter name="stroke">#232323</se:SvgParameter>
+         <se:SvgParameter name="stroke-width">0.5</se:SvgParameter>
+        </se:Stroke>
+       </se:Mark>
+       <se:Size>6</se:Size>
+      </se:Graphic>
+     </se:PointSymbolizer>
+    </se:Rule>
+    <se:Rule>
+     <se:Name>Fronteira</se:Name>
+     <se:Description>
+      <se:Title>Fronteira</se:Title>
+     </se:Description>
+     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+      <ogc:PropertyIsEqualTo>
+       <ogc:PropertyName>valor_tipo_no_hidrografico</ogc:PropertyName>
+       <ogc:Literal>7</ogc:Literal>
+      </ogc:PropertyIsEqualTo>
+     </ogc:Filter>
+     <se:MinScaleDenominator>1</se:MinScaleDenominator>
+     <se:MaxScaleDenominator>25000</se:MaxScaleDenominator>
+     <se:PointSymbolizer>
+      <se:Graphic>
+       <se:Mark>
+        <se:WellKnownName>circle</se:WellKnownName>
+        <se:Fill>
+         <se:SvgParameter name="fill">#ff0000</se:SvgParameter>
+        </se:Fill>
+        <se:Stroke>
+         <se:SvgParameter name="stroke">#232323</se:SvgParameter>
+         <se:SvgParameter name="stroke-width">0.5</se:SvgParameter>
+        </se:Stroke>
+       </se:Mark>
+       <se:Size>6</se:Size>
+      </se:Graphic>
+     </se:PointSymbolizer>
+    </se:Rule>
+    <se:Rule>
+     <se:Name>Limite do Trabalho</se:Name>
+     <se:Description>
+      <se:Title>Limite do Trabalho</se:Title>
+     </se:Description>
+     <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+      <ogc:PropertyIsEqualTo>
+       <ogc:PropertyName>valor_tipo_no_hidrografico</ogc:PropertyName>
+       <ogc:Literal>8</ogc:Literal>
+      </ogc:PropertyIsEqualTo>
+     </ogc:Filter>
+     <se:MinScaleDenominator>1</se:MinScaleDenominator>
+     <se:MaxScaleDenominator>25000</se:MaxScaleDenominator>
+     <se:PointSymbolizer>
+      <se:Graphic>
+       <se:Mark>
+        <se:WellKnownName>circle</se:WellKnownName>
+        <se:Fill>
+         <se:SvgParameter name="fill">#6b6b6b</se:SvgParameter>
         </se:Fill>
         <se:Stroke>
          <se:SvgParameter name="stroke">#232323</se:SvgParameter>
