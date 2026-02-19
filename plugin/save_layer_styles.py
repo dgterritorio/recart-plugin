@@ -43,6 +43,15 @@
 # export_categories =  QgsMapLayer.StyleCategory.LayerConfiguration | QgsMapLayer.StyleCategory.Symbology | QgsMapLayer.StyleCategory.Labeling | QgsMapLayer.StyleCategory.Fields | QgsMapLayer.StyleCategory.Rendering | QgsMapLayer.StyleCategory.Relations
 # layer.saveStyleToDatabase(name=layer.name(),description="Default style for {}".format(layer.name()), useAsDefault=True, uiFileContent="", categories = export_categories)
 
+# Corrigir só um layer
+# Não é preciso esta script
+# Alterar o estilo no QGIS (Nó hidrográfico)
+# Exportar para a base de dados, escolhendo apenas as classes LayerConfiguration | Symbology | Labeling | Fields | Rendering | Relations
+# Ir à Base de dados, layer_styles e para esse estilo fazer copy e paste do QML
+# Num editor, trocar ' por ''
+# Alterar o ficheiro layer_styles.sql, na parte referente ao QGIS
+# Ir à Base de dados, layer_styles e para esse estilo fazer copy e paste do SLD
+# Alterar o ficheiro layer_styles.sql, na parte referente ao SLD
 
 mapGeometryType = {
     0: "Point",
