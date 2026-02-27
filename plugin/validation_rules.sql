@@ -534,138 +534,22 @@ SELECT a.identificador
 
 
 delete from validation.rules where code = 'rg_4_3_2';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('rg_4_3_2', 'Consistência tridimensional entre Altimetria e Hidrografia (Nível do solo)',
 $$As curva_de_nivel e curso_de_agua_eixo, quando se cruzam, têm que ter o mesmo valor Z. 
 Estas só se devem cruzar quando o curso_de_agua_eixo.valor_posicao_vertical tem valor '0'.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
-$$with linhas1 as (
-	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel
-),
-linhas2 as (
-	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and delimitacao_conhecida and not ficticio
-),
-allintersections as (
-	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
-	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
-	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
-	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
-	FROM linhas1, linhas2
-	where ST_Intersects(linhas1.geometria, linhas2.geometria)
-),
-confirmacoes as (
-	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
-			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
-			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
-		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
-		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
-		(dp).geom as geometria
-	from allintersections
-),
-verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
-	abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z
-	from confirmacoes where not l1_intersection and not l2_intersection),
-total as (select count(*) from confirmacoes),
-verygood as (select count(*) from confirmacoes where l1_intersection or l2_intersection),
-good as (select count(*) from verificar where delta_z <= ('%1$s'::json->>'desvio_3D')::numeric),
-bad as (select count(*) from verificar where delta_z > ('%1$s'::json->>'desvio_3D')::numeric)
-select total.count as total, verygood.count + good.count as good, bad.count as bad
-from total, verygood, good, bad$$,
-$$with linhas1 as (
-	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel
-),
-linhas2 as (
-	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and delimitacao_conhecida and not ficticio
-),
-allintersections as (
-	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
-	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
-	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
-	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
-	FROM linhas1, linhas2
-	where ST_Intersects(linhas1.geometria, linhas2.geometria)
-),
-confirmacoes as (
-	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
-			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
-			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
-		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
-		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
-		(dp).geom as geometria
-	from allintersections
-),
-verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
-	st_z( p1_intersecao ) - st_z( p2_intersecao ) as delta_z
-	from confirmacoes where not l1_intersection and not l2_intersection),
-bad as (select * from verificar where delta_z > ('%1$s'::json->>'desvio_3D')::numeric)
-select * from bad$$ );
+$$select * from validation.rg4_3_2_validation (1, '%s'::json)$$,
+$$select * from validation.rg4_3_2_validation (2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 'rg_4_3_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('rg_4_3_2', 'Consistência tridimensional entre Altimetria e Hidrografia (Nível do solo)',
 $$As curva_de_nivel e curso_de_agua_eixo, quando se cruzam, têm que ter o mesmo valor Z. 
 Estas só se devem cruzar quando o curso_de_agua_eixo.valor_posicao_vertical tem valor '0'.$$,
 $$Todos os objetos do Tema "Altimetria" e os objetos tridimensionais (3D) dos Temas "Hidrografia", "Transportes" e "Construções"$$, 'validation.intersecoes_3d',
-$$with linhas1 as (
-	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
-),
-linhas2 as (
-	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and delimitacao_conhecida and not ficticio and ST_Intersects(geometria, '%1$s')
-),
-allintersections as (
-	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
-	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
-	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
-	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
-	FROM linhas1, linhas2
-	where ST_Intersects(linhas1.geometria, linhas2.geometria)
-),
-confirmacoes as (
-	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
-			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
-			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
-		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
-		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
-		(dp).geom as geometria
-	from allintersections
-),
-verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
-	abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z
-	from confirmacoes where not l1_intersection and not l2_intersection),
-total as (select count(*) from confirmacoes),
-verygood as (select count(*) from confirmacoes where l1_intersection or l2_intersection),
-good as (select count(*) from verificar where delta_z <= ('%2$s'::json->>'desvio_3D')::numeric),
-bad as (select count(*) from verificar where delta_z > ('%2$s'::json->>'desvio_3D')::numeric)
-select total.count as total, verygood.count + good.count as good, bad.count as bad
-from total, verygood, good, bad$$,
-$$with linhas1 as (
-	select identificador, geometria, 'curva_de_nivel' as tabela from {schema}.curva_de_nivel where ST_Intersects(geometria, '%1$s')
-),
-linhas2 as (
-	select identificador, geometria, 'curso_de_agua_eixo' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = '0' and delimitacao_conhecida and not ficticio and ST_Intersects(geometria, '%1$s')
-),
-allintersections as (
-	SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, 
-	linhas1.identificador as id_1, linhas1.geometria as geom_1, 
-	linhas2.identificador as id_2, linhas2.geometria as geom_2, 
-	ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
-	FROM linhas1, linhas2
-	where ST_Intersects(linhas1.geometria, linhas2.geometria)
-),
-confirmacoes as (
-	select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, 
-			ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, 
-			ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,
-		ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, 
-		ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, 
-		(dp).geom as geometria
-	from allintersections
-),
-verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, 
-	st_z( p1_intersecao ) - st_z( p2_intersecao ) as delta_z
-	from confirmacoes where not l1_intersection and not l2_intersection),
-bad as (select * from verificar where delta_z > ('%2$s'::json->>'desvio_3D')::numeric)
-select * from bad$$ );
+$$select * from validation.rg4_3_2_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.rg4_3_2_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 --
 --

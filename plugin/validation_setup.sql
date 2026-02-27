@@ -1912,56 +1912,130 @@ end;
 $$ language plpgsql;
 
 
--- select * from validation.re3_2_validation ();
-create or replace function validation.re3_2_validation (ndd integer) returns table (total int, good int, bad int) as $$
+create or replace function validation.rg4_3_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
 	count_bad integer := 0;
 
-	valor_equi integer := case when ndd = 1 then 2 else 5 end;
+	desvio_3D numeric;
 begin
+	if ndd=1 then
+		select coalesce(_args->>'desvio_3D', '0.028')::numeric into desvio_3D;
+	else
+		select coalesce(_args->>'desvio_3D', '0.141')::numeric into desvio_3D;
+	end if;
+
 	CREATE SCHEMA IF NOT EXISTS errors;
-		-- table without indexes
-		-- raise notice '%', tbl;
-	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel INCLUDING ALL);
+	CREATE TABLE IF NOT exists errors.intersecoes_3d_rg_4_3_2 (like validation.intersecoes_3d INCLUDING ALL);
 
-	delete from errors.curva_de_nivel_re3_2;
+	delete from errors.intersecoes_3d_rg_4_3_2;
 
-	select count(*) from {schema}.curva_de_nivel into count_all;
-
-	WITH pares AS (
-        SELECT 
-            all_cdn.identificador,
-            round(abs(st_z(ST_PointN(all_cdn.geometria, 1)) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance
-        FROM {schema}.curva_de_nivel AS all_cdn
-        CROSS JOIN LATERAL (
-            SELECT geometria
-            FROM {schema}.curva_de_nivel AS ports
-            WHERE all_cdn.identificador != ports.identificador
-              AND valor_tipo_curva IN ('1','2')
-            ORDER BY ST_PointN(all_cdn.geometria, 1) <-> ports.geometria
-            LIMIT 1
-        ) AS closest_cdn
-        WHERE all_cdn.valor_tipo_curva IN ('1','2')
-    ),
-    bad_rows AS (        
-		INSERT INTO errors.curva_de_nivel_re3_2
-	    SELECT cn.*
-	    FROM {schema}.curva_de_nivel cn
-	    WHERE cn.identificador IN (
-			SELECT identificador
-	        FROM pares
-	        WHERE NOT (z_distance = 0 OR z_distance = valor_equi))
-		RETURNING 1
-    )
-	SELECT count(*) FROM bad_rows into count_bad;
-
-	select (count_all - count_bad) into count_good;
+	execute format(
+		'with linhas1 as ('
+			'select identificador, geometria, ''curva_de_nivel'' as tabela from {schema}.curva_de_nivel '
+		'),'
+		'linhas2 as ('
+			'select identificador, geometria, ''curso_de_agua_eixo'' as tabela from {schema}.curso_de_agua_eixo where valor_posicao_vertical = ''0'' and delimitacao_conhecida and not ficticio '
+		'),'
+		'allintersections as ('
+			'SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, '
+				'linhas1.identificador as id_1, linhas1.geometria as geom_1, '
+				'linhas2.identificador as id_2, linhas2.geometria as geom_2, '
+				'ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp '
+			'FROM linhas1, linhas2 '
+			'where ST_Intersects(linhas1.geometria, linhas2.geometria) '
+		'),'
+		'confirmacoes as ('
+			'select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, '
+					'ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, '
+					'ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,'
+				'ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, '
+				'ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, '
+				'(dp).geom as geometria '
+			'from allintersections'
+		'),'
+		'verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, '
+			'abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z '
+			'from confirmacoes where not l1_intersection and not l2_intersection),'
+		'total as (select count(*) from confirmacoes),'
+		'verygood as (select count(*) from confirmacoes where l1_intersection or l2_intersection),'
+		'good as (select count(*) from verificar where delta_z <= %1$L),'
+		'bad as (select count(*) from verificar where delta_z > %1$L),'
+		'bad_rows AS (        '
+			'INSERT INTO errors.intersecoes_3d_rg_4_3_2 '
+			'select * from verificar where delta_z > %1$L '
+			'on conflict do nothing '
+			'RETURNING 1'
+		')'
+		'SELECT bad.count, verygood.count + good.count, total.count FROM bad, verygood, good, total', desvio_3D) into count_bad, count_good, count_all;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
+
+create or replace function validation.rg4_3_2_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+
+	desvio_3D numeric;
+begin
+	if ndd=1 then
+		select coalesce(_args->>'desvio_3D', '0.028')::numeric into desvio_3D;
+	else
+		select coalesce(_args->>'desvio_3D', '0.141')::numeric into desvio_3D;
+	end if;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.intersecoes_3d_rg_4_3_2 (like validation.intersecoes_3d INCLUDING ALL);
+
+	delete from errors.intersecoes_3d_rg_4_3_2;
+
+	execute format(
+		'with linhas1 as ('
+			'select identificador, geometria, ''curva_de_nivel'' as tabela from {schema}.curva_de_nivel where ST_Intersects(geometria, %2$L) '
+		'),'
+		'linhas2 as ('
+			'select identificador, geometria, ''curso_de_agua_eixo'' as tabela from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, %2$L) and valor_posicao_vertical = ''0'' and delimitacao_conhecida and not ficticio '
+		'),'
+		'allintersections as ('
+			'SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2, '
+				'linhas1.identificador as id_1, linhas1.geometria as geom_1, '
+				'linhas2.identificador as id_2, linhas2.geometria as geom_2, '
+				'ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp '
+			'FROM linhas1, linhas2 '
+			'where ST_Intersects(linhas1.geometria, linhas2.geometria) '
+		'),'
+		'confirmacoes as ('
+			'select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, '
+					'ST_3DIntersects(geom_1, (dp).geom ) as l1_intersection, '
+					'ST_3DIntersects(geom_2, (dp).geom ) as l2_intersection,'
+				'ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao, '
+				'ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao, '
+				'(dp).geom as geometria '
+			'from allintersections'
+		'),'
+		'verificar as (select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, '
+			'abs( st_z( p1_intersecao ) - st_z( p2_intersecao ) ) as delta_z '
+			'from confirmacoes where not l1_intersection and not l2_intersection),'
+		'total as (select count(*) from confirmacoes),'
+		'verygood as (select count(*) from confirmacoes where l1_intersection or l2_intersection),'
+		'good as (select count(*) from verificar where delta_z <= %1$L),'
+		'bad as (select count(*) from verificar where delta_z > %1$L),'
+		'bad_rows AS (        '
+			'INSERT INTO errors.intersecoes_3d_rg_4_3_2 '
+			'select * from verificar where delta_z > %1$L '
+			'on conflict do nothing '
+			'RETURNING 1'
+		')'
+		'SELECT bad.count, verygood.count + good.count, total.count FROM bad, verygood, good, total', desvio_3D, sect) into count_bad, count_good, count_all;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
 
 -- select * from validation.re3_2_validation ();
 create or replace function validation.re3_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
@@ -1987,29 +2061,31 @@ begin
 
 	select count(*) from {schema}.curva_de_nivel into count_all;
 
-	WITH pares AS (
+	with candidates AS (
+    	SELECT identificador, geometria, ST_PointN(geometria, 1) AS first_point
+    		FROM {schema}.curva_de_nivel
+    	WHERE valor_tipo_curva IN ('1', '2')
+	),
+	pares AS (
         SELECT 
             all_cdn.identificador,
-            round(abs(st_z(ST_PointN(all_cdn.geometria, 1)) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance
-        FROM {schema}.curva_de_nivel AS all_cdn
+            round(abs(st_z(all_cdn.first_point) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance
+        FROM candidates AS all_cdn
         CROSS JOIN LATERAL (
-            SELECT geometria
-            FROM {schema}.curva_de_nivel AS ports
+            SELECT geometria FROM candidates AS ports
             WHERE all_cdn.identificador != ports.identificador
-              AND valor_tipo_curva IN ('1','2')
-            ORDER BY ST_PointN(all_cdn.geometria, 1) <-> ports.geometria
+            ORDER BY all_cdn.first_point <-> ports.geometria
             LIMIT 1
         ) AS closest_cdn
-        WHERE all_cdn.valor_tipo_curva IN ('1','2')
+    ),
+    bad_ids AS ( 
+    	SELECT identificador FROM pares WHERE z_distance NOT IN (0, valor_equi)
     ),
     bad_rows AS (        
 		INSERT INTO errors.curva_de_nivel_re3_2
 	    SELECT cn.*
 	    FROM {schema}.curva_de_nivel cn
-	    WHERE cn.identificador IN (
-			SELECT identificador
-	        FROM pares
-	        WHERE NOT (z_distance = 0 OR z_distance = valor_equi))
+	    WHERE cn.identificador IN (SELECT identificador FROM bad_ids)
 		RETURNING 1
     )
 	SELECT count(*) FROM bad_rows into count_bad;
@@ -2020,62 +2096,6 @@ begin
 end;
 $$ language plpgsql;
 
-CREATE OR REPLACE FUNCTION validation.re3_2_validation(ndd integer, sect geometry)
- RETURNS TABLE(total integer, good integer, bad integer)
- LANGUAGE plpgsql
-AS $function$
-declare
-	count_all integer := 0;
-	count_good integer := 0;
-	count_bad integer := 0;
-
-	valor_equi integer := case when ndd = 1 then 2 else 5 end;
-begin
-	CREATE SCHEMA IF NOT EXISTS errors;
-		-- table without indexes
-		-- raise notice '%', tbl;
-	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like public.curva_de_nivel INCLUDING ALL);
-
-	delete from errors.curva_de_nivel_re3_2;
-
-	execute format('select count(*) from {schema}.curva_de_nivel') into count_all;
-
-	execute format(
-		'WITH pares AS ('
-			'SELECT '
-				'all_cdn.identificador,'
-				'round(abs(st_z(ST_PointN(all_cdn.geometria, 1)) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance '
-			'FROM {schema}.curva_de_nivel AS all_cdn '
-			'CROSS JOIN LATERAL ('
-				'SELECT geometria '
-				'FROM {schema}.curva_de_nivel AS ports '
-				'WHERE ST_Intersects(ports.geometria, %1$L) and all_cdn.identificador != ports.identificador '
-				'AND valor_tipo_curva IN (''1'',''2'')'
-				'ORDER BY ST_PointN(all_cdn.geometria, 1) <-> ports.geometria '
-				'LIMIT 1 '
-			') AS closest_cdn '
-			'WHERE ST_Intersects(all_cdn.geometria, %1$L) and all_cdn.valor_tipo_curva IN (''1'',''2'')'
-		'),'
-		'bad_rows AS ('
-			'INSERT INTO errors.curva_de_nivel_re3_2 '
-			'SELECT cn.* '
-			'FROM {schema}.curva_de_nivel cn '
-			'WHERE cn.identificador IN ('
-				'SELECT identificador '
-				'FROM pares '
-				'WHERE NOT (z_distance = 0 OR z_distance = %2$L)) '
-			'ON CONFLICT (identificador) DO NOTHING '
-			'RETURNING 1 '
-		')'
-		'SELECT count(*) FROM bad_rows;'
-	, sect, valor_equi) into count_bad;
-
-	select (count_all - count_bad) into count_good;
-
-	return query select count_all as total, count_good as good, count_bad as bad;
-end;
-$function$
-;
 
 CREATE OR REPLACE FUNCTION validation.re3_2_validation(ndd integer, sect geometry, _args json)
  RETURNS TABLE(total integer, good integer, bad integer)
@@ -2104,29 +2124,34 @@ begin
 	execute format('select count(*) from {schema}.curva_de_nivel') into count_all;
 
 	execute format(
-		'WITH pares AS ('
+		'WITH candidates AS ('
+    			'SELECT identificador, geometria, ST_PointN(geometria, 1) AS first_point '
+    		'FROM {schema}.curva_de_nivel c '
+    	'WHERE valor_tipo_curva IN (''1'', ''2'') and ST_Intersects(c.geometria, %1$L)'
+		'),'
+		'pares AS ('
 			'SELECT '
 				'all_cdn.identificador,'
-				'round(abs(st_z(ST_PointN(all_cdn.geometria, 1)) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance '
-			'FROM {schema}.curva_de_nivel AS all_cdn '
+				'round(abs(st_z(all_cdn.first_point) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance '
+			'FROM candidates AS all_cdn '
 			'CROSS JOIN LATERAL ('
 				'SELECT geometria '
-				'FROM {schema}.curva_de_nivel AS ports '
-				'WHERE ST_Intersects(ports.geometria, %1$L) and all_cdn.identificador != ports.identificador '
-				'AND valor_tipo_curva IN (''1'',''2'')'
-				'ORDER BY ST_PointN(all_cdn.geometria, 1) <-> ports.geometria '
+				'FROM candidates AS ports '
+				'WHERE all_cdn.identificador != ports.identificador '
+				'ORDER BY all_cdn.first_point <-> ports.geometria '
 				'LIMIT 1 '
-			') AS closest_cdn '
-			'WHERE ST_Intersects(all_cdn.geometria, %1$L) and all_cdn.valor_tipo_curva IN (''1'',''2'')'
+			') AS closest_cdn'
 		'),'
+		'bad_ids AS ( '
+    		'SELECT identificador FROM pares WHERE z_distance NOT IN (0,  %2$L)'
+    	'),'
 		'bad_rows AS ('
 			'INSERT INTO errors.curva_de_nivel_re3_2 '
 			'SELECT cn.* '
 			'FROM {schema}.curva_de_nivel cn '
 			'WHERE cn.identificador IN ('
 				'SELECT identificador '
-				'FROM pares '
-				'WHERE NOT (z_distance = 0 OR z_distance = %2$L)) '
+				'FROM bad_ids )'
 			'ON CONFLICT (identificador) DO NOTHING '
 			'RETURNING 1 '
 		')'
