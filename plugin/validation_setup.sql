@@ -1407,6 +1407,8 @@ begin
 			tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS motivo TEXT NULL', tabela_erro);
+
 			execute format('delete from %s', tabela_erro);
 			execute format('insert into %s select t.*, st_isvalidreason(geometria) from {schema}.%I t where not st_isvalid(geometria) ON CONFLICT (identificador) DO NOTHING', tabela_erro, tabela);
 		end if;
@@ -1467,6 +1469,8 @@ begin
 			tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS motivo TEXT NULL', tabela_erro);
+
 			execute format('insert into %s select t.*, st_isvalidreason(geometria) from {schema}.%I t where not st_isvalid(geometria) and ST_Intersects(geometria, %L) ON CONFLICT (identificador) DO NOTHING', tabela_erro, tabela, sect);
 		end if;
 	end loop;
