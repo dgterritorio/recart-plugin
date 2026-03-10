@@ -2234,6 +2234,201 @@ end;
 $$ language plpgsql;
 
 
+create or replace function validation.re5_5_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.seg_via_rodov_re_5_5_2 (like {schema}.seg_via_rodov INCLUDING ALL);
+
+	delete from errors.seg_via_rodov_re_5_5_2;
+
+	with 
+		extremes as (
+			select st_startpoint(geometria) as pt from {schema}.seg_via_rodov
+			union
+			select st_endpoint(geometria) as pt from {schema}.seg_via_rodov
+		),
+		all_intersecoes as (
+			select cf1.identificador AS id1, cf2.identificador AS id2,
+				st_intersection(cf1.geometria, cf2.geometria) AS geom_inter
+			from {schema}.seg_via_rodov cf1
+			join {schema}.seg_via_rodov cf2
+				on cf1.identificador < cf2.identificador
+					and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
+					and st_intersects(cf1.geometria, cf2.geometria)
+		),
+		intersecoes_dump as (
+			select 
+				id1, id2,
+				(st_dump(geom_inter)).geom AS geom,
+				geometrytype(geom_inter) AS gtype
+			FROM all_intersecoes
+		),
+		ok_intersecoes as (
+			select id1, id2, geom 
+				FROM intersecoes_dump 
+				WHERE gtype IN ('POINT', 'MULTIPOINT')
+		),
+		existentes as (
+			select id1, id2, geom,
+				EXISTS (select 1 FROM extremes e WHERE e.pt && o.geom AND st_equals(e.pt, o.geom)) AS at_extremity
+			from ok_intersecoes o
+		),
+		segmentos as (
+			select COUNT(DISTINCT id) AS cnt FROM (
+				select id1 AS id FROM existentes WHERE NOT at_extremity
+				UNION
+				select id2 FROM existentes WHERE NOT at_extremity
+			) as foo
+		),
+		linhas_duplicadas as (
+			select COUNT(DISTINCT id) AS cnt FROM (
+				select id1 AS id FROM all_intersecoes
+				WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+				UNION
+				select id2 FROM all_intersecoes
+				WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+			) as foo
+		),
+		total as (
+			select COUNT(DISTINCT id) AS cnt FROM (
+				select id1 AS id FROM intersecoes_dump
+				UNION
+				select id2 FROM intersecoes_dump
+			) as foo
+		),
+		good as (
+			select COUNT(DISTINCT id) AS cnt FROM (
+				select id1 AS id FROM existentes WHERE at_extremity
+				UNION
+				select id2 FROM existentes WHERE at_extremity
+			) as foo
+		),
+		bad_rows AS (
+			INSERT INTO errors.seg_via_rodov_re_5_5_2
+				select * from {schema}.seg_via_rodov
+					where identificador in (
+						select id1 AS id FROM existentes WHERE NOT at_extremity
+						UNION
+						select id2 FROM existentes WHERE NOT at_extremity
+					) or identificador in (
+						select id1 AS id FROM all_intersecoes
+							WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+						UNION
+						select id2 FROM all_intersecoes
+							WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+					)
+				on conflict do nothing
+				RETURNING 1
+		)
+		select total.cnt as total, good.cnt as good, (segmentos.cnt + linhas_duplicadas.cnt) as bad
+		from total, good, segmentos, linhas_duplicadas into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re5_5_2_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.seg_via_rodov_re_5_5_2 (like {schema}.seg_via_rodov INCLUDING ALL);
+
+	delete from errors.seg_via_rodov_re_5_5_2;
+
+	with 
+		extremes as (
+			select st_startpoint(geometria) as pt from {schema}.seg_via_rodov s1 WHERE ST_Intersects(s1.geometria, sect)
+			union
+			select st_endpoint(geometria) as pt from {schema}.seg_via_rodov s2 WHERE ST_Intersects(s2.geometria, sect)
+		),
+		all_intersecoes as (
+			select cf1.identificador AS id1, cf2.identificador AS id2,
+				st_intersection(cf1.geometria, cf2.geometria) AS geom_inter
+			from {schema}.seg_via_rodov cf1
+			join {schema}.seg_via_rodov cf2
+				on cf1.identificador < cf2.identificador
+					and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
+					and st_intersects(cf1.geometria, cf2.geometria)
+			WHERE ST_Intersects(cf1.geometria, sect)
+		),
+		intersecoes_dump as (
+			select 
+				id1, id2,
+				(st_dump(geom_inter)).geom AS geom,
+				geometrytype(geom_inter) AS gtype
+			FROM all_intersecoes
+		),
+		ok_intersecoes as (
+			select id1, id2, geom 
+				FROM intersecoes_dump 
+				WHERE gtype IN ('POINT', 'MULTIPOINT')
+		),
+		existentes as (
+			select id1, id2, geom,
+				EXISTS (select 1 FROM extremes e WHERE e.pt && o.geom AND st_equals(e.pt, o.geom)) AS at_extremity
+			from ok_intersecoes o
+		),
+		segmentos as (
+			select COUNT(DISTINCT id) AS cnt FROM (
+				select id1 AS id FROM existentes WHERE NOT at_extremity
+				UNION
+				select id2 FROM existentes WHERE NOT at_extremity
+			) as foo
+		),
+		linhas_duplicadas as (
+			select COUNT(DISTINCT id) AS cnt FROM (
+				select id1 AS id FROM all_intersecoes
+				WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+				UNION
+				select id2 FROM all_intersecoes
+				WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+			) as foo
+		),
+		total as (
+			select COUNT(DISTINCT id) AS cnt FROM (
+				select id1 AS id FROM intersecoes_dump
+				UNION
+				select id2 FROM intersecoes_dump
+			) as foo
+		),
+		good as (
+			select COUNT(DISTINCT id) AS cnt FROM (
+				select id1 AS id FROM existentes WHERE at_extremity
+				UNION
+				select id2 FROM existentes WHERE at_extremity
+			) as foo
+		),
+		bad_rows AS (
+			INSERT INTO errors.seg_via_rodov_re_5_5_2
+				select * from {schema}.seg_via_rodov
+					where identificador in (
+						select id1 AS id FROM existentes WHERE NOT at_extremity
+						UNION
+						select id2 FROM existentes WHERE NOT at_extremity
+					) or identificador in (
+						select id1 AS id FROM all_intersecoes
+							WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+						UNION
+						select id2 FROM all_intersecoes
+							WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+					)
+				on conflict do nothing
+				RETURNING 1
+		)
+		select total.cnt as total, good.cnt as good, (segmentos.cnt + linhas_duplicadas.cnt) as bad
+		from total, good, segmentos, linhas_duplicadas into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
 -- select * from validation.re3_2_validation ();
 create or replace function validation.re3_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare

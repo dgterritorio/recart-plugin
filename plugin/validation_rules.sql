@@ -3141,7 +3141,7 @@ $$select * from {schema}.area_infra_trans_ferrov where ST_Intersects(geometria, 
 -- Interrupção da via rodoviária
 -- RE5.5.2
 delete from validation.rules where code = 're5_5_2';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re5_5_2', 'Interrupção da via rodoviária', 
 $$O “Segmento da via-férrea” é interrompido quando:
  - Existe uma interceção com outro “Segmento da via-férrea”;
@@ -3157,62 +3157,12 @@ de uma “Infraestrutura de transporte ferroviário”.
 $$"“Segmento da via rodoviária”, “Via rodoviária - Limite”, “Segmento da via-
 férrea”, “Nó de transporte rodoviário” e “Infraestrutura de transporte
 rodoviário”".$$, 'seg_via_rodov',
-$$with 
-all_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes),
-ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
-existentes as (
-	select * from ok_intersecoes where geom in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)
-),
-inexistentes as (
-	select * from 
-	ok_intersecoes where geom not in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)),
-segmentos as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, inexistentes i where st_contains(svf.geometria, i.geom)) as foo),
-linhas_duplicadas as (
-	select count(cf1.*) from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-		where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-			and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-total as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, all_intersecoes i where st_contains(svf.geometria, i.geom)) as foo),
-good as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, existentes i where st_contains(svf.geometria, i.geom)) as foo),
-bad as (select segmentos.count + linhas_duplicadas.count as count
-	from segmentos, linhas_duplicadas)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
-linhas_duplicadas as (
-select cf1.*
-from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes 
-and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-inexistentes as (
-	select * from 
-	ok_intersecoes where geom not in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)),
-segmentos as (select svf.* from {schema}.seg_via_rodov svf, inexistentes i where st_contains(svf.geometria, i.geom) )
-select * from segmentos union select * from linhas_duplicadas$$ );
+$$select * from validation.re5_5_2_validation (1, '%s'::json)$$,
+$$select * from validation.re5_5_2_validation (2, '%s'::json)$$ );
 
 
 delete from validation.rules_area where code = 're5_5_2';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re5_5_2', 'Interrupção da via rodoviária', 
 $$O “Segmento da via-férrea” é interrompido quando:
  - Existe uma interceção com outro “Segmento da via-férrea”;
@@ -3228,58 +3178,8 @@ de uma “Infraestrutura de transporte ferroviário”.
 $$"“Segmento da via rodoviária”, “Via rodoviária - Limite”, “Segmento da via-
 férrea”, “Nó de transporte rodoviário” e “Infraestrutura de transporte
 rodoviário”".$$, 'seg_via_rodov',
-$$with 
-all_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes),
-ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
-existentes as (
-	select * from ok_intersecoes where geom in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)
-),
-inexistentes as (
-	select * from 
-	ok_intersecoes where geom not in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)),
-segmentos as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, inexistentes i where ST_Intersects(svf.geometria, '%1$s'::geometry) and  st_contains(svf.geometria, i.geom)) as foo),
-linhas_duplicadas as (
-	select count(cf1.*) from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-		where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-			and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-total as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, all_intersecoes i where st_contains(svf.geometria, i.geom)) as foo),
-good as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, existentes i where st_contains(svf.geometria, i.geom)) as foo),
-bad as (select segmentos.count + linhas_duplicadas.count as count
-	from segmentos, linhas_duplicadas)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
-linhas_duplicadas as (
-select cf1.*
-from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes 
-and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-inexistentes as (
-	select * from 
-	ok_intersecoes where geom not in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)),
-segmentos as (select svf.* from {schema}.seg_via_rodov svf, inexistentes i where st_contains(svf.geometria, i.geom) )
-select * from segmentos union select * from linhas_duplicadas$$ );
+$$select * from validation.re5_5_2_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re5_5_2_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 -- RE5.5.3
