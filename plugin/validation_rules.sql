@@ -2295,78 +2295,26 @@ $$select nh.* from {schema}.no_hidrografico nh
 delete from validation.rules where code = 're4_11_1';
 delete from validation.rules where code = 're4_11_2';
 delete from validation.rules where code = 're4_11';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_11', 'Hierarquia dos nós hidrográficos', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
 “Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó“.$$, 
 $$"Curso de água - eixo, Nó hidrográfico".$$, 'no_hidrografico',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
-		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
-		group by st_intersection(l1.geometria, l2.geometria)
-),
-total as (
-	select count(*) from inter where count > 2
-),
-good as (
-	select count(*) from {schema}.no_hidrografico n1
-	where geometria in (select geom from inter where count > 2)
-		and geometria not in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-		and valor_tipo_no_hidrografico = '3'
-),
-bad as (
-	select count(*) from {schema}.no_hidrografico n1
-	where geometria in (select geom from inter where count > 2)
-		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-			or valor_tipo_no_hidrografico <> '3')
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
-		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_hidrografico n1
-	where geometria in (select geom from inter where count > 2)
-		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-			or valor_tipo_no_hidrografico <> '3')$$ );
+$$select * from validation.re4_11_validation (1, '%s'::json)$$,
+$$select * from validation.re4_11_validation (2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're4_11_1';
 delete from validation.rules_area where code = 're4_11_2';
 delete from validation.rules_area where code = 're4_11';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_11', 'Hierarquia dos nós hidrográficos', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
 “Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó$$, 
 $$"Curso de água - eixo, Nó hidrográfico".$$, 'curso_de_agua_eixo',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
-		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
-		group by st_intersection(l1.geometria, l2.geometria)
-),
-total as (
-	select count(*) from inter where count > 2
-),
-good as (
-	select count(*) from {schema}.no_hidrografico n1
-	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and geometria not in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-		and valor_tipo_no_hidrografico = '3'
-),
-bad as (
-	select count(*) from {schema}.no_hidrografico n1
-	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-			or valor_tipo_no_hidrografico <> '3')
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
-		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_hidrografico n1
-	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-			or valor_tipo_no_hidrografico <> '3')$$ );
+$$select * from validation.re4_11_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_11_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 -- pseudo-nós
 -- Entre dois nós só pode haver um segmento

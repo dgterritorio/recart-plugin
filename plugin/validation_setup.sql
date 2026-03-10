@@ -2122,6 +2122,118 @@ end;
 $$ language plpgsql;
 
 
+create or replace function validation.re4_11_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.no_hidrografico_re_4_11 (like {schema}.no_hidrografico INCLUDING ALL);
+
+	delete from errors.no_hidrografico_re_4_11;
+
+	WITH inter AS (
+		SELECT 
+			ST_Intersection(l1.geometria, l2.geometria) AS geom
+		FROM {schema}.curso_de_agua_eixo l1
+		JOIN {schema}.curso_de_agua_eixo l2 
+			ON l1.identificador < l2.identificador
+			AND ST_Intersects(l1.geometria, l2.geometria)
+	),
+	intersection_counts AS (
+		SELECT geom FROM inter
+		GROUP BY geom
+		HAVING COUNT(*) > 2
+	),
+	nos_classified AS (
+		SELECT 
+			n.identificador,
+			CASE 
+				WHEN COUNT(*) OVER (PARTITION BY n.geometria) = 1 
+					AND n.valor_tipo_no_hidrografico = '3' 
+				THEN 'good'
+				ELSE 'bad'
+			END AS classification
+		FROM {schema}.no_hidrografico n
+		WHERE EXISTS (
+			SELECT 1 FROM intersection_counts ic 
+			WHERE ic.geom = n.geometria
+		)
+	),
+	bad_rows AS (
+		INSERT INTO errors.no_hidrografico_re_4_11
+			select * from {schema}.no_hidrografico
+				where identificador in (select identificador from nos_classified WHERE classification = 'bad')
+			on conflict do nothing
+			RETURNING 1
+	)
+	SELECT 
+		COUNT(*) AS total,
+		COUNT(*) FILTER (WHERE classification = 'good') AS good,
+		COUNT(*) FILTER (WHERE classification = 'bad') AS bad
+	FROM nos_classified into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_11_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.no_hidrografico_re_4_11 (like {schema}.no_hidrografico INCLUDING ALL);
+
+	WITH inter AS (
+		SELECT 
+			ST_Intersection(l1.geometria, l2.geometria) AS geom
+		FROM {schema}.curso_de_agua_eixo l1
+		JOIN {schema}.curso_de_agua_eixo l2 
+			ON l1.identificador < l2.identificador
+			AND ST_Intersects(l1.geometria, l2.geometria)
+		WHERE ST_Intersects(l1.geometria, sect)
+	),
+	intersection_counts AS (
+		SELECT geom FROM inter
+		GROUP BY geom
+		HAVING COUNT(*) > 2
+	),
+	nos_classified AS (
+		SELECT 
+			n.identificador,
+			CASE 
+				WHEN COUNT(*) OVER (PARTITION BY n.geometria) = 1 
+					AND n.valor_tipo_no_hidrografico = '3' 
+				THEN 'good'
+				ELSE 'bad'
+			END AS classification
+		FROM {schema}.no_hidrografico n
+		WHERE EXISTS (
+			SELECT 1 FROM intersection_counts ic 
+			WHERE ic.geom = n.geometria
+		)
+	),
+	bad_rows AS (
+		INSERT INTO errors.no_hidrografico_re_4_11
+			select * from {schema}.no_hidrografico
+				where identificador in (select identificador from nos_classified WHERE classification = 'bad')
+			on conflict do nothing
+			RETURNING 1
+	)
+	SELECT 
+		COUNT(*) AS total,
+		COUNT(*) FILTER (WHERE classification = 'good') AS good,
+		COUNT(*) FILTER (WHERE classification = 'bad') AS bad
+	FROM nos_classified into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
 -- select * from validation.re3_2_validation ();
 create or replace function validation.re3_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare
