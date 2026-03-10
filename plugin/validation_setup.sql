@@ -2041,6 +2041,87 @@ end;
 $$ language plpgsql;
 
 
+create or replace function validation.re4_8_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.curso_de_agua_eixo_re_4_8_1 (like {schema}.curso_de_agua_eixo INCLUDING ALL);
+
+	delete from errors.curso_de_agua_eixo_re_4_8_1;
+
+	WITH intersections AS (
+		SELECT 
+			a.identificador,	
+			BOOL_OR(
+				a.identificador != b.identificador 
+				AND NOT ST_Touches(a.geometria, b.geometria)
+			) AS has_bad
+		FROM {schema}.curso_de_agua_eixo a
+		JOIN {schema}.curso_de_agua_eixo b 
+			ON ST_Intersects(a.geometria, b.geometria)
+		WHERE a.identificador != b.identificador
+		GROUP BY a.identificador
+	),
+	bad_rows AS (
+		INSERT INTO errors.curso_de_agua_eixo_re_4_8_1
+			select * from {schema}.curso_de_agua_eixo
+				where identificador in (select identificador from intersections WHERE has_bad)
+			on conflict do nothing
+			RETURNING 1
+	)
+	SELECT 
+		COUNT(*) AS total,
+		COUNT(*) FILTER (WHERE NOT has_bad) AS good,
+		COUNT(*) FILTER (WHERE has_bad) AS bad
+	FROM intersections into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_8_1_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.curso_de_agua_eixo_re_4_8_1 (like {schema}.curso_de_agua_eixo INCLUDING ALL);
+
+	WITH intersections AS (
+		SELECT 
+			a.identificador,	
+			BOOL_OR(
+				a.identificador != b.identificador 
+				AND NOT ST_Touches(a.geometria, b.geometria)
+			) AS has_bad
+		FROM {schema}.curso_de_agua_eixo a
+		JOIN {schema}.curso_de_agua_eixo b 
+			ON ST_Intersects(a.geometria, b.geometria)
+		WHERE ST_Intersects(a.geometria, sect) AND a.identificador != b.identificador
+		GROUP BY a.identificador
+	),
+	bad_rows AS (
+		INSERT INTO errors.curso_de_agua_eixo_re_4_8_1
+			select * from {schema}.curso_de_agua_eixo
+				where identificador in (select identificador from intersections WHERE has_bad)
+			on conflict do nothing
+			RETURNING 1
+	)
+	SELECT 
+		COUNT(*) AS total,
+		COUNT(*) FILTER (WHERE NOT has_bad) AS good,
+		COUNT(*) FILTER (WHERE has_bad) AS bad
+	FROM intersections into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
 -- select * from validation.re3_2_validation ();
 create or replace function validation.re3_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare

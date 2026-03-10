@@ -1779,7 +1779,7 @@ $$select a.*
  */
 
 delete from validation.rules where code = 're4_8_1';
-insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report ) 
+insert into validation.rules (code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_8_1', 'Interrupção do curso de água (topologia)', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
@@ -1790,30 +1790,11 @@ caracteriza o "Curso de água - eixo";
 regulação de fluxo ("Barreira").$$,
 $$"Curso de água - eixo", "Curso de água - área", "Queda de água", "Zona
 húmida" e "Barreira".$$, 'curso_de_agua_eixo',
-$$with
-total as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where ST_intersects(a.geometria, b.geometria)),
-good as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_intersects(a.geometria, b.geometria) and ST_Touches(a.geometria, b.geometria)
-),
-bad as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-NULL,
-$$select distinct a.*
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$ );
+$$select * from validation.re4_8_1_validation (1, '%s'::json)$$,
+$$select * from validation.re4_8_1_validation (2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're4_8_1';
-insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2, report ) 
+insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_8_1', 'Interrupção do curso de água (topologia)', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
@@ -1824,30 +1805,8 @@ caracteriza o "Curso de água - eixo";
 regulação de fluxo ("Barreira").$$,
 $$"Curso de água - eixo", "Curso de água - área", "Queda de água", "Zona
 húmida" e "Barreira".$$, 'curso_de_agua_eixo',
-$$with
-total as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where ST_Intersects(a.geometria, '%1$s') and ST_intersects(a.geometria, b.geometria)),
-good as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_Intersects(a.geometria, '%1$s') and
-		ST_intersects(a.geometria, b.geometria) and ST_Touches(a.geometria, b.geometria)
-),
-bad as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_Intersects(a.geometria, '%1$s') and
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-NULL,
-$$select distinct a.*
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_Intersects(a.geometria, '%1$s') and
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$ );
+$$select * from validation.re4_8_1_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_8_1_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 delete from validation.rules where code = 're4_8_2';
