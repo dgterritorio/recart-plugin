@@ -2429,6 +2429,95 @@ begin
 end;
 $$ language plpgsql;
 
+
+create or replace function validation.re5_5_4_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.no_trans_rodov_re_5_5_4 (like {schema}.no_trans_rodov INCLUDING ALL);
+
+	delete from errors.no_trans_rodov_re_5_5_4;
+
+	with inter as (
+		select distinct st_intersection(l1.geometria, l2.geometria) as geom from {schema}.seg_via_rodov l1
+			join {schema}.infra_trans_rodov l2
+				on st_intersects(ST_StartPoint(l1.geometria), l2.geometria)
+				or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
+	),
+	inter_with_counts AS (
+		SELECT i.geom, COUNT(n.geometria) AS node_count
+		FROM inter i
+		LEFT JOIN {schema}.no_trans_rodov n ON n.geometria = i.geom
+		GROUP BY i.geom
+	),
+	estat AS (
+		SELECT
+			COUNT(*) FILTER (WHERE node_count <> 0) AS total,
+			COUNT(*) FILTER (WHERE node_count <> 0 and node_count = 2) AS good,
+			COUNT(*) FILTER (WHERE node_count <> 0 and node_count <> 2) AS bad
+		FROM inter_with_counts
+	),
+	bad_rows AS (
+		INSERT INTO errors.no_trans_rodov_re_5_5_4
+			SELECT n.*
+			FROM {schema}.no_trans_rodov n
+			WHERE n.geometria IN (SELECT geom FROM inter_with_counts WHERE node_count <> 2)
+			ON CONFLICT DO NOTHING
+			RETURNING 1
+	)
+	select s.total, s.good, s.bad from estat s into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re5_5_4_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.no_trans_rodov_re_5_5_4 (like {schema}.no_trans_rodov INCLUDING ALL);
+
+	with inter as (
+		select distinct st_intersection(l1.geometria, l2.geometria) as geom from {schema}.seg_via_rodov l1
+			join {schema}.infra_trans_rodov l2
+				on st_intersects(ST_StartPoint(l1.geometria), l2.geometria)
+				or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
+			WHERE ST_Intersects(l2.geometria, sect)
+	),
+	inter_with_counts AS (
+		SELECT i.geom, COUNT(n.geometria) AS node_count
+		FROM inter i
+		LEFT JOIN {schema}.no_trans_rodov n ON n.geometria = i.geom
+		GROUP BY i.geom
+	),
+	estat AS (
+		SELECT
+			COUNT(*) FILTER (WHERE node_count <> 0) AS total,
+			COUNT(*) FILTER (WHERE node_count <> 0 and node_count = 2) AS good,
+			COUNT(*) FILTER (WHERE node_count <> 0 and node_count <> 2) AS bad
+		FROM inter_with_counts
+	),
+	bad_rows AS (
+		INSERT INTO errors.no_trans_rodov_re_5_5_4
+			SELECT n.*
+			FROM {schema}.no_trans_rodov n
+			WHERE n.geometria IN (SELECT geom FROM inter_with_counts WHERE node_count <> 2)
+			ON CONFLICT DO NOTHING
+			RETURNING 1
+	)
+	select s.total, s.good, s.bad from estat s into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
 -- select * from validation.re3_2_validation ();
 create or replace function validation.re3_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare

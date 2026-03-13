@@ -3356,53 +3356,25 @@ $$ select *
 
 -- RE5.5.4
 delete from validation.rules where code = 're5_5_4';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re5_5_4', 'Nós terminais da via rodoviária', 
 $$Quando um “Segmento da via rodoviária” tem o seu fim numa “Infraestrutura de transporte rodoviário” é colocado um “Nó de transporte rodoviário” 
 correspondente ao fim da via e um outro “Nó de transporte rodoviário” correspondente à infraestrutura. 
 Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via rodoviária” em conformidade com a topologia implícita.$$, 
 $$"“Segmento da via rodoviária”, “Infraestrutura de transporte rodoviário” e “Nó de transporte rodoviário”".$$, 'no_trans_rodov',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.infra_trans_rodov l2 on st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-), total as (
-	select count(*) from inter
-), good as (
-	select count(*) from inter where (select count(*) from {schema}.no_trans_rodov where geom=geometria) = 2
-), bad as (
-	select count(*) from inter where (select count(*) from {schema}.no_trans_rodov where geom=geometria) <> 2
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.infra_trans_rodov l2 on st_intersects(l1.geometria, l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_trans_rodov where geometria in (select geom from inter where (select count(*) from {schema}.no_trans_rodov where geom=geometria) <> 2)$$ );
+$$select * from validation.re5_5_4_validation (1, '%s'::json)$$,
+$$select * from validation.re5_5_4_validation (2, '%s'::json)$$ );
 
 
 delete from validation.rules_area where code = 're5_5_4';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re5_5_4', 'Nós terminais da via rodoviária', 
 $$Quando um “Segmento da via rodoviária” tem o seu fim numa “Infraestrutura de transporte rodoviário” é colocado um “Nó de transporte rodoviário” 
 correspondente ao fim da via e um outro “Nó de transporte rodoviário” correspondente à infraestrutura. 
 Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via rodoviária” em conformidade com a topologia implícita.$$, 
 $$"“Segmento da via rodoviária”, “Infraestrutura de transporte rodoviário” e “Nó de transporte rodoviário”".$$, 'no_trans_rodov',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.infra_trans_rodov l2 on st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-), total as (
-	select count(*) from inter
-), good as (
-	select count(*) from inter where ST_Intersects(geom, '%1$s') and (select count(*) from {schema}.no_trans_rodov where geom=geometria) = 2
-), bad as (
-	select count(*) from inter where ST_Intersects(geom, '%1$s') and (select count(*) from {schema}.no_trans_rodov where geom=geometria) <> 2
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.infra_trans_rodov l2 on st_intersects(l1.geometria, l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_trans_rodov where ST_Intersects(geom, '%1$s') and geometria in (select geom from inter where (select count(*) from {schema}.no_trans_rodov where geom=geometria) <> 2)$$ );
+$$select * from validation.re5_5_4_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re5_5_4_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 -- RE5.5.5
