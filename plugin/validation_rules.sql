@@ -1779,7 +1779,7 @@ $$select a.*
  */
 
 delete from validation.rules where code = 're4_8_1';
-insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report ) 
+insert into validation.rules (code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_8_1', 'Interrupção do curso de água (topologia)', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
@@ -1790,30 +1790,11 @@ caracteriza o "Curso de água - eixo";
 regulação de fluxo ("Barreira").$$,
 $$"Curso de água - eixo", "Curso de água - área", "Queda de água", "Zona
 húmida" e "Barreira".$$, 'curso_de_agua_eixo',
-$$with
-total as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where ST_intersects(a.geometria, b.geometria)),
-good as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_intersects(a.geometria, b.geometria) and ST_Touches(a.geometria, b.geometria)
-),
-bad as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-NULL,
-$$select distinct a.*
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$ );
+$$select * from validation.re4_8_1_validation (1, '%s'::json)$$,
+$$select * from validation.re4_8_1_validation (2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're4_8_1';
-insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2, report ) 
+insert into validation.rules_area (code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_8_1', 'Interrupção do curso de água (topologia)', 
 $$O "Curso de água- eixo" e o "Curso de água - área" são interrompidos
 quando:
@@ -1824,30 +1805,8 @@ caracteriza o "Curso de água - eixo";
 regulação de fluxo ("Barreira").$$,
 $$"Curso de água - eixo", "Curso de água - área", "Queda de água", "Zona
 húmida" e "Barreira".$$, 'curso_de_agua_eixo',
-$$with
-total as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where ST_Intersects(a.geometria, '%1$s') and ST_intersects(a.geometria, b.geometria)),
-good as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_Intersects(a.geometria, '%1$s') and
-		ST_intersects(a.geometria, b.geometria) and ST_Touches(a.geometria, b.geometria)
-),
-bad as (select count(distinct a.identificador)
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_Intersects(a.geometria, '%1$s') and
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad$$,
-NULL,
-$$select distinct a.*
-	from {schema}.curso_de_agua_eixo a, {schema}.curso_de_agua_eixo b
-	where a.identificador != b.identificador and 
-		ST_Intersects(a.geometria, '%1$s') and
-		ST_intersects(a.geometria, b.geometria) and not ST_Touches(a.geometria, b.geometria)$$ );
+$$select * from validation.re4_8_1_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_8_1_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 delete from validation.rules where code = 're4_8_2';
@@ -2336,78 +2295,26 @@ $$select nh.* from {schema}.no_hidrografico nh
 delete from validation.rules where code = 're4_11_1';
 delete from validation.rules where code = 're4_11_2';
 delete from validation.rules where code = 're4_11';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_11', 'Hierarquia dos nós hidrográficos', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
 “Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó“.$$, 
 $$"Curso de água - eixo, Nó hidrográfico".$$, 'no_hidrografico',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
-		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
-		group by st_intersection(l1.geometria, l2.geometria)
-),
-total as (
-	select count(*) from inter where count > 2
-),
-good as (
-	select count(*) from {schema}.no_hidrografico n1
-	where geometria in (select geom from inter where count > 2)
-		and geometria not in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-		and valor_tipo_no_hidrografico = '3'
-),
-bad as (
-	select count(*) from {schema}.no_hidrografico n1
-	where geometria in (select geom from inter where count > 2)
-		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-			or valor_tipo_no_hidrografico <> '3')
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
-		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_hidrografico n1
-	where geometria in (select geom from inter where count > 2)
-		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-			or valor_tipo_no_hidrografico <> '3')$$ );
+$$select * from validation.re4_11_validation (1, '%s'::json)$$,
+$$select * from validation.re4_11_validation (2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're4_11_1';
 delete from validation.rules_area where code = 're4_11_2';
 delete from validation.rules_area where code = 're4_11';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_11', 'Hierarquia dos nós hidrográficos', 
 $$Quando um “Curso de água - eixo” interseta outro e, simultaneamente, 
 observa-se uma alteração de atributos, o “Nó hidrográfico” assume o valor 
 “Junção”. Apenas é inserido um nó que assume o valor “Junção” prevalecendo este sobre o valor “Pseudo-nó$$, 
 $$"Curso de água - eixo, Nó hidrográfico".$$, 'curso_de_agua_eixo',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
-		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
-		group by st_intersection(l1.geometria, l2.geometria)
-),
-total as (
-	select count(*) from inter where count > 2
-),
-good as (
-	select count(*) from {schema}.no_hidrografico n1
-	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and geometria not in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-		and valor_tipo_no_hidrografico = '3'
-),
-bad as (
-	select count(*) from {schema}.no_hidrografico n1
-	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-			or valor_tipo_no_hidrografico <> '3')
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.curso_de_agua_eixo l1
-		join {schema}.curso_de_agua_eixo l2 on st_intersects(l1.geometria, l2.geometria) and l1.identificador <> l2.identificador
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_hidrografico n1
-	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and (geometria in (select geometria from {schema}.no_hidrografico n2 where n1.identificador <> n2.identificador)
-			or valor_tipo_no_hidrografico <> '3')$$ );
+$$select * from validation.re4_11_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_11_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 -- pseudo-nós
 -- Entre dois nós só pode haver um segmento
@@ -3234,7 +3141,7 @@ $$select * from {schema}.area_infra_trans_ferrov where ST_Intersects(geometria, 
 -- Interrupção da via rodoviária
 -- RE5.5.2
 delete from validation.rules where code = 're5_5_2';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re5_5_2', 'Interrupção da via rodoviária', 
 $$O “Segmento da via-férrea” é interrompido quando:
  - Existe uma interceção com outro “Segmento da via-férrea”;
@@ -3250,62 +3157,12 @@ de uma “Infraestrutura de transporte ferroviário”.
 $$"“Segmento da via rodoviária”, “Via rodoviária - Limite”, “Segmento da via-
 férrea”, “Nó de transporte rodoviário” e “Infraestrutura de transporte
 rodoviário”".$$, 'seg_via_rodov',
-$$with 
-all_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes),
-ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
-existentes as (
-	select * from ok_intersecoes where geom in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)
-),
-inexistentes as (
-	select * from 
-	ok_intersecoes where geom not in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)),
-segmentos as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, inexistentes i where st_contains(svf.geometria, i.geom)) as foo),
-linhas_duplicadas as (
-	select count(cf1.*) from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-		where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-			and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-total as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, all_intersecoes i where st_contains(svf.geometria, i.geom)) as foo),
-good as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, existentes i where st_contains(svf.geometria, i.geom)) as foo),
-bad as (select segmentos.count + linhas_duplicadas.count as count
-	from segmentos, linhas_duplicadas)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
-linhas_duplicadas as (
-select cf1.*
-from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes 
-and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-inexistentes as (
-	select * from 
-	ok_intersecoes where geom not in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)),
-segmentos as (select svf.* from {schema}.seg_via_rodov svf, inexistentes i where st_contains(svf.geometria, i.geom) )
-select * from segmentos union select * from linhas_duplicadas$$ );
+$$select * from validation.re5_5_2_validation (1, '%s'::json)$$,
+$$select * from validation.re5_5_2_validation (2, '%s'::json)$$ );
 
 
 delete from validation.rules_area where code = 're5_5_2';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re5_5_2', 'Interrupção da via rodoviária', 
 $$O “Segmento da via-férrea” é interrompido quando:
  - Existe uma interceção com outro “Segmento da via-férrea”;
@@ -3321,58 +3178,8 @@ de uma “Infraestrutura de transporte ferroviário”.
 $$"“Segmento da via rodoviária”, “Via rodoviária - Limite”, “Segmento da via-
 férrea”, “Nó de transporte rodoviário” e “Infraestrutura de transporte
 rodoviário”".$$, 'seg_via_rodov',
-$$with 
-all_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes),
-ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
-existentes as (
-	select * from ok_intersecoes where geom in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)
-),
-inexistentes as (
-	select * from 
-	ok_intersecoes where geom not in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)),
-segmentos as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, inexistentes i where ST_Intersects(svf.geometria, '%1$s'::geometry) and  st_contains(svf.geometria, i.geom)) as foo),
-linhas_duplicadas as (
-	select count(cf1.*) from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-		where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-			and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-total as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, all_intersecoes i where st_contains(svf.geometria, i.geom)) as foo),
-good as (select count(*) from (select distinct identificador from {schema}.seg_via_rodov svf, existentes i where st_contains(svf.geometria, i.geom)) as foo),
-bad as (select segmentos.count + linhas_duplicadas.count as count
-	from segmentos, linhas_duplicadas)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
-	from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
-linhas_duplicadas as (
-select cf1.*
-from {schema}.seg_via_rodov cf1, {schema}.seg_via_rodov cf2
-where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes 
-and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
-inexistentes as (
-	select * from 
-	ok_intersecoes where geom not in (
-		select st_startpoint(geometria) from {schema}.seg_via_rodov
-		union
-		select st_endpoint(geometria) from {schema}.seg_via_rodov
-	)),
-segmentos as (select svf.* from {schema}.seg_via_rodov svf, inexistentes i where st_contains(svf.geometria, i.geom) )
-select * from segmentos union select * from linhas_duplicadas$$ );
+$$select * from validation.re5_5_2_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re5_5_2_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 -- RE5.5.3
@@ -3549,53 +3356,25 @@ $$ select *
 
 -- RE5.5.4
 delete from validation.rules where code = 're5_5_4';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re5_5_4', 'Nós terminais da via rodoviária', 
 $$Quando um “Segmento da via rodoviária” tem o seu fim numa “Infraestrutura de transporte rodoviário” é colocado um “Nó de transporte rodoviário” 
 correspondente ao fim da via e um outro “Nó de transporte rodoviário” correspondente à infraestrutura. 
 Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via rodoviária” em conformidade com a topologia implícita.$$, 
 $$"“Segmento da via rodoviária”, “Infraestrutura de transporte rodoviário” e “Nó de transporte rodoviário”".$$, 'no_trans_rodov',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.infra_trans_rodov l2 on st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-), total as (
-	select count(*) from inter
-), good as (
-	select count(*) from inter where (select count(*) from {schema}.no_trans_rodov where geom=geometria) = 2
-), bad as (
-	select count(*) from inter where (select count(*) from {schema}.no_trans_rodov where geom=geometria) <> 2
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.infra_trans_rodov l2 on st_intersects(l1.geometria, l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_trans_rodov where geometria in (select geom from inter where (select count(*) from {schema}.no_trans_rodov where geom=geometria) <> 2)$$ );
+$$select * from validation.re5_5_4_validation (1, '%s'::json)$$,
+$$select * from validation.re5_5_4_validation (2, '%s'::json)$$ );
 
 
 delete from validation.rules_area where code = 're5_5_4';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re5_5_4', 'Nós terminais da via rodoviária', 
 $$Quando um “Segmento da via rodoviária” tem o seu fim numa “Infraestrutura de transporte rodoviário” é colocado um “Nó de transporte rodoviário” 
 correspondente ao fim da via e um outro “Nó de transporte rodoviário” correspondente à infraestrutura. 
 Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via rodoviária” em conformidade com a topologia implícita.$$, 
 $$"“Segmento da via rodoviária”, “Infraestrutura de transporte rodoviário” e “Nó de transporte rodoviário”".$$, 'no_trans_rodov',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.infra_trans_rodov l2 on st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-), total as (
-	select count(*) from inter
-), good as (
-	select count(*) from inter where ST_Intersects(geom, '%1$s') and (select count(*) from {schema}.no_trans_rodov where geom=geometria) = 2
-), bad as (
-	select count(*) from inter where ST_Intersects(geom, '%1$s') and (select count(*) from {schema}.no_trans_rodov where geom=geometria) <> 2
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.infra_trans_rodov l2 on st_intersects(l1.geometria, l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_trans_rodov where ST_Intersects(geom, '%1$s') and geometria in (select geom from inter where (select count(*) from {schema}.no_trans_rodov where geom=geometria) <> 2)$$ );
+$$select * from validation.re5_5_4_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re5_5_4_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 -- RE5.5.5

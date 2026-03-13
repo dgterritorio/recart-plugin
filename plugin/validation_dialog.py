@@ -129,8 +129,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
         # self.ignoreSusp.setEnabled(state)
         # self.ignorarSub.setEnabled(state)
         # self.ignorarSolo.setEnabled(state)
-        self.ignorarFict.setEnabled(state)
-        self.ignorarDesc.setEnabled(state)
+        # self.ignorarFict.setEnabled(state)
+        # self.ignorarDesc.setEnabled(state)
 
         self.rg1_ndd1.setEnabled(state)
         self.rg1_ndd2.setEnabled(state)
