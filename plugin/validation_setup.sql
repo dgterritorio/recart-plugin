@@ -2949,13 +2949,32 @@ $$ language plpgsql;
 select validation.create_tin();
 
 -- Criar area de trabalho multi-poligono para casos com multiplas areas de trabalho no mesmo projecto
+-- Faz-se um teste, para adivinhar se as múltiplas áreas são contíguas ou não. Sendo contíguas, tenta-se gerar só um polígono, usando buffer positivo e negativo,
+-- para tentar eliminar as linhas de divisão. Caso contrário, gera-se um multi-polígono.
 
-CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
-(
-	SELECT st_multi(st_union(geometria)) as geometria
-	FROM {schema}.area_trabalho
-);
-CREATE INDEX ON validation.area_trabalho_multi USING gist(geometria);
+do $$
+declare
+  all_touch boolean;
+begin
+  SELECT (COUNT(DISTINCT cluster_id) = 1) INTO all_touch
+  FROM (SELECT ST_ClusterDBSCAN(geometria, eps := 0, minpoints := 1) OVER () AS cluster_id FROM area_trabalho) AS subquery;
+  if all_touch then
+    -- raise notice 'As areas são contíguas';
+	CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
+		(
+			select ST_Buffer(ST_Union(ST_Buffer(geometria, 0.25)), -0.25) AS geometria
+			FROM {schema}.area_trabalho
+		);
+  else
+	CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
+		(
+			SELECT st_multi(st_union(geometria)) as geometria
+			FROM {schema}.area_trabalho
+		);
+    -- raise notice 'As areas não são contíguas';
+  end if;
+  CREATE INDEX ON validation.area_trabalho_multi USING gist(geometria);
+end $$;
 
 CREATE TABLE IF NOT EXISTS validation.no_hidro AS (
 	SELECT ST_Collect(f.geometria) AS geom_col FROM (
@@ -3278,6 +3297,14 @@ CREATE TABLE IF NOT EXISTS validation.descontinuidades (
 CREATE TABLE IF NOT EXISTS validation.intersecoes_2d (
     p1_id uuid NULL,
 	p2_id uuid NULL,
+	geometria geometry(pointz, 3763) NULL
+);
+
+CREATE TABLE IF NOT EXISTS validation.erros_3d (
+	identificador uuid NULL,
+	entidade text NULL,
+	indice integer NULL,
+	motivo text NULL,
 	geometria geometry(pointz, 3763) NULL
 );
 
