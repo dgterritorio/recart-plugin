@@ -1015,6 +1015,94 @@ begin
 end;
 $$ language plpgsql;
 
+create or replace function validation.re3_1_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		total as (select count(*) from public.curva_de_nivel),
+		good as (select count(cdn.identificador)
+			from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
+				and ( ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and
+					ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) ) 
+		),
+		bad as (select count(cdn.identificador) 
+			from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			where not ST_IsClosed(cdn.geometria)
+				and (not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) or
+					not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) )
+		)
+	select total.count as total, good.count as good, bad.count as bad 
+	from total, good, bad 
+	into count_all, count_good, count_bad;
+
+	WITH bad_points AS (
+		insert into validation.erros_3d (identificador, entidade, indice, motivo, geometria)
+		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', ST_StartPoint(cdn.geometria) as geometria
+		from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria))
+		union
+		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', ST_EndPoint(cdn.geometria) as geometria
+		from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria))
+		ON CONFLICT (identificador, motivo, geometria) DO nothing
+		RETURNING 1
+	)
+	SELECT count(*) FROM bad_points into count_bad_points;
+	raise notice 'Existem % pontos errados', count_bad_points;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re3_1_1_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		total as (select count(*) from public.curva_de_nivel),
+		good as (select count(cdn.identificador)
+			from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
+				and ( ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and
+					ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) ) and ST_Intersects(cdn.geometria, sect)
+		),
+		bad as (select count(cdn.identificador) 
+			from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			where not ST_IsClosed(cdn.geometria)
+				and (not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) or
+					not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) and ST_Intersects(cdn.geometria, sect)
+		)
+	select total.count as total, good.count as good, bad.count as bad 
+	from total, good, bad 
+	into count_all, count_good, count_bad;
+
+	WITH bad_points AS (
+		insert into validation.erros_3d (identificador, entidade, indice, motivo, geometria)
+		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', ST_StartPoint(cdn.geometria) as geometria
+		from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
+		union
+		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', ST_EndPoint(cdn.geometria) as geometria
+		from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
+		ON CONFLICT (identificador, motivo, geometria) DO nothing
+		RETURNING 1
+	)
+	SELECT count(*) FROM bad_points into count_bad_points;
+	raise notice 'Existem % pontos errados', count_bad_points;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
 -- select * from validation.rg5_validation ();
 create or replace function validation.rg5_validation () returns table (total int, good int, bad int) as $$
 declare
@@ -3300,6 +3388,9 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_2d (
 	geometria geometry(pointz, 3763) NULL
 );
 
+ALTER TABLE validation.intersecoes_2d DROP CONSTRAINT IF EXISTS intersecoes_2d_pk;
+ALTER TABLE validation.intersecoes_2d ADD CONSTRAINT intersecoes_2d_pk PRIMARY KEY (p1_id, p2_id);
+
 CREATE TABLE IF NOT EXISTS validation.erros_3d (
 	identificador uuid NULL,
 	entidade text NULL,
@@ -3308,8 +3399,7 @@ CREATE TABLE IF NOT EXISTS validation.erros_3d (
 	geometria geometry(pointz, 3763) NULL
 );
 
-ALTER TABLE validation.intersecoes_2d DROP CONSTRAINT IF EXISTS intersecoes_2d_pk;
-ALTER TABLE validation.intersecoes_2d ADD CONSTRAINT intersecoes_2d_pk PRIMARY KEY (p1_id, p2_id);
+ALTER TABLE validation.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, motivo, geometria);
 
 create or replace function validation.sort_asc(p_input double precision[]) 
   returns double precision[]

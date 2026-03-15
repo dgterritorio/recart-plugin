@@ -800,94 +800,20 @@ $$ select * from validation.rg7_validation () $$, true );
 
 
 delete from validation.rules where code = 're3_1_1';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('re3_1_1', 'Continuidade das curvas de nível (Parte 1)', 
 $$A "Curva de nível" é representada por uma linha contínua sem interrupção.$$, 
 $$"Curva de nível".$$, 'curva_de_nivel',
-$$with 
-total as (select count(*) from {schema}.curva_de_nivel),
-good as (select count(cdn.identificador)
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) or (ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true and
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true))
-),
-bad as (select count(cdn.identificador) 
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-total as (select count(*) from {schema}.curva_de_nivel),
-good as (select count(cdn.identificador)
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) or (ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true))
-),
-bad as (select count(cdn.identificador) 
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$select cdn.*
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true)$$ );
+$$select * from validation.re3_1_1_validation(1, '%s'::json)$$,
+$$select * from validation.re3_1_1_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're3_1_1';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('re3_1_1', 'Continuidade das curvas de nível (Parte 1)', 
 $$A "Curva de nível" é representada por uma linha contínua sem interrupção.$$, 
 $$"Curva de nível".$$, 'curva_de_nivel',
-$$with 
-total as (select count(*) from {schema}.curva_de_nivel),
-good as (select count(cdn.identificador)
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) or (ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true)
-		and ST_Intersects(cdn.geometria, '%1$s'::geometry))
-),
-bad as (select count(cdn.identificador) 
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true) and ST_Intersects(cdn.geometria, '%1$s'::geometry)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-total as (select count(*) from {schema}.curva_de_nivel),
-good as (select count(cdn.identificador)
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) or (ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is true)
-		and ST_Intersects(cdn.geometria, '%1$s'::geometry))
-),
-bad as (select count(cdn.identificador) 
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true)
-		and ST_Intersects(cdn.geometria, '%1$s'::geometry)
-)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$select cdn.*
-	from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-	where ST_IsClosed(cdn.geometria) is not true
-		and (ST_DWithin(ST_StartPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true or
-			ST_DWithin(ST_EndPoint(cdn.geometria), ST_Boundary(adt.geometria), 0.0001) is not true) and ST_Intersects(cdn.geometria, '%1$s'::geometry)$$ );
-
+$$select * from validation.re3_1_1_validation(1, '%s'::json)$$,
+$$select * from validation.re3_1_1_validation(2, '%s'::json)$$ );
 
 delete from validation.rules where code = 're3_1_2';
 insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
