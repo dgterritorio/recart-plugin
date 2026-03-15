@@ -1023,15 +1023,15 @@ declare
 	count_bad_points integer := 0;
 begin
 	with 
-		total as (select count(*) from public.curva_de_nivel),
+		total as (select count(*) from {schema}.curva_de_nivel),
 		good as (select count(cdn.identificador)
-			from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 			where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
 				and ( ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and
 					ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) ) 
 		),
 		bad as (select count(cdn.identificador) 
-			from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 			where not ST_IsClosed(cdn.geometria)
 				and (not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) or
 					not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) )
@@ -1043,11 +1043,11 @@ begin
 	WITH bad_points AS (
 		insert into validation.erros_3d (identificador, entidade, indice, motivo, geometria)
 		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', ST_StartPoint(cdn.geometria) as geometria
-		from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria))
 		union
 		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', ST_EndPoint(cdn.geometria) as geometria
-		from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria))
 		ON CONFLICT (identificador, motivo, geometria) DO nothing
 		RETURNING 1
@@ -1067,15 +1067,15 @@ declare
 	count_bad_points integer := 0;
 begin
 	with 
-		total as (select count(*) from public.curva_de_nivel),
+		total as (select count(*) from {schema}.curva_de_nivel),
 		good as (select count(cdn.identificador)
-			from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 			where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
 				and ( ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and
 					ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) ) and ST_Intersects(cdn.geometria, sect)
 		),
 		bad as (select count(cdn.identificador) 
-			from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 			where not ST_IsClosed(cdn.geometria)
 				and (not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) or
 					not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) and ST_Intersects(cdn.geometria, sect)
@@ -1087,11 +1087,11 @@ begin
 	WITH bad_points AS (
 		insert into validation.erros_3d (identificador, entidade, indice, motivo, geometria)
 		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', ST_StartPoint(cdn.geometria) as geometria
-		from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
 		union
 		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', ST_EndPoint(cdn.geometria) as geometria
-		from public.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
 		ON CONFLICT (identificador, motivo, geometria) DO nothing
 		RETURNING 1
@@ -1801,7 +1801,7 @@ begin
 	execute format(
 		'with bad_rows AS (
 			INSERT INTO %s
-			select identificador, ''equip_util_coletiva'', ''valor_tipo_equipamento_coletivo'', NULL from public.equip_util_coletiva where identificador not in (select equip_util_coletiva_id from public.lig_valor_tipo_equipamento_coletivo_equip_util_coletiva)
+			select identificador, ''equip_util_coletiva'', ''valor_tipo_equipamento_coletivo'', NULL from {schema}.equip_util_coletiva where identificador not in (select equip_util_coletiva_id from {schema}.lig_valor_tipo_equipamento_coletivo_equip_util_coletiva)
 			RETURNING 1
 		)
 		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
@@ -2686,7 +2686,7 @@ begin
 	CREATE SCHEMA IF NOT EXISTS errors;
 		-- table without indexes
 		-- raise notice '%', tbl;
-	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like public.curva_de_nivel INCLUDING ALL);
+	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel INCLUDING ALL);
 
 	delete from errors.curva_de_nivel_re3_2;
 
