@@ -816,44 +816,22 @@ $$select * from validation.re3_1_1_validation(1, '%s'::json)$$,
 $$select * from validation.re3_1_1_validation(2, '%s'::json)$$ );
 
 delete from validation.rules where code = 're3_1_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('re3_1_2', 'Continuidade das curvas de nível (Parte 2)', 
 $$Todos os vértices de uma "Curva de nível" devem apresentar o mesmo valor
 altimétrico.$$, 
 $$"Curva de nível".$$, 'curva_de_nivel',
-$$with 
-total as (select count(*) from {schema}.curva_de_nivel),
-good as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) = ST_ZMin(geometria)),
-bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria))
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-total as (select count(*) from {schema}.curva_de_nivel),
-good as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) = ST_ZMin(geometria)),
-bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria))
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria)$$ );
+$$select * from validation.re3_1_2_validation(1, '%s'::json)$$,
+$$select * from validation.re3_1_2_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're3_1_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('re3_1_2', 'Continuidade das curvas de nível (Parte 2)', 
 $$Todos os vértices de uma "Curva de nível" devem apresentar o mesmo valor
 altimétrico.$$, 
 $$"Curva de nível".$$, 'curva_de_nivel',
-$$with 
-total as (select count(*) from {schema}.curva_de_nivel),
-good as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) = ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'::geometry)),
-bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'::geometry))
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-total as (select count(*) from {schema}.curva_de_nivel),
-good as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) = ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'::geometry)),
-bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'::geometry))
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria) and ST_Intersects(geometria, '%1$s'::geometry)$$ );
+$$select * from validation.re3_1_2_validation(1, '%s'::json)$$,
+$$select * from validation.re3_1_2_validation(2, '%s'::json)$$ );
 
 -- Só verifico as mestres e secundárias
 -- select count(*) from {schema}.curva_de_nivel where valor_tipo_curva <= 2

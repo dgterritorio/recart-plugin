@@ -1103,6 +1103,81 @@ begin
 end;
 $$ language plpgsql;
 
+create or replace function validation.re3_1_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		total as (select count(*) from {schema}.curva_de_nivel),
+		bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria))
+	select total.count, total.count - bad.count as good, bad.count from total, bad
+	into count_all, count_good, count_bad;
+
+	with 
+	bad as (select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria)),
+	pontos as (select
+		identificador, ST_ZMax(geometria) as max, ST_ZMin(geometria) as min,
+		ST_DumpPoints(geometria) as dp
+		FROM bad as pc),
+	media as (select identificador, percentile_disc(0.5) WITHIN GROUP (
+		ORDER BY st_z((dp).geom)) as mediana
+		FROM pontos 
+		GROUP by identificador),
+	bad_points AS (
+		insert into validation.erros_3d (identificador, entidade, indice, motivo, geometria)	
+		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, (dp).geom as geometria from pontos, media
+		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
+		ON CONFLICT (identificador, motivo, geometria) DO nothing
+		RETURNING 1
+	)
+
+	SELECT count(*) FROM bad_points into count_bad_points;
+	raise notice 'Existem % pontos errados', count_bad_points;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re3_1_2_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		total as (select count(*) from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect)),
+		bad as (select count(*) from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect) and ST_ZMax(geometria) != ST_ZMin(geometria))
+	select total.count, total.count - bad.count as good, bad.count from total, bad
+	into count_all, count_good, count_bad;
+
+	with 
+	bad as (select * from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect) and ST_ZMax(geometria) != ST_ZMin(geometria)),
+	pontos as (select
+		identificador, ST_ZMax(geometria) as max, ST_ZMin(geometria) as min,
+		ST_DumpPoints(geometria) as dp
+		FROM bad as pc),
+	media as (select identificador, percentile_disc(0.5) WITHIN GROUP (
+		ORDER BY st_z((dp).geom)) as mediana
+		FROM pontos 
+		GROUP by identificador),
+	bad_points AS (
+		insert into validation.erros_3d (identificador, entidade, indice, motivo, geometria)	
+		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, (dp).geom as geometria from pontos, media
+		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
+		ON CONFLICT (identificador, motivo, geometria) DO nothing
+		RETURNING 1
+	)
+	SELECT count(*) FROM bad_points into count_bad_points;
+	raise notice 'Existem % pontos errados', count_bad_points;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
 -- select * from validation.rg5_validation ();
 create or replace function validation.rg5_validation () returns table (total int, good int, bad int) as $$
 declare
