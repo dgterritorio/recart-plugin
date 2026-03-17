@@ -6,6 +6,7 @@ displayList = {
     'fronteira': {'index': 140, 'alias': 'Fronteira', 'name': '[01] UNIDADES ADMINISTRATIVAS', 'geom': ['LINESTRING']},
     'designacao_local': {'index': 210, 'alias': 'Designação local', 'name': '[02] TOPONÍMIA', 'geom': ['POINT']},
     'curva_de_nivel': {'index': 310, 'alias': 'Curva de nível', 'name': '[03] ALTIMETRIA', 'geom': ['LINESTRINGZ']},
+    'erros_3d': {'index': 310, 'alias': 'Curva de nível', 'name': '[03] ALTIMETRIA', 'geom': ['POINTZ']},
     'linha_de_quebra': {'index': 320, 'alias': 'Linha de quebra', 'name': '[03] ALTIMETRIA', 'geom': ['LINESTRINGZ']},
     'ponto_cotado': {'index': 330, 'alias': 'Ponto cotado', 'name': '[03] ALTIMETRIA', 'geom': ['POINTZ']},
     'intersecoes_3d': {'index': 340, 'alias': 'Interseções 3D', 'name': '[03] ALTIMETRIA', 'geom': ['POINTZ']},
