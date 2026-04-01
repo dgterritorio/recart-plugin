@@ -1172,16 +1172,16 @@ end;
 $$ language plpgsql;
 
 
-create or replace function validation.descontinuidades_seg_via_rodov_quadrantes () returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
+create or replace function validation.descontinuidades_quadrantes (entidade text) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
 begin
-	return query WITH p AS (
-		SELECT  {schema}.seg_via_rodov.identificador AS id, {schema}.st_startpoint(seg_via_rodov.geometria) AS geom
-			FROM {schema}.seg_via_rodov
+	return query execute format('WITH p AS (
+		SELECT  {schema}.%1$I.identificador AS id, {schema}.st_startpoint(%1$I.geometria) AS geom
+			FROM {schema}.%1$I
 		UNION
-		SELECT  {schema}.seg_via_rodov.identificador, {schema}.st_endpoint(seg_via_rodov.geometria) AS geom
-			FROM {schema}.seg_via_rodov
+		SELECT  {schema}.%1$I.identificador, {schema}.st_endpoint(%1$I.geometria) AS geom
+			FROM {schema}.%1$I
 	), q AS (
-		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || ',' || trunc(ST_Y(p.geom)/100)::text AS quad
+		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || '','' || trunc(ST_Y(p.geom)/100)::text AS quad
 			FROM p
 	)
 	SELECT p1.id AS p1_id, p2.id AS p2_id, st_3ddistance(p1.geom, p2.geom) AS dist_p1_p2,
@@ -1189,22 +1189,22 @@ begin
 		FROM (q p1
 			JOIN q p2 ON p1.quad = p2.quad
 			 AND (((st_3ddistance(p1.geom, p2.geom) <> (0)::double precision) AND (st_3ddistance(p1.geom, p2.geom) < (0.2)::double precision)))
-		);
+		);', entidade);
 end;
 $$ language plpgsql;
 
-create or replace function validation.descontinuidades_seg_via_rodov_quadrantes (sect geometry) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
+create or replace function validation.descontinuidades_quadrantes (sect geometry) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
 begin
-	return query WITH p AS (
-		SELECT  {schema}.seg_via_rodov.identificador AS id, {schema}.st_startpoint(seg_via_rodov.geometria) AS geom
-			FROM {schema}.seg_via_rodov
-			where ST_Intersects(seg_via_rodov.geometria, sect)
+	return query execute format('WITH p AS (
+		SELECT  {schema}.%1$I.identificador AS id, {schema}.st_startpoint(%1$I.geometria) AS geom
+			FROM {schema}.%1$I
+			where ST_Intersects(%1$I.geometria, sect)
 		UNION
-		SELECT  {schema}.seg_via_rodov.identificador, {schema}.st_endpoint(seg_via_rodov.geometria) AS geom
-			FROM {schema}.seg_via_rodov
-			where ST_Intersects(seg_via_rodov.geometria, sect)
+		SELECT  {schema}.%1$I.identificador, {schema}.st_endpoint(%1$I.geometria) AS geom
+			FROM {schema}.%1$I
+			where ST_Intersects(%1$I.geometria, sect)
 	), q AS (
-		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || ',' || trunc(ST_Y(p.geom)/100)::text AS quad
+		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || '','' || trunc(ST_Y(p.geom)/100)::text AS quad
 			FROM p
 	)
 	SELECT p1.id AS p1_id, p2.id AS p2_id, st_3ddistance(p1.geom, p2.geom) AS dist_p1_p2,
@@ -1212,7 +1212,7 @@ begin
 		FROM (q p1
 			JOIN q p2 ON p1.quad = p2.quad
 			 AND (((st_3ddistance(p1.geom, p2.geom) <> (0)::double precision) AND (st_3ddistance(p1.geom, p2.geom) < (0.2)::double precision)))
-		);
+		);', entidade);
 end;
 $$ language plpgsql;
 
@@ -1616,22 +1616,81 @@ begin
 		select 1 into cvalue;
 	end if;
 
-	-- descontinuidades seg_via_rodov
-	select count(*) from {schema}.seg_via_rodov into count_all;
-
 	CREATE SCHEMA IF NOT EXISTS errors;
 	tabela := 'descontinuidades';
 	tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 	execute format('CREATE TABLE IF NOT exists %s (like validation.%I INCLUDING ALL)', tabela_erro, tabela);
 
+	-- descontinuidades seg_via_rodov
+	select count(*) from {schema}.seg_via_rodov into all_aux;
+
 	execute format('delete from %s', tabela_erro);
 	execute format(
 		'with bad_rows AS (
 			INSERT INTO %s
-			SELECT * from validation.descontinuidades_seg_via_rodov_quadrantes()
+			SELECT * from validation.descontinuidades_quadrantes(''seg_via_rodov'')
 			RETURNING 1
 		)
-		SELECT count(*) FROM bad_rows', tabela_erro) into count_bad;
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades via_rodov_limite
+	select count(*) from {schema}.via_rodov_limite into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''via_rodov_limite'')
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades seg_via_ferrea
+	select count(*) from {schema}.seg_via_ferrea into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''seg_via_ferrea'')
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades curva_de_nivel
+	select count(*) from {schema}.curva_de_nivel into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''curva_de_nivel'')
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+		-- descontinuidades curso_de_agua_eixo
+	select count(*) from {schema}.curso_de_agua_eixo into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''curso_de_agua_eixo'')
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
 
 	-- intersecoes curva_de_nivel
 	-- select count(*) from {schema}.curva_de_nivel into all_aux;
@@ -1710,21 +1769,80 @@ begin
 		select 1 into cvalue;
 	end if;
 
-	-- descontinuidades seg_via_rodov
-	select count(*) from {schema}.seg_via_rodov into count_all;
-
 	CREATE SCHEMA IF NOT EXISTS errors;
 	tabela := 'descontinuidades';
 	tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 	execute format('CREATE TABLE IF NOT exists %s (like validation.%I INCLUDING ALL)', tabela_erro, tabela);
 
+	-- descontinuidades seg_via_rodov
+	select count(*) from {schema}.seg_via_rodov into all_aux;
+
 	execute format(
 		'with bad_rows AS (
 			INSERT INTO %s
-			SELECT * from validation.descontinuidades_seg_via_rodov_quadrantes(%L)
+			SELECT * from validation.descontinuidades_quadrantes(''seg_via_rodov'', %L)
 			RETURNING 1
 		)
-		SELECT count(*) FROM bad_rows', tabela_erro, sect) into count_bad;
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades via_rodov_limite
+	select count(*) from {schema}.via_rodov_limite into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''via_rodov_limite'', %L)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades seg_via_ferrea
+	select count(*) from {schema}.seg_via_ferrea into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''seg_via_ferrea'', %L)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades curva_de_nivel
+	select count(*) from {schema}.curva_de_nivel into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''curva_de_nivel'', %L)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+		-- descontinuidades curso_de_agua_eixo
+	select count(*) from {schema}.curso_de_agua_eixo into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''curso_de_agua_eixo'', %L)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
 
 	-- intersecoes curva_de_nivel
 	-- select count(*) from {schema}.curva_de_nivel into all_aux;
