@@ -830,8 +830,8 @@ values ('re3_1_2', 'Continuidade das curvas de nível (Parte 2)',
 $$Todos os vértices de uma "Curva de nível" devem apresentar o mesmo valor
 altimétrico.$$, 
 $$"Curva de nível".$$, 'curva_de_nivel',
-$$select * from validation.re3_1_2_validation(1, '%s'::json)$$,
-$$select * from validation.re3_1_2_validation(2, '%s'::json)$$ );
+$$select * from validation.re3_1_2_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re3_1_2_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 -- Só verifico as mestres e secundárias
 -- select count(*) from {schema}.curva_de_nivel where valor_tipo_curva <= 2
@@ -1461,66 +1461,22 @@ where st_intersects(geometria, '%1$s') and not exists (select * from {schema}.cu
 
 -- Garantir a monotonia de uma LineString
 delete from validation.rules where code = 're4_5_2';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('re4_5_2', 'Representação do eixo do curso de água (Parte 2 - Vértices)', 
 $$Todos os vértices do "Curso de água - eixo" devem ser coerentes entre si
 também na componente tridimensional.$$,
 $$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
-$$with
-aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
-pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
-total as (select count(*) from {schema}.curso_de_agua_eixo),
-good as (select count(*) from teste where comparacao),
-bad as (select count(*) from teste where not comparacao)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with
-aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
-pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
-total as (select count(*) from {schema}.curso_de_agua_eixo),
-good as (select count(*) from teste where comparacao),
-bad as (select count(*) from teste where not comparacao)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with
-aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
-pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
-bad as (select identificador from teste where not comparacao)
-select * from {schema}.curso_de_agua_eixo where identificador in (select * from bad) $$ );
+$$select * from validation.re4_5_2_validation(1, '%s'::json)$$,
+$$select * from validation.re4_5_2_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're4_5_2';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('re4_5_2', 'Representação do eixo do curso de água (Parte 2 - Vértices)', 
 $$Todos os vértices do "Curso de água - eixo" devem ser coerentes entre si
 também na componente tridimensional.$$,
 $$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
-$$with
-aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
-pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
-total as (select count(*) from {schema}.curso_de_agua_eixo),
-good as (select count(*) from teste where comparacao),
-bad as (select count(*) from teste where not comparacao)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with
-aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
-pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
-total as (select count(*) from {schema}.curso_de_agua_eixo),
-good as (select count(*) from teste where comparacao),
-bad as (select count(*) from teste where not comparacao)
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with
-aux as (select identificador, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo where ST_Intersects(geometria, '%1$s') group by identificador, geometria),
-pontos as (select identificador, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador),
-teste as (select identificador, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
-bad as (select identificador from teste where not comparacao)
-select * from {schema}.curso_de_agua_eixo where identificador in (select * from bad) $$ );
+$$select * from validation.re4_5_2_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_5_2_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 -- TODO
 delete from validation.rules where code = 're4_6';

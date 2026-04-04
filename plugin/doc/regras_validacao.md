@@ -29,8 +29,8 @@ As regras definidas neste plugin são as seguintes:
 | `re4_2`     | Representação do dique, da comporta e da eclusa                                                     | Valida as seguintes condições: 1. A representação do "Dique" é sempre feita através de uma linha. 2. A representação da "Comporta" é sempre feita através de uma única linha (independentemente da área que ocupa, do número de comportas individuais e do nível de detalhe). 3. A representação da "Eclusa" é sempre feita através de um polígono.                                                                        |
 | `re4_3_1`   | Representação da barreira da barragem de betão ou terra e da barreira do açude ou represa (Parte 1) | Verifica que os elementos da tabela `barreira` com valor de barreira descrito como 'betão', 'terra', ou 'açude ou represa', são representados por geometria do tipo linha.                                                                                                                                                                                                                                                 |
 | `re4_3_2`   | Representação da barreira da barragem de betão ou terra e da barreira do açude ou represa (Parte 2) | Verifica que os elementos da tabela `barreira` com valor de barreira descrito como 'betão' ou 'terra' têm um registo correspondente na tabela `edificio` com valor forma do edifício preenchida para barragem.                                                                                                                                                                                                             |
-| `re4_5_1`   | Representação do eixo do curso de água (Parte 1)                                                    | Valida a existência de um eixo de curso de água correspondente a cada àrea do curso de água representada.                                                                                                                                                                                                                                                                                                                  |
-| `re4_5_2`   | Representação do eixo do curso de água (Parte 2 - Vértices)                                         | Valida a monotonia relativa aos vértices dos eixos de curso de água.                                                                                                                                                                                                                                                                                                                                                       |
+| `re4_5_1`   | Representação do eixo do curso de água (Parte 1)                                                    | Valida a existência de um eixo de curso de água correspondente a cada área do curso de água representada.                                                                                                                                                                                                                                                                                                                  |
+| `re4_5_2`   | Representação do eixo do curso de água (Parte 2 - Vértices)                                         | Valida a monotonia relativa aos vértices dos eixos de curso de água. Reporta os pontos de inflexão da monotonia na tabela `errors.erros_3d`.                                                                                                                                                                                                                                                                                                                                                      |
 | `re4_8_1`   | Interrupção do curso de água (topologia)                                                            | Utiliza as funções `ST_intersects` e `ST_Touches` de maneira a verificar que todas as interseções de eixos de curso de água se realizam nas suas extremidades.                                                                                                                                                                                                                                                             |
 | `re4_8_2`   | Interrupção do curso de água (atributos)                                                            | Verifica que os eixos dos cursos de água apenas são interrompidos nas seguintes condições: 1. Existe uma interceção com outro curso de água; 2. Existe uma alteração do valor de qualquer um dos atributos que caracteriza o "Curso de água - eixo"; 3. Existe uma variação ("Queda de água" ou "Zona húmida") ou regulação de fluxo ("Barreira").                                                                         |
 | `re4_9_1`   | Conexão entre o eixo de curso de água e os nós hidrográficos (Parte 1 - Eixos)                      | Valida que os eixos de um curso de água possuem nós hidrográficos correspondentes nas suas extremidades.                                                                                                                                                                                                                                                                                                                   |
@@ -73,3 +73,39 @@ Depois de calculadas essas áreas, é colocado um ponto cotado no centróide da 
 Exemplos dos pontos criados, no centróide das áreas anteriormente identificadas;
 
 ![](../images/pontos_re3_3.png)
+
+
+### Área de trabalho única para validação
+
+Havendo várias áreas de trabalho contíguas, as regras que usam a `area_trabalho` não vão funcionar corretamente (contra toda a área de trabalho). Por exemplo, não se consegue validar se as curvas de nível batem certo umas com as outras na junção das áreas de trabalho. Para resolver este problema, deverá ser criada uma nova tabela `validation.area_trabalho_multi` que contém um polígono ou multi-polígono resultante da união de todas as áreas de trabalho. Esta tabela serve para as validações que necessitam de uma área de trabalho unificada.
+
+```sql
+-- Criar area de trabalho multi-poligono para casos com multiplas areas de trabalho no mesmo projecto
+-- Faz-se um teste, para adivinhar se as múltiplas áreas são contíguas ou não. Sendo contíguas, tenta-se gerar só um polígono, usando buffer positivo e negativo,
+-- para tentar eliminar as linhas de divisão. Caso contrário, gera-se um multi-polígono.
+
+do $$
+declare
+  all_touch boolean;
+begin
+  SELECT (COUNT(DISTINCT cluster_id) = 1) INTO all_touch
+  FROM (SELECT ST_ClusterDBSCAN(geometria, eps := 0, minpoints := 1) OVER () AS cluster_id FROM area_trabalho) AS subquery;
+  if all_touch then
+    -- raise notice 'As areas são contíguas';
+	CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
+		(
+			select ST_Buffer(ST_Union(ST_Buffer(geometria, 0.25)), -0.25) AS geometria
+			FROM {schema}.area_trabalho
+		);
+  else
+	CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
+		(
+			SELECT st_multi(st_union(geometria)) as geometria
+			FROM {schema}.area_trabalho
+		);
+    -- raise notice 'As areas não são contíguas';
+  end if;
+  CREATE INDEX ON validation.area_trabalho_multi USING gist(geometria);
+end $$;
+```
+
