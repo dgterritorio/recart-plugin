@@ -54,8 +54,8 @@ create table if not exists validation.rules_area_report (
 -- Regras Gerais
 
 delete from validation.rules where code = 'rg_1';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
-values ('rg_1', 'Dimensão mínima dos polígonos', 
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 ) 
+values ('rg_1', '{v1.1.2}', 'Dimensão mínima dos polígonos', 
 $$A área mínima de uma entidade representada através de um objeto de
 geometria polígono é:
  - NdD1: 4 m²;
@@ -65,9 +65,20 @@ geometria polígono.$$,
 $$select * from validation.rg1_2_validation (1, 1, true, '%s'::json )$$,
 $$select * from validation.rg1_2_validation (1, 1, false, '%s'::json )$$ );
 
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 ) 
+values ('rg_1', '{v2.0.1,v2.0.2}', 'Dimensão mínima dos polígonos', 
+$$A área mínima de uma entidade representada através de um objeto de
+geometria polígono é:
+ - NdD1: 4 m²;
+ - NdD2: 20 m² .$$, 
+$$Todas as entidades representadas exclusivamente através de objetos de
+geometria polígono.$$,
+$$select * from validation.rg1_2_validation (1, 2, true, '%s'::json )$$,
+$$select * from validation.rg1_2_validation (1, 2, false, '%s'::json )$$ );
+
 delete from validation.rules_area where code = 'rg_1';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
-values ('rg_1', 'Dimensão mínima dos polígonos', 
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2 ) 
+values ('rg_1', '{v1.1.2}', 'Dimensão mínima dos polígonos', 
 $$A área mínima de uma entidade representada através de um objeto de
 geometria polígono é:
  - NdD1: 4 m²;
@@ -77,9 +88,20 @@ geometria polígono.$$,
 $$select * from validation.rg1_2_validation (1, 1, true, '%s'::geometry, '%s'::json)$$,
 $$select * from validation.rg1_2_validation (1, 1, false, '%s'::geometry, '%s'::json)$$ );
 
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2 ) 
+values ('rg_1', '{v2.0.1,v2.0.2}', 'Dimensão mínima dos polígonos', 
+$$A área mínima de uma entidade representada através de um objeto de
+geometria polígono é:
+ - NdD1: 4 m²;
+ - NdD2: 20 m² .$$, 
+$$Todas as entidades representadas exclusivamente através de objetos de
+geometria polígono.$$,
+$$select * from validation.rg1_2_validation (1, 2, true, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.rg1_2_validation (1, 2, false, '%s'::geometry, '%s'::json)$$ );
+
 delete from validation.rules where code = 'rg_2';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
-values ('rg_2', 'Dupla geometria ponto e polígono', 
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 ) 
+values ('rg_2', '{v1.1.2}', 'Dupla geometria ponto e polígono', 
 $$Às entidades que são representadas através de objetos de geometria ponto ou
 através de objetos de geometria polígono aplica-se a regra:
  - NdD1: a entidade é representada através de um polígono se a sua área for
@@ -94,9 +116,25 @@ petróleo, gás e substâncias químicas" e "Mobiliário urbano e sinalização"
 $$select * from validation.rg1_2_validation (2, 1, true, '%s'::json )$$,
 $$select * from validation.rg1_2_validation (2, 1, false, '%s'::json )$$ );
 
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 ) 
+values ('rg_2', '{v2.0.1,v2.0.2}', 'Dupla geometria ponto e polígono', 
+$$Às entidades que são representadas através de objetos de geometria ponto ou
+através de objetos de geometria polígono aplica-se a regra:
+ - NdD1: a entidade é representada através de um polígono se a sua área for
+igual ou superior a 4 m² e através de um ponto se a sua área for inferior a
+4 m²;
+ - NdD2: a entidade é representada através de um polígono se a sua área for
+igual ou superior a 20 m² e através de um ponto se a sua área for inferior
+a 20 m² .$$,
+$$"Construção poligonal", "Edifício", "Ponto de interesse", "Elemento associado
+de água", "Elementos associado de eletricidade", "Elementos associado de
+petróleo, gás e substâncias químicas" e "Mobiliário urbano e sinalização".$$,
+$$select * from validation.rg1_2_validation (2, 2, true, '%s'::json )$$,
+$$select * from validation.rg1_2_validation (2, 2, false, '%s'::json )$$ );
+
 delete from validation.rules_area where code = 'rg_2';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
-values ('rg_2', 'Dupla geometria ponto e polígono', 
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2 ) 
+values ('rg_2', '{v1.1.2}', 'Dupla geometria ponto e polígono', 
 $$Às entidades que são representadas através de objetos de geometria ponto ou
 através de objetos de geometria polígono aplica-se a regra:
  - NdD1: a entidade é representada através de um polígono se a sua área for
@@ -110,6 +148,22 @@ de água", "Elementos associado de eletricidade", "Elementos associado de
 petróleo, gás e substâncias químicas" e "Mobiliário urbano e sinalização".$$,
 $$select * from validation.rg1_2_validation (2, 1, true, '%s'::geometry, '%s'::json )$$,
 $$select * from validation.rg1_2_validation (2, 1, false, '%s'::geometry, '%s'::json )$$ );
+
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2 ) 
+values ('rg_2', '{v2.0.1,v2.0.2}', 'Dupla geometria ponto e polígono', 
+$$Às entidades que são representadas através de objetos de geometria ponto ou
+através de objetos de geometria polígono aplica-se a regra:
+ - NdD1: a entidade é representada através de um polígono se a sua área for
+igual ou superior a 4 m² e através de um ponto se a sua área for inferior a
+4 m²;
+ - NdD2: a entidade é representada através de um polígono se a sua área for
+igual ou superior a 20 m² e através de um ponto se a sua área for inferior
+a 20 m² .$$,
+$$"Construção poligonal", "Edifício", "Ponto de interesse", "Elemento associado
+de água", "Elementos associado de eletricidade", "Elementos associado de
+petróleo, gás e substâncias químicas" e "Mobiliário urbano e sinalização".$$,
+$$select * from validation.rg1_2_validation (2, 2, true, '%s'::geometry, '%s'::json )$$,
+$$select * from validation.rg1_2_validation (2, 2, false, '%s'::geometry, '%s'::json )$$ );
 
 -- TODO
 -- Eventualmente criar topologia com tolerância 0
@@ -3739,16 +3793,16 @@ insert into validation.rules ( code, name, rule, scope, query, query_nd2 )
 values ('pq2_4_1', 'Consistência topológica dos objetos',
 $$Avalia a existência erros topológicos nos dados.$$,
 $$Todos os objetos com exceção dos objetos do Tema Toponímia.$$,
-$$select * from validation.pq2_4_1_validation ()$$,
-$$select * from validation.pq2_4_1_validation ()$$ );
+$$select * from validation.pq2_4_1_validation (true)$$,
+$$select * from validation.pq2_4_1_validation (false)$$ );
 
 delete from validation.rules_area where code = 'pq2_4_1';
 insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 )
 values ('pq2_4_1', 'Consistência topológica dos objetos',
 $$Avalia a existência erros topológicos nos dados.$$,
 $$Todos os objetos com exceção dos objetos do Tema Toponímia.$$,
-$$select * from validation.pq2_4_1_validation ('%1$s'::geometry)$$,
-$$select * from validation.pq2_4_1_validation ('%1$s'::geometry)$$ );
+$$select * from validation.pq2_4_1_validation (true, '%1$s'::geometry)$$,
+$$select * from validation.pq2_4_1_validation (false, '%1$s'::geometry)$$ );
 
 
 drop table if exists validation.area_trabalho_grid;

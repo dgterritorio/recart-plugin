@@ -594,76 +594,6 @@ $function$
 -- rg:  1|2
 -- versao: 1|2|3|...
 -- nd1: true|false
-create or replace function validation.rg1_2_validation (rg int, versao int, nd1 boolean) returns table (total int, good int, bad int) as $$
-declare 
-	count_all integer := 0;
-	count_good integer := 0;
-	count_bad integer := 0;
-	all_aux integer;
-	good_aux integer;
-	bad_aux integer;
-	tabela text;
-	tabela_erro text;
-	tabelas text;
-	cvalue integer;
-begin
-	if nd1=true then
-		cvalue = 4;
-	else
-		cvalue = 20;
-	end if;
-
-	if rg = 1 then
-		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria'' ';
-	else
-		if versao = 1 then
-			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
-			('edificio','geometria'), 
-			('ponto_interesse','geometria'), 
-			('elem_assoc_agua','geometria'), 
-			('elem_assoc_eletricidade','geometria'), 
-			('mob_urbano_sinal','geometria'))
-			SELECT * FROM dupla_geometria	$q$;
-		else
-			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
-			('constru_polig','geometria'), 
-			('edificio','geometria'), 
-			('ponto_interesse','geometria'), 
-			('elem_assoc_agua','geometria'), 
-			('elem_assoc_eletricidade','geometria'), 
-			('elem_assoc_pgq','geometria'), 
-			('mob_urbano_sinal','geometria'))
-			SELECT * FROM dupla_geometria	$q$;
-		end if;
-	end if;
-
-	for tabela in execute tabelas
-	loop 
-		-- RAISE NOTICE '-------------------------- table % -------------------------------------------------', rec.f_table_name;
-		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' or geometrytype(geometria) = ''LINESTRING''', tabela ) INTO all_aux;
-		-- RAISE NOTICE 'All is % for table %', all_aux, rec.f_table_name;
-		count_all := count_all + all_aux;
-		execute format('select count(*) from {schema}.%I where (geometrytype(geometria) = ''POLYGON'' and st_area(geometria) >= %s) or (geometrytype(geometria) = ''LINESTRING'' and st_3dlength(geometria) >= 0.2)', tabela, cvalue) INTO good_aux;
-		-- RAISE NOTICE 'Good is % for table %', good_aux, rec.f_table_name;
-		count_good := count_good + good_aux;
-		execute format('select count(*) from {schema}.%I where (geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s) or (geometrytype(geometria) = ''LINESTRING'' and st_3dlength(geometria) < 0.2)', tabela, cvalue) INTO bad_aux;
-		-- RAISE NOTICE 'Bad is % for table %', bad_aux, rec.f_table_name;
-		count_bad := count_bad + bad_aux;
-	
-		if bad_aux > 0 then
-			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tabela_erro := 'errors.' || tabela || '_rg_' || rg;
-			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
-			execute format('delete from %s', tabela_erro);
-			execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela_erro, tabela, cvalue);
-		end if;
-	end loop;
-return query select count_all as total, count_good as good, count_bad as bad;
-end;
-$$ language plpgsql;
-
 create or replace function validation.rg1_2_validation (rg int, versao int, nd1 boolean, _args json) returns table (total int, good int, bad int) as $$
 declare 
 	count_all integer := 0;
@@ -730,77 +660,6 @@ begin
 			execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s', tabela_erro, tabela, cvalue);
 		end if;
 	end loop;
-return query select count_all as total, count_good as good, count_bad as bad;
-end;
-$$ language plpgsql;
-
-create or replace function validation.rg1_2_validation (rg int, versao int, nd1 boolean, sect geometry) returns table (total int, good int, bad int) as $$
-declare 
-	count_all integer := 0;
-	count_good integer := 0;
-	count_bad integer := 0;
-	all_aux integer;
-	good_aux integer;
-	bad_aux integer;
-	tabela text;
-	tabela_erro text;
-	tabelas text;
-	cvalue integer;
-begin
-	if nd1=true then
-		cvalue = 4;
-	else
-		cvalue = 20;
-	end if;
-
-	if rg = 1 then
-		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria'' ';
-	else
-		if versao = 1 then
-			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
-			('edificio','geometria'), 
-			('ponto_interesse','geometria'), 
-			('elem_assoc_agua','geometria'), 
-			('elem_assoc_eletricidade','geometria'), 
-			('mob_urbano_sinal','geometria'))
-			SELECT * FROM dupla_geometria	$q$;
-		else
-			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
-			('constru_polig','geometria'), 
-			('edificio','geometria'), 
-			('ponto_interesse','geometria'), 
-			('elem_assoc_agua','geometria'), 
-			('elem_assoc_eletricidade','geometria'), 
-			('elem_assoc_pgq','geometria'), 
-			('mob_urbano_sinal','geometria'))
-			SELECT * FROM dupla_geometria	$q$;
-		end if;
-	end if;
-
-	for tabela in execute tabelas
-	loop 
-		-- RAISE NOTICE '-------------------------- table % -------------------------------------------------', rec.f_table_name;
-		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON''', tabela) INTO all_aux;
-		-- RAISE NOTICE 'All is % for table %', all_aux, rec.f_table_name;
-		count_all := count_all + all_aux;
-		-- execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) >= %s and ST_Intersects(geometria, %L)', tabela, cvalue, sect) INTO good_aux;
-		-- RAISE NOTICE 'Good is % for table %', good_aux, rec.f_table_name;
-		-- count_good := count_good + good_aux;
-		execute format('select count(*) from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s and ST_Intersects(geometria, %L)', tabela, cvalue, sect) INTO bad_aux;
-		-- RAISE NOTICE 'Bad is % for table %', bad_aux, rec.f_table_name;
-		count_bad := count_bad + bad_aux;
-	
-		if bad_aux > 0 then
-			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tabela_erro := 'errors.' || tabela || '_rg_' || rg;
-			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
-			execute format('delete from %s', tabela_erro);
-			execute format('insert into %s select * from {schema}.%I where geometrytype(geometria) = ''POLYGON'' and st_area(geometria) < %s and ST_Intersects(geometria, %L) on conflict do nothing', tabela_erro, tabela, cvalue, sect);
-		end if;
-	end loop;
-	select (count_all - count_bad) into count_good;
 return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
@@ -877,6 +736,7 @@ begin
 return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
+
 
 create or replace function validation.rg4_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare
@@ -1037,12 +897,12 @@ begin
 		RAISE NOTICE 'All is % for table %', all_aux, tabela;
 		count_all := count_all + all_aux;
 	
-		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+		execute format('select count(t.*) from {schema}.%I t, validation.area_trabalho_multi adt
 			where St_Contains(adt.geometria, t.geometria)', tabela) INTO good_aux;
 		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
 		count_good := count_good + good_aux;
 	
-		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+		execute format('select count(t.*) from {schema}.%I t, validation.area_trabalho_multi adt
 			where not St_Contains(adt.geometria, t.geometria)', tabela) INTO bad_aux;
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
@@ -1054,7 +914,7 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %1$s select t.* from {schema}.%2$I t, {schema}.area_trabalho adt
+			execute format('insert into %1$s select t.* from {schema}.%2$I t, validation.area_trabalho_multi adt
 				where not St_Contains(adt.geometria, t.geometria) on conflict ON constraint %3$s_pkey do nothing', tabela_erro, tabela, tabela || '_rg_5');
 		end if;
 	end loop;
@@ -1083,12 +943,12 @@ begin
 		RAISE NOTICE 'All is % for table %', all_aux, tabela;
 		count_all := count_all + all_aux;
 	
-		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+		execute format('select count(t.*) from {schema}.%I t, validation.area_trabalho_multi adt
 			where ST_Intersects(t.geometria, %L) and St_Contains(adt.geometria, t.geometria)', tabela, sect) INTO good_aux;
 		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
 		count_good := count_good + good_aux;
 	
-		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+		execute format('select count(t.*) from {schema}.%I t, validation.area_trabalho_multi adt
 			where ST_Intersects(t.geometria, %L) and not St_Contains(adt.geometria, t.geometria)', tabela, sect) INTO bad_aux;
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
@@ -1100,7 +960,7 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %1$s select t.* from {schema}.%2$I t, {schema}.area_trabalho adt
+			execute format('insert into %1$s select t.* from {schema}.%2$I t, validation.area_trabalho_multi adt
 				where ST_Intersects(t.geometria, %3$L) and not St_Contains(adt.geometria, t.geometria) on conflict ON constraint %4$s_pkey do nothing', tabela_erro, tabela, sect, tabela || '_rg_5');
 		end if;
 	end loop;
@@ -1130,12 +990,12 @@ begin
 		RAISE NOTICE 'All is % for table %', all_aux, tabela;
 		count_all := count_all + all_aux;
 	
-		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+		execute format('select count(t.*) from {schema}.%I t, validation.area_trabalho_multi adt
 			where St_Contains(adt.geometria, t.geometria)', tabela) INTO good_aux;
 		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
 		count_good := count_good + good_aux;
 	
-		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+		execute format('select count(t.*) from {schema}.%I t, validation.area_trabalho_multi adt
 			where not St_Contains(adt.geometria, t.geometria)', tabela) INTO bad_aux;
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
@@ -1147,7 +1007,7 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %1$s select t.* from {schema}.%2$I t, {schema}.area_trabalho adt
+			execute format('insert into %1$s select t.* from {schema}.%2$I t, validation.area_trabalho_multi adt
 				where not St_Contains(adt.geometria, t.geometria) on conflict ON constraint %3$s_pkey do nothing', tabela_erro, tabela, tabela || '_rg_5');
 		end if;
 	end loop;
@@ -1176,12 +1036,12 @@ begin
 		RAISE NOTICE 'All is % for table %', all_aux, tabela;
 		count_all := count_all + all_aux;
 	
-		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+		execute format('select count(t.*) from {schema}.%I t, validation.area_trabalho_multi adt
 			where ST_Intersects(t.geometria, %L) and St_Contains(adt.geometria, t.geometria)', tabela, sect) INTO good_aux;
 		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
 		count_good := count_good + good_aux;
 	
-		execute format('select count(t.*) from {schema}.%I t, {schema}.area_trabalho adt
+		execute format('select count(t.*) from {schema}.%I t, validation.area_trabalho_multi adt
 			where ST_Intersects(t.geometria, %L) and not St_Contains(adt.geometria, t.geometria)', tabela, sect) INTO bad_aux;
 		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
@@ -1193,7 +1053,7 @@ begin
 			-- raise notice '%', tbl;
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('delete from %s', tabela_erro);
-			execute format('insert into %1$s select t.* from {schema}.%2$I t, {schema}.area_trabalho adt
+			execute format('insert into %1$s select t.* from {schema}.%2$I t, validation.area_trabalho_multi adt
 				where ST_Intersects(t.geometria, %3$L) and not St_Contains(adt.geometria, t.geometria) on conflict ON constraint %4$s_pkey do nothing', tabela_erro, tabela, sect, tabela || '_rg_5');
 		end if;
 	end loop;
@@ -1312,16 +1172,16 @@ end;
 $$ language plpgsql;
 
 
-create or replace function validation.descontinuidades_seg_via_rodov_quadrantes () returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
+create or replace function validation.descontinuidades_quadrantes (entidade text) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
 begin
-	return query WITH p AS (
-		SELECT  {schema}.seg_via_rodov.identificador AS id, {schema}.st_startpoint(seg_via_rodov.geometria) AS geom
-			FROM {schema}.seg_via_rodov
+	return query execute format('WITH p AS (
+		SELECT  {schema}.%1$I.identificador AS id, {schema}.st_startpoint(%1$I.geometria) AS geom
+			FROM {schema}.%1$I
 		UNION
-		SELECT  {schema}.seg_via_rodov.identificador, {schema}.st_endpoint(seg_via_rodov.geometria) AS geom
-			FROM {schema}.seg_via_rodov
+		SELECT  {schema}.%1$I.identificador, {schema}.st_endpoint(%1$I.geometria) AS geom
+			FROM {schema}.%1$I
 	), q AS (
-		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || ',' || trunc(ST_Y(p.geom)/100)::text AS quad
+		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || '','' || trunc(ST_Y(p.geom)/100)::text AS quad
 			FROM p
 	)
 	SELECT p1.id AS p1_id, p2.id AS p2_id, st_3ddistance(p1.geom, p2.geom) AS dist_p1_p2,
@@ -1329,22 +1189,22 @@ begin
 		FROM (q p1
 			JOIN q p2 ON p1.quad = p2.quad
 			 AND (((st_3ddistance(p1.geom, p2.geom) <> (0)::double precision) AND (st_3ddistance(p1.geom, p2.geom) < (0.2)::double precision)))
-		);
+		);', entidade);
 end;
 $$ language plpgsql;
 
-create or replace function validation.descontinuidades_seg_via_rodov_quadrantes (sect geometry) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
+create or replace function validation.descontinuidades_quadrantes (sect geometry) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
 begin
-	return query WITH p AS (
-		SELECT  {schema}.seg_via_rodov.identificador AS id, {schema}.st_startpoint(seg_via_rodov.geometria) AS geom
-			FROM {schema}.seg_via_rodov
-			where ST_Intersects(seg_via_rodov.geometria, sect)
+	return query execute format('WITH p AS (
+		SELECT  {schema}.%1$I.identificador AS id, {schema}.st_startpoint(%1$I.geometria) AS geom
+			FROM {schema}.%1$I
+			where ST_Intersects(%1$I.geometria, sect)
 		UNION
-		SELECT  {schema}.seg_via_rodov.identificador, {schema}.st_endpoint(seg_via_rodov.geometria) AS geom
-			FROM {schema}.seg_via_rodov
-			where ST_Intersects(seg_via_rodov.geometria, sect)
+		SELECT  {schema}.%1$I.identificador, {schema}.st_endpoint(%1$I.geometria) AS geom
+			FROM {schema}.%1$I
+			where ST_Intersects(%1$I.geometria, sect)
 	), q AS (
-		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || ',' || trunc(ST_Y(p.geom)/100)::text AS quad
+		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || '','' || trunc(ST_Y(p.geom)/100)::text AS quad
 			FROM p
 	)
 	SELECT p1.id AS p1_id, p2.id AS p2_id, st_3ddistance(p1.geom, p2.geom) AS dist_p1_p2,
@@ -1352,7 +1212,7 @@ begin
 		FROM (q p1
 			JOIN q p2 ON p1.quad = p2.quad
 			 AND (((st_3ddistance(p1.geom, p2.geom) <> (0)::double precision) AND (st_3ddistance(p1.geom, p2.geom) < (0.2)::double precision)))
-		);
+		);', entidade);
 end;
 $$ language plpgsql;
 
@@ -1727,7 +1587,7 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function validation.pq2_4_1_validation () returns table (total int, good int, bad int) as $$
+create or replace function validation.pq2_4_1_validation (nd1 boolean) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
@@ -1739,30 +1599,98 @@ declare
 
 	rec_aux RECORD;
 
+	tabelas text;
 	tabela text;
 	tabela_erro text;
+
+	cvalue double precision;
 
 	p1_id uuid;
 	p2_id uuid;
 	dist_p1_p2 numeric;
 	p1_endpoint_geom geometry;
 begin
-	-- descontinuidades seg_via_rodov
-	select count(*) from {schema}.seg_via_rodov into count_all;
+	if nd1=true then
+		select 0.2 into cvalue;
+	else
+		select 1 into cvalue;
+	end if;
 
 	CREATE SCHEMA IF NOT EXISTS errors;
 	tabela := 'descontinuidades';
 	tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 	execute format('CREATE TABLE IF NOT exists %s (like validation.%I INCLUDING ALL)', tabela_erro, tabela);
 
+	-- descontinuidades seg_via_rodov
+	select count(*) from {schema}.seg_via_rodov into all_aux;
+
 	execute format('delete from %s', tabela_erro);
 	execute format(
 		'with bad_rows AS (
 			INSERT INTO %s
-			SELECT * from validation.descontinuidades_seg_via_rodov_quadrantes()
+			SELECT * from validation.descontinuidades_quadrantes(''seg_via_rodov'')
 			RETURNING 1
 		)
-		SELECT count(*) FROM bad_rows', tabela_erro) into count_bad;
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades via_rodov_limite
+	select count(*) from {schema}.via_rodov_limite into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''via_rodov_limite'')
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades seg_via_ferrea
+	select count(*) from {schema}.seg_via_ferrea into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''seg_via_ferrea'')
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades curva_de_nivel
+	select count(*) from {schema}.curva_de_nivel into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''curva_de_nivel'')
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+		-- descontinuidades curso_de_agua_eixo
+	select count(*) from {schema}.curso_de_agua_eixo into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''curso_de_agua_eixo'')
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
 
 	-- intersecoes curva_de_nivel
 	-- select count(*) from {schema}.curva_de_nivel into all_aux;
@@ -1788,13 +1716,31 @@ begin
 	count_all := count_all + rec_aux.total;
 	count_bad := count_bad + rec_aux.bad;
 
+	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_''';
+
+	for tabela in execute tabelas
+	loop 
+		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
+		count_all := count_all + all_aux;
+
+		execute format('select count(*) from {schema}.%I where st_3dlength(geometria) < %s', tabela, cvalue) INTO bad_aux;
+		count_bad := count_bad + bad_aux;
+
+		if bad_aux > 0 then
+			tabela_erro := 'errors.' || tabela || '_pq2_4_1';
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS motivo TEXT NULL', tabela_erro);
+			execute format('insert into %s select *, ''min length'' from {schema}.%I where st_3dlength(geometria) < %s on conflict (identificador) do nothing', tabela_erro, tabela, cvalue);
+		end if;
+	end loop;
+
 	select (count_all - count_bad) into count_good;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
 
-create or replace function validation.pq2_4_1_validation (sect geometry) returns table (total int, good int, bad int) as $$
+create or replace function validation.pq2_4_1_validation (nd1 boolean, sect geometry) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
@@ -1806,29 +1752,97 @@ declare
 
 	rec_aux RECORD;
 
+	tabelas text;
 	tabela text;
 	tabela_erro text;
+
+	cvalue double precision;
 
 	p1_id uuid;
 	p2_id uuid;
 	dist_p1_p2 numeric;
 	p1_endpoint_geom geometry;
 begin
-	-- descontinuidades seg_via_rodov
-	select count(*) from {schema}.seg_via_rodov into count_all;
+	if nd1=true then
+		select 0.2 into cvalue;
+	else
+		select 1 into cvalue;
+	end if;
 
 	CREATE SCHEMA IF NOT EXISTS errors;
 	tabela := 'descontinuidades';
 	tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 	execute format('CREATE TABLE IF NOT exists %s (like validation.%I INCLUDING ALL)', tabela_erro, tabela);
 
+	-- descontinuidades seg_via_rodov
+	select count(*) from {schema}.seg_via_rodov into all_aux;
+
 	execute format(
 		'with bad_rows AS (
 			INSERT INTO %s
-			SELECT * from validation.descontinuidades_seg_via_rodov_quadrantes(%L)
+			SELECT * from validation.descontinuidades_quadrantes(''seg_via_rodov'', %L)
 			RETURNING 1
 		)
-		SELECT count(*) FROM bad_rows', tabela_erro, sect) into count_bad;
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades via_rodov_limite
+	select count(*) from {schema}.via_rodov_limite into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''via_rodov_limite'', %L)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades seg_via_ferrea
+	select count(*) from {schema}.seg_via_ferrea into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''seg_via_ferrea'', %L)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	-- descontinuidades curva_de_nivel
+	select count(*) from {schema}.curva_de_nivel into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''curva_de_nivel'', %L)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+		-- descontinuidades curso_de_agua_eixo
+	select count(*) from {schema}.curso_de_agua_eixo into all_aux;
+
+	execute format(
+		'with bad_rows AS (
+			INSERT INTO %s
+			SELECT * from validation.descontinuidades_quadrantes(''curso_de_agua_eixo'', %L)
+			RETURNING 1
+		)
+		SELECT count(*) FROM bad_rows', tabela_erro, sect) into bad_aux;
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
 
 	-- intersecoes curva_de_nivel
 	-- select count(*) from {schema}.curva_de_nivel into all_aux;
@@ -1854,6 +1868,24 @@ begin
 	rec_aux := (select validation.valid_simple());
 	count_all := count_all + rec_aux.total;
 	count_bad := count_bad + rec_aux.bad;
+
+	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_''';
+
+	for tabela in execute tabelas
+	loop 
+		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
+		count_all := count_all + all_aux;
+
+		execute format('select count(*) from {schema}.%I where st_3dlength(geometria) < %s and ST_Intersects(geometria, %L)', tabela, cvalue, sect) INTO bad_aux;
+		count_bad := count_bad + bad_aux;
+
+		if bad_aux > 0 then
+			tabela_erro := 'errors.' || tabela || '_pq2_4_1';
+			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
+			execute format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS motivo TEXT NULL', tabela_erro);
+			execute format('insert into %s select *, ''min length'' from {schema}.%I where st_3dlength(geometria) < %s and ST_Intersects(geometria, %L) on conflict (identificador) do nothing', tabela_erro, tabela, cvalue, sect);
+		end if;
+	end loop;
 
 	select (count_all - count_bad) into count_good;
 
