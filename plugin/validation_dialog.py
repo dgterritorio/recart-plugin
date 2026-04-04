@@ -1111,21 +1111,27 @@ class AddLayersProcess(QThread):
 
             if ( tables ):
                 for tb in tables:
+                    # self.write('Tabela {}'.format(tb[0]))
                     ts = re.search(r'([a-z0-9_]+)_rg|([a-z0-9_]+)_re|([a-z0-9_]+)_ra|([a-z0-9_]+)_pq', tb[0])
                     slayer = None
-                    if ts.group(1) is not None:
-                        slayer = ts.group(1)
-                    elif ts.group(2) is not None:
-                        slayer = ts.group(2)
-                    elif ts.group(3) is not None:
-                        slayer = ts.group(3)
-                    elif ts.group(4) is not None:
-                        slayer = ts.group(4)
+                    if ts is not None:
+                        if ts.group(1) is not None:
+                            slayer = ts.group(1)
+                        elif ts.group(2) is not None:
+                            slayer = ts.group(2)
+                        elif ts.group(3) is not None:
+                            slayer = ts.group(3)
+                        elif ts.group(4) is not None:
+                            slayer = ts.group(4)
+                        else:
+                            continue
+                    elif tb[0] == 'erros_3d':
+                        slayer = tb[0]
                     else:
-                        print('-----')
-                        print(tb[0])
+                        continue
 
                     if slayer is not None:
+                        # self.write('Camada {}'.format(slayer))
                         if len(displayList[slayer]["geom"]) > 0:
                             for gt in displayList[slayer]["geom"]:
                                 ln = tb[0] if len(

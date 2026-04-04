@@ -875,6 +875,247 @@ begin
 end;
 $$ language plpgsql;
 
+create or replace function validation.re3_1_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		total as (select count(*) from {schema}.curva_de_nivel),
+		good as (select count(cdn.identificador)
+			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
+				and ( ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and
+					ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) ) 
+		),
+		bad as (select count(cdn.identificador) 
+			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			where not ST_IsClosed(cdn.geometria)
+				and (not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) or
+					not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) )
+		)
+	select total.count as total, good.count as good, bad.count as bad 
+	from total, good, bad 
+	into count_all, count_good, count_bad;
+
+	WITH bad_points AS (
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)
+		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', ST_StartPoint(cdn.geometria) as geometria
+		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria))
+		union
+		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', ST_EndPoint(cdn.geometria) as geometria
+		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria))
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		RETURNING 1
+	)
+	SELECT count(*) FROM bad_points into count_bad_points;
+	raise notice 'Existem % pontos errados', count_bad_points;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re3_1_1_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		total as (select count(*) from {schema}.curva_de_nivel),
+		good as (select count(cdn.identificador)
+			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
+				and ( ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and
+					ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) ) and ST_Intersects(cdn.geometria, sect)
+		),
+		bad as (select count(cdn.identificador) 
+			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
+			where not ST_IsClosed(cdn.geometria)
+				and (not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) or
+					not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) and ST_Intersects(cdn.geometria, sect)
+		)
+	select total.count as total, good.count as good, bad.count as bad 
+	from total, good, bad 
+	into count_all, count_good, count_bad;
+
+	WITH bad_points AS (
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)
+		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', ST_StartPoint(cdn.geometria) as geometria
+		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
+		union
+		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', ST_EndPoint(cdn.geometria) as geometria
+		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
+		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		RETURNING 1
+	)
+	SELECT count(*) FROM bad_points into count_bad_points;
+	raise notice 'Existem % pontos errados', count_bad_points;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re3_1_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		total as (select count(*) from {schema}.curva_de_nivel),
+		bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria))
+	select total.count, total.count - bad.count as good, bad.count from total, bad
+	into count_all, count_good, count_bad;
+
+	with 
+	bad as (select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria)),
+	pontos as (select
+		identificador, ST_ZMax(geometria) as max, ST_ZMin(geometria) as min,
+		ST_DumpPoints(geometria) as dp
+		FROM bad as pc),
+	media as (select identificador, percentile_disc(0.5) WITHIN GROUP (
+		ORDER BY st_z((dp).geom)) as mediana
+		FROM pontos 
+		GROUP by identificador),
+	bad_points AS (
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)	
+		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, (dp).geom as geometria from pontos, media
+		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		RETURNING 1
+	)
+
+	SELECT count(*) FROM bad_points into count_bad_points;
+	raise notice 'Existem % pontos errados', count_bad_points;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re3_1_2_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		total as (select count(*) from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect)),
+		bad as (select count(*) from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect) and ST_ZMax(geometria) != ST_ZMin(geometria))
+	select total.count, total.count - bad.count as good, bad.count from total, bad
+	into count_all, count_good, count_bad;
+
+	with 
+	bad as (select * from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect) and ST_ZMax(geometria) != ST_ZMin(geometria)),
+	pontos as (select
+		identificador, ST_ZMax(geometria) as max, ST_ZMin(geometria) as min,
+		ST_DumpPoints(geometria) as dp
+		FROM bad as pc),
+	media as (select identificador, percentile_disc(0.5) WITHIN GROUP (
+		ORDER BY st_z((dp).geom)) as mediana
+		FROM pontos 
+		GROUP by identificador),
+	bad_points AS (
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)	
+		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, (dp).geom as geometria from pontos, media
+		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		RETURNING 1
+	)
+	SELECT count(*) FROM bad_points into count_bad_points;
+	raise notice 'Existem % pontos errados', count_bad_points;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_5_2_insert (_id uuid, _arr  float[], _geo geometry) returns int as $$
+declare
+	var int;
+	count_all integer := 0;
+begin
+	if _arr[1] > _arr[array_upper(_arr, 1)] then
+		-- a altimetria está diminuir
+		for var in 1..array_upper(_arr, 1)-1 loop
+			if _arr[var] < _arr[var+1] then
+				count_all := count_all + 1;
+				insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)
+				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', ST_PointN(_geo, var))
+				ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing;
+			end if;
+		end loop;
+	else
+		-- a altimetria está aumentar
+		for var in 1..array_upper(_arr, 1)-1 loop
+			if _arr[var] > _arr[var+1] then
+				count_all := count_all + 1;
+				insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)
+				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', ST_PointN(_geo, var))
+				ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing;
+			end if;
+		end loop;
+	end if;
+	return count_all;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_5_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		aux as (select identificador, geometria, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
+		pontos as (select identificador, geometria, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador, geometria),
+		teste as (select identificador, geometria, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
+		total as (select count(*) from {schema}.curso_de_agua_eixo),
+		good as (select count(*) from teste where comparacao),
+		bad as (
+			select count( validation.re4_5_2_insert (identificador, pontos_arr, geometria) )
+			from teste where not comparacao)
+	select total.count as total, total.count - bad.count as good, bad.count as bad from total, bad
+	into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_5_2_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+	count_bad_points integer := 0;
+begin
+	with 
+		aux as (select identificador, geometria, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo 
+			where ST_Intersects(geometria, sect)
+			group by identificador, geometria),
+		pontos as (select identificador, geometria, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador, geometria),
+		teste as (select identificador, geometria, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
+		total as (select count(*) from {schema}.curso_de_agua_eixo),
+		good as (select count(*) from teste where comparacao),
+		bad as (
+			select count( validation.re4_5_2_insert (identificador, pontos_arr, geometria) )
+			from teste where not comparacao)
+	select total.count as total, total.count - bad.count as good, bad.count as bad from total, bad
+	into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
 -- select * from validation.rg5_validation ();
 create or replace function validation.rg5_validation () returns table (total int, good int, bad int) as $$
 declare
@@ -1573,7 +1814,7 @@ begin
 	execute format(
 		'with bad_rows AS (
 			INSERT INTO %s
-			select identificador, ''equip_util_coletiva'', ''valor_tipo_equipamento_coletivo'', NULL from public.equip_util_coletiva where identificador not in (select equip_util_coletiva_id from public.lig_valor_tipo_equipamento_coletivo_equip_util_coletiva)
+			select identificador, ''equip_util_coletiva'', ''valor_tipo_equipamento_coletivo'', NULL from {schema}.equip_util_coletiva where identificador not in (select equip_util_coletiva_id from {schema}.lig_valor_tipo_equipamento_coletivo_equip_util_coletiva)
 			RETURNING 1
 		)
 		SELECT count(*) FROM bad_rows', tabela_erro) into bad_aux;
@@ -2630,7 +2871,7 @@ begin
 	CREATE SCHEMA IF NOT EXISTS errors;
 		-- table without indexes
 		-- raise notice '%', tbl;
-	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like public.curva_de_nivel INCLUDING ALL);
+	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel INCLUDING ALL);
 
 	delete from errors.curva_de_nivel_re3_2;
 
@@ -2980,8 +3221,7 @@ $$ language plpgsql;
 
 select validation.create_tin();
 
--- Criar area de trabalho multi-poligono para casos com multiplas areas de trabalho no mesmo projecto
-
+-- Criar área de trabalho multi-polígono para casos com múltiplas áreas de trabalho no mesmo projecto
 CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
 (
 	SELECT st_multi(st_union(geometria)) as geometria
@@ -2994,23 +3234,6 @@ CREATE TABLE IF NOT EXISTS validation.no_hidro AS (
 		SELECT geometria FROM {schema}.no_hidrografico
 	) AS f
 );
-
--- CREATE TABLE IF NOT EXISTS validation.no_hidro_juncao AS (
--- 	SELECT ST_Collect(f.geometria) AS geom_col FROM (
--- 		SELECT geometria FROM {schema}.no_hidrografico n where n.valor_tipo_no_hidrografico='3'
--- 	) AS f
--- );
-
--- barreira é 2D apenas
--- CREATE TABLE IF NOT EXISTS validation.interrupcao_fluxo AS (
--- 	SELECT ST_Collect(f.geometria) AS geom_col FROM (
--- 		SELECT geometria FROM {schema}.queda_de_agua union all
--- 		SELECT geometria FROM {schema}.zona_humida -- union all
--- 		-- SELECT geometria FROM {schema}.barreira
--- 	) AS f
--- );
-
--- CREATE INDEX IF NOT EXISTS idx_val_curso_de_agua_eixo_geometria ON {schema}.curso_de_agua_eixo USING GIST (geometria);
 
 CREATE TABLE IF NOT EXISTS validation.consistencia_valores_def (
 	entidade text NULL,
@@ -3315,6 +3538,18 @@ CREATE TABLE IF NOT EXISTS validation.intersecoes_2d (
 
 ALTER TABLE validation.intersecoes_2d DROP CONSTRAINT IF EXISTS intersecoes_2d_pk;
 ALTER TABLE validation.intersecoes_2d ADD CONSTRAINT intersecoes_2d_pk PRIMARY KEY (p1_id, p2_id);
+
+CREATE SCHEMA IF NOT EXISTS errors;
+
+CREATE TABLE IF NOT EXISTS errors.erros_3d (
+	identificador uuid NULL,
+	entidade text NULL,
+	indice integer NULL,
+	motivo text NULL,
+	geometria geometry(pointz, 3763) NULL
+);
+
+ALTER TABLE errors.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, entidade, motivo, geometria);
 
 create or replace function validation.sort_asc(p_input double precision[]) 
   returns double precision[]

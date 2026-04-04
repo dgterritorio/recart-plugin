@@ -23,14 +23,14 @@ As regras definidas neste plugin são as seguintes:
 | `re3_1_1`   | Continuidade das curvas de nível (Parte 1)                                                          | Valida que curvas de nível que não se encontrem "fechadas" intersectam os limites da área de trabalho nas suas extremidades.                                                                                                                                                                                                                                                                                               |
 | `re3_1_2`   | Continuidade das curvas de nível (Parte 2)                                                          | Verifica que todos os vértices de uma curva de nível respeitam o mesmo valor para Z.                                                                                                                                                                                                                                                                                                                                       |
 | `re3_2`     | Equidistância natural                                                                               | Verifica que as cotas respetivas para cada curva de nível em comparação com as mais próximas respeitam a distância vertical pré-estabelecida.                                                                                                                                                                                                                                                                              |
-| `re3_3`     | Pontos cotados                                                                                      | Verifica que é recolhido pelo menos um "Ponto cotado" nas zonas planas onde a distância horizontal entre os objetos "Curva de nível" exceda os seguintes valores (NdD1: 100 m; NdD2: 500 m).                                                                                                                                                                                                                               |
+| `re3_3`     | Pontos cotados                                                                                      | Verifica que é recolhido pelo menos um "Ponto cotado" nas zonas planas onde a distância horizontal entre os objetos "Curva de nível" exceda os seguintes valores (NdD1: 100 m; NdD2: 500 m).  Ver [discussão desta regra](#regra-específica-33).                                                                                                                                                                                                                             |
 | `re4_1_1`   | Representação de água lêntica (Parte 1)                                                             | Verifica que os registos relativos a água lêntica que estejam identificados como tendo `cota_plena_armazenamento=false` têm o atributo data a fonte de dados preenchido.                                                                                                                                                                                                                                                   |
 | `re4_1_2`   | Representação de água lêntica (Parte 2 - geometria)                                                 | Verifica que todos os vértices que representam uma água lêntica respeitam o mesmo valor para Z.                                                                                                                                                                                                                                                                                                                            |
 | `re4_2`     | Representação do dique, da comporta e da eclusa                                                     | Valida as seguintes condições: 1. A representação do "Dique" é sempre feita através de uma linha. 2. A representação da "Comporta" é sempre feita através de uma única linha (independentemente da área que ocupa, do número de comportas individuais e do nível de detalhe). 3. A representação da "Eclusa" é sempre feita através de um polígono.                                                                        |
 | `re4_3_1`   | Representação da barreira da barragem de betão ou terra e da barreira do açude ou represa (Parte 1) | Verifica que os elementos da tabela `barreira` com valor de barreira descrito como 'betão', 'terra', ou 'açude ou represa', são representados por geometria do tipo linha.                                                                                                                                                                                                                                                 |
 | `re4_3_2`   | Representação da barreira da barragem de betão ou terra e da barreira do açude ou represa (Parte 2) | Verifica que os elementos da tabela `barreira` com valor de barreira descrito como 'betão' ou 'terra' têm um registo correspondente na tabela `edificio` com valor forma do edifício preenchida para barragem.                                                                                                                                                                                                             |
-| `re4_5_1`   | Representação do eixo do curso de água (Parte 1)                                                    | Valida a existência de um eixo de curso de água correspondente a cada àrea do curso de água representada.                                                                                                                                                                                                                                                                                                                  |
-| `re4_5_2`   | Representação do eixo do curso de água (Parte 2 - Vértices)                                         | Valida a monotonia relativa aos vértices dos eixos de curso de água.                                                                                                                                                                                                                                                                                                                                                       |
+| `re4_5_1`   | Representação do eixo do curso de água (Parte 1)                                                    | Valida a existência de um eixo de curso de água correspondente a cada área do curso de água representada.                                                                                                                                                                                                                                                                                                                  |
+| `re4_5_2`   | Representação do eixo do curso de água (Parte 2 - Vértices)                                         | Valida a monotonia relativa aos vértices dos eixos de curso de água. Reporta os pontos de inflexão da monotonia na tabela `errors.erros_3d`.                                                                                                                                                                                                                                                                                                                                                      |
 | `re4_8_1`   | Interrupção do curso de água (topologia)                                                            | Utiliza as funções `ST_intersects` e `ST_Touches` de maneira a verificar que todas as interseções de eixos de curso de água se realizam nas suas extremidades.                                                                                                                                                                                                                                                             |
 | `re4_8_2`   | Interrupção do curso de água (atributos)                                                            | Verifica que os eixos dos cursos de água apenas são interrompidos nas seguintes condições: 1. Existe uma interceção com outro curso de água; 2. Existe uma alteração do valor de qualquer um dos atributos que caracteriza o "Curso de água - eixo"; 3. Existe uma variação ("Queda de água" ou "Zona húmida") ou regulação de fluxo ("Barreira").                                                                         |
 | `re4_9_1`   | Conexão entre o eixo de curso de água e os nós hidrográficos (Parte 1 - Eixos)                      | Valida que os eixos de um curso de água possuem nós hidrográficos correspondentes nas suas extremidades.                                                                                                                                                                                                                                                                                                                   |
@@ -60,3 +60,52 @@ As regras definidas neste plugin são as seguintes:
 | `pq1_1`     | Comissão de objetos                                                                                 | Verifica a existência de geometrias duplicadas. Respeitando as exceções estabelecidas para os nós de transporte rodoviário.                                                                                                                                                                                                                                                                                                |
 | `pq2_1_1`   | Conformidade dos dados                                                                              | Valida a existência de valores correspondentes nas tabelas de relação (`lig_valor_tipo_circulacao_seg_via_rodov` e `lig_valor_tipo_equipamento_coletivo_equip_util_coletiva`) para as entidades "Segmento via rodoviária" e "Equipamento utilização coletiva", respetivamente.                                                                                                                                             |
 | `pq2_4_1`   | Consistência topológica dos objetos                                                                 | Valida a inexistência de descontinuidades para os segmentos de via rodoviária.                                                                                                                                                                                                                                                                                                                                             |
+### Regra específica 3.3
+
+A validação desta regra desenvolve-se em duas fases. Na primeira fase, identificam-se aŕeas, dentro da área de trabalho, onde não há nem curvas de nível, nem pontos cotados a menos de 100m/500m, consoante o NDD.
+
+Exemplo das áreas (a vermelho) onde não há pontos cotados e provavelmente devera haver:
+
+![](../images/areas_re3_3.png)
+
+Depois de calculadas essas áreas, é colocado um ponto cotado no centróide da mesma, que serve para indicar a área onde constar um ponto cotado. É uma posição meramente indicativa. Estes ponto indicativas são gerados na tabela `errors.ponto_cotado_re3_3`.
+
+Exemplos dos pontos criados, no centróide das áreas anteriormente identificadas;
+
+![](../images/pontos_re3_3.png)
+
+
+### Área de trabalho única para validação
+
+Havendo várias áreas de trabalho contíguas, as regras que usam a `area_trabalho` não vão funcionar corretamente (contra toda a área de trabalho). Por exemplo, não se consegue validar se as curvas de nível batem certo umas com as outras na junção das áreas de trabalho. Para resolver este problema, deverá ser criada uma nova tabela `validation.area_trabalho_multi` que contém um polígono ou multi-polígono resultante da união de todas as áreas de trabalho. Esta tabela serve para as validações que necessitam de uma área de trabalho unificada.
+
+```sql
+-- Criar area de trabalho multi-poligono para casos com multiplas areas de trabalho no mesmo projecto
+-- Faz-se um teste, para adivinhar se as múltiplas áreas são contíguas ou não. Sendo contíguas, tenta-se gerar só um polígono, usando buffer positivo e negativo,
+-- para tentar eliminar as linhas de divisão. Caso contrário, gera-se um multi-polígono.
+
+do $$
+declare
+  all_touch boolean;
+begin
+  SELECT (COUNT(DISTINCT cluster_id) = 1) INTO all_touch
+  FROM (SELECT ST_ClusterDBSCAN(geometria, eps := 0, minpoints := 1) OVER () AS cluster_id FROM area_trabalho) AS subquery;
+  if all_touch then
+    -- raise notice 'As areas são contíguas';
+	CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
+		(
+			select ST_Buffer(ST_Union(ST_Buffer(geometria, 0.25)), -0.25) AS geometria
+			FROM {schema}.area_trabalho
+		);
+  else
+	CREATE TABLE IF NOT EXISTS validation.area_trabalho_multi AS
+		(
+			SELECT st_multi(st_union(geometria)) as geometria
+			FROM {schema}.area_trabalho
+		);
+    -- raise notice 'As areas não são contíguas';
+  end if;
+  CREATE INDEX ON validation.area_trabalho_multi USING gist(geometria);
+end $$;
+```
+
