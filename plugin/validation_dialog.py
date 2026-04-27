@@ -150,18 +150,17 @@ class ValidationDialog(QDialog, FORM_CLASS):
         title = self.lineEdit.text() if self.lineEdit.text() else "recartDGTlog"
         times = datetime.now()
 
-        filepath = os.path.join(os.getcwd(), self.sanitize_filename(title) + \
-                times.strftime("%Y%m%d") + ".txt")
+        filepath = None
 
         if self.mQgsFileWidget.filePath() != "":
-            filepath = os.path.join(self.mQgsFileWidget.filePath(), self.sanitize_filename(title) + \
-                times.strftime("%Y%m%d") + ".txt")
+            filepath = os.path.join(self.mQgsFileWidget.filePath(), self.sanitize_filename(title)  + ".txt")
 
         formated = times.strftime("%Y-%m-%d %H:%M:%S")
         self.plainTextEdit.appendPlainText('{} {}'.format(formated, text))
         
-        with open(filepath, 'a') as f:
-            f.write('{} {}\n'.format(formated, text))
+        if filepath is not None:
+            with open(filepath, 'a') as f:
+                f.write('{} {}\n'.format(formated, text))
 
     def getConnection(self):
         return self.connCombo.currentText()
