@@ -32,7 +32,7 @@ from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QFont
 
 from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
 from qgis.gui import QgsFileWidget
-from qgis.utils import iface
+from qgis.utils import iface, pluginMetadata
 
 from . import qgis_configs
 from .postgis_helper import PostgisUtils
@@ -388,8 +388,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.actconn = self.pgutils.get_or_create_connection()
         allChecked = True
 
-        if self.iface.pluginManagerInterface().pluginMetadata('recartDGT') is not None:
-            self.writeText("recartDGT v{}".format(self.iface.pluginManagerInterface().pluginMetadata('recartDGT')['version_installed']))
+        if iface.pluginManagerInterface().pluginMetadata('recartDGT') is not None:
+            self.writeText("recartDGT v{}".format(iface.pluginManagerInterface().pluginMetadata('recartDGT')['version_installed']))
+        else:
+            self.writeText("recartDGT {}".format(pluginMetadata('recartDGT', 'version')))
 
         self.writeText("A carregar a versão das regras {}...".format(self.vrs if self.vrs is not None else 'Desconhecida'))
         try:
@@ -925,7 +927,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 fltr = "{} {} '{}'".format(self.mFieldComboBox.currentText(), self.getOp(self.comboBoxOps.currentText()),
                                            self.fltrValue.text())
 
-            self.validateProcess = ValidateProcess(self.conString, schema, self.ndCombo.currentText(), self.vrs, self.is_sections, self.areaComboBox.currentText(), args, fltr, self.pgutils)
+            self.validateProcess = ValidateProcess(self.conString, schema, self.ndCombo.currentText(), self.vrs, self.is_sections, self.areaComboBox.currentText(), args, fltr, self.pgutils, self.ignoreChecks.isChecked())
 
             self.validateProcess.signal.connect(self.writeText)
             self.validateProcess.finished.connect(self.finishedValidate)
@@ -1292,7 +1294,7 @@ class CreateProcess(QThread):
 class ValidateProcess(QThread):
     signal = pyqtSignal('PyQt_PyObject')
 
-    def __init__(self, conn, schema, ndd1, vrs, is_sections=False, areaTable=None, args=None, fltrValue=None, pgutils=None):
+    def __init__(self, conn, schema, ndd1, vrs, is_sections=False, areaTable=None, args=None, fltrValue=None, pgutils=None, ignoreChecks=False):
         QThread.__init__(self)
 
         self.conn = conn
@@ -1307,6 +1309,8 @@ class ValidateProcess(QThread):
         self.areaTable = areaTable
         self.args = args if args is not None else {}
         self.fltrValue = fltrValue
+
+        self.ignoreChecks = ignoreChecks
 
         self.pgutils = pgutils if pgutils is not None else PostgisUtils(self, conn)
 
@@ -1339,6 +1343,20 @@ class ValidateProcess(QThread):
 
             validated = {}
             interrupt = False
+            
+            # check geometries and extensions
+            res = self.pgutils.run_query_with_conn(self.actconn, 'select validation.check_geometries_extensions();')
+            
+            checkProblem = False
+            if res and len(res) > 0 and res[0][0] == 1:
+                self.write("\t[Erro] A base de dados não tem as extensões necessárias (\"uuid-ossp\")")
+                checkProblem = True
+            elif res and len(res) > 0 and res[0][0] == 2:
+                self.write("\t[Erro] A base de dados tem tabelas com geometrias inválidas")
+                checkProblem = True
+
+            if checkProblem and not self.ignoreChecks:
+                return
 
             # validate values
             vndd = '1' if self.ndd1 == 'NdD1' else '2'

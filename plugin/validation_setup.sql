@@ -3421,6 +3421,55 @@ begin
 	close tables;
 end; $$;
 
+
+CREATE OR REPLACE FUNCTION validation.check_geometries_extensions()
+RETURNS INTEGER AS $$
+DECLARE
+    tbl TEXT;
+    uuid_ossp_available BOOLEAN;
+    invalid_found BOOLEAN := FALSE;
+    row_invalid_count BIGINT;
+BEGIN
+    SELECT EXISTS(
+        SELECT 1 FROM pg_extension WHERE extname = 'uuid-ossp'
+    ) INTO uuid_ossp_available;
+    
+    IF NOT uuid_ossp_available THEN
+        RAISE WARNING 'Extension uuid-ossp is not installed.';
+        RETURN 1;
+    END IF;
+
+    FOR tbl IN 
+        SELECT c.table_name::TEXT
+        FROM information_schema.columns c
+        JOIN information_schema.tables t 
+            ON c.table_schema = t.table_schema 
+            AND c.table_name = t.table_name
+        WHERE c.table_schema = '{schema}'
+            AND c.column_name = 'geometria'
+            AND t.table_type = 'BASE TABLE'
+    LOOP
+        EXECUTE format(
+            'SELECT SUM(CASE WHEN geometria IS NOT NULL AND NOT ST_IsValid(geometria) THEN 1 ELSE 0 END)::BIGINT
+             FROM {schema}.%I',
+            tbl
+        ) INTO row_invalid_count;
+        
+        IF row_invalid_count > 0 THEN
+            RAISE WARNING 'Table % has % invalid geometries', tbl, row_invalid_count;
+            invalid_found := TRUE;
+        END IF;
+    END LOOP;
+
+    IF invalid_found THEN
+        RETURN 2;
+    END IF;
+
+    RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- drop index IF EXISTS validation.tin_geom_idx;
 -- create index tin_geom_idx ON validation.tin using gist(geometria);
 
@@ -3495,6 +3544,7 @@ CREATE TABLE IF NOT EXISTS errors.erros_3d (
 	geometria geometry(pointz, 3763) NULL
 );
 
+ALTER TABLE errors.erros_3d DROP CONSTRAINT IF EXISTS erros_3d_pk;
 ALTER TABLE errors.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, entidade, motivo, geometria);
 
 create or replace function validation.sort_asc(p_input double precision[]) 
