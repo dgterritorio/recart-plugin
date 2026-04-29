@@ -2763,35 +2763,31 @@ begin
 
 	select count(*) from {schema}.curva_de_nivel into count_all;
 
-	WITH candidates AS (
-    	SELECT identificador, geometria,
-		    	ST_PointN(geometria, 1) AS first_point,
-		    	ST_Centroid(geometria)::geometry(Point, 3763) AS pt,
-    			ST_Z(ST_PointN(geometria, 1)) AS z_value
+	with candidates AS (
+    	SELECT identificador, geometria, ST_PointN(geometria, 1) AS first_point
     		FROM {schema}.curva_de_nivel
     	WHERE valor_tipo_curva IN ('1', '2')
 	),
-	with_nearest AS (
-		SELECT 
-			a.identificador,
-			a.z_value,
-			nearest.z_value AS nearest_z
-		FROM candidates a
-		CROSS JOIN LATERAL (
-			SELECT b.z_value
-			FROM candidates b
-			WHERE b.identificador != a.identificador
-				AND ST_DWithin(a.pt, b.pt, 5000)
-			ORDER BY a.first_point <-> b.geometria
-			LIMIT 1
-		) nearest
-	),
-	bad_rows AS (        
+	pares AS (
+        SELECT 
+            all_cdn.identificador,
+            round(abs(st_z(all_cdn.first_point) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance
+        FROM candidates AS all_cdn
+        CROSS JOIN LATERAL (
+            SELECT geometria FROM candidates AS ports
+            WHERE all_cdn.identificador != ports.identificador
+            ORDER BY all_cdn.first_point <-> ports.geometria
+            LIMIT 1
+        ) AS closest_cdn
+    ),
+    bad_ids AS ( 
+    	SELECT identificador FROM pares WHERE z_distance NOT IN (0, valor_equi)
+    ),
+    bad_rows AS (        
 		INSERT INTO errors.curva_de_nivel_re3_2
 	    SELECT cn.*
-    	FROM {schema}.curva_de_nivel cn
-    		JOIN with_nearest wn ON cn.identificador = wn.identificador
-    	WHERE round(abs(wn.z_value - wn.nearest_z)::numeric, 2) NOT IN (0, valor_equi)
+	    FROM {schema}.curva_de_nivel cn
+	    WHERE cn.identificador IN (SELECT identificador FROM bad_ids)
 		RETURNING 1
     )
 	SELECT count(*) FROM bad_rows into count_bad;
@@ -2827,38 +2823,40 @@ begin
 
 	execute format('select count(*) from {schema}.curva_de_nivel') into count_all;
 
-	WITH candidates AS (
-    	SELECT identificador, geometria,
-		    	ST_PointN(geometria, 1) AS first_point,
-		    	ST_Centroid(geometria)::geometry(Point, 3763) AS pt,
-    			ST_Z(ST_PointN(geometria, 1)) AS z_value
-    		FROM {schema}.curva_de_nivel
-    	WHERE valor_tipo_curva IN ('1', '2') and ST_Intersects(geometria, sect)
-	),
-	with_nearest AS (
-		SELECT 
-			a.identificador,
-			a.z_value,
-			nearest.z_value AS nearest_z
-		FROM candidates a
-		CROSS JOIN LATERAL (
-			SELECT b.z_value
-			FROM candidates b
-			WHERE b.identificador != a.identificador
-				AND ST_DWithin(a.pt, b.pt, 5000)
-			ORDER BY a.first_point <-> b.geometria
-			LIMIT 1
-		) nearest
-	),
-	bad_rows AS (        
-		INSERT INTO errors.curva_de_nivel_re3_2
-	    SELECT cn.*
-    	FROM {schema}.curva_de_nivel cn
-    		JOIN with_nearest wn ON cn.identificador = wn.identificador
-    	WHERE round(abs(wn.z_value - wn.nearest_z)::numeric, 2) NOT IN (0, valor_equi)
-		RETURNING 1
-    )
-	SELECT count(*) FROM bad_rows into count_bad;
+	execute format(
+		'WITH candidates AS ('
+    			'SELECT identificador, geometria, ST_PointN(geometria, 1) AS first_point '
+    		'FROM {schema}.curva_de_nivel c '
+    	'WHERE valor_tipo_curva IN (''1'', ''2'') and ST_Intersects(c.geometria, %1$L)'
+		'),'
+		'pares AS ('
+			'SELECT '
+				'all_cdn.identificador,'
+				'round(abs(st_z(all_cdn.first_point) - st_z(ST_PointN(closest_cdn.geometria, 1)))::numeric, 2) AS z_distance '
+			'FROM candidates AS all_cdn '
+			'CROSS JOIN LATERAL ('
+				'SELECT geometria '
+				'FROM candidates AS ports '
+				'WHERE all_cdn.identificador != ports.identificador '
+				'ORDER BY all_cdn.first_point <-> ports.geometria '
+				'LIMIT 1 '
+			') AS closest_cdn'
+		'),'
+		'bad_ids AS ( '
+    		'SELECT identificador FROM pares WHERE z_distance NOT IN (0,  %2$L)'
+    	'),'
+		'bad_rows AS ('
+			'INSERT INTO errors.curva_de_nivel_re3_2 '
+			'SELECT cn.* '
+			'FROM {schema}.curva_de_nivel cn '
+			'WHERE cn.identificador IN ('
+				'SELECT identificador '
+				'FROM bad_ids )'
+			'ON CONFLICT (identificador) DO NOTHING '
+			'RETURNING 1 '
+		')'
+		'SELECT count(*) FROM bad_rows;'
+	, sect, valor_equi) into count_bad;
 
 	select (count_all - count_bad) into count_good;
 
