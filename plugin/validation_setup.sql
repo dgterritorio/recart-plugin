@@ -2518,87 +2518,62 @@ begin
 
 	delete from errors.seg_via_rodov_re_5_5_2;
 
-	with 
-		extremes as (
-			select st_startpoint(geometria) as pt from {schema}.seg_via_rodov
-			union
-			select st_endpoint(geometria) as pt from {schema}.seg_via_rodov
+	WITH
+		intersection_pairs AS (
+			SELECT 
+				cf1.identificador AS id1,
+				cf2.identificador AS id2,
+				cf1.geometria AS geom1,
+				cf2.geometria AS geom2,
+				st_relate(cf1.geometria, cf2.geometria) AS de9im
+			FROM {schema}.seg_via_rodov cf1
+			JOIN {schema}.seg_via_rodov cf2
+				ON cf1.identificador < cf2.identificador
+				AND cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
+				AND st_intersects(cf1.geometria, cf2.geometria)
 		),
-		all_intersecoes as (
-			select cf1.identificador AS id1, cf2.identificador AS id2,
-				st_intersection(cf1.geometria, cf2.geometria) AS geom_inter
-			from {schema}.seg_via_rodov cf1
-			join {schema}.seg_via_rodov cf2
-				on cf1.identificador < cf2.identificador
-					and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-					and st_intersects(cf1.geometria, cf2.geometria)
-		),
-		intersecoes_dump as (
-			select 
+		classified AS (
+			SELECT 
 				id1, id2,
-				(st_dump(geom_inter)).geom AS geom,
-				geometrytype(geom_inter) AS gtype
-			FROM all_intersecoes
+				CASE
+					-- Lines share interior points (overlap/duplicate)
+					WHEN st_relate(geom1, geom2, '1********') THEN 'duplicate'
+					-- Lines cross (interior intersects interior at point)
+					WHEN st_relate(geom1, geom2, '0********') THEN 'crossing'
+					-- Lines touch at boundary only (valid connection)
+					WHEN st_relate(geom1, geom2, 'FF*F*****') 
+					OR st_relate(geom1, geom2, 'FF*0F****') THEN 'valid'
+					ELSE 'valid'
+				END AS status
+			FROM intersection_pairs
 		),
-		ok_intersecoes as (
-			select id1, id2, geom 
-				FROM intersecoes_dump 
-				WHERE gtype IN ('POINT', 'MULTIPOINT')
-		),
-		existentes as (
-			select id1, id2, geom,
-				EXISTS (select 1 FROM extremes e WHERE e.pt && o.geom AND st_equals(e.pt, o.geom)) AS at_extremity
-			from ok_intersecoes o
-		),
-		segmentos as (
-			select COUNT(DISTINCT id) AS cnt FROM (
-				select id1 AS id FROM existentes WHERE NOT at_extremity
+		bad_ids AS (
+			SELECT DISTINCT id FROM (
+				SELECT id1 AS id FROM classified WHERE status IN ('duplicate', 'crossing')
 				UNION
-				select id2 FROM existentes WHERE NOT at_extremity
-			) as foo
+				SELECT id2 FROM classified WHERE status IN ('duplicate', 'crossing')
+			) x
 		),
-		linhas_duplicadas as (
-			select COUNT(DISTINCT id) AS cnt FROM (
-				select id1 AS id FROM all_intersecoes
-				WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+		good_ids AS (
+			SELECT DISTINCT id FROM (
+				SELECT id1 AS id FROM classified WHERE status = 'valid'
 				UNION
-				select id2 FROM all_intersecoes
-				WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
-			) as foo
-		),
-		total as (
-			select COUNT(DISTINCT id) AS cnt FROM (
-				select id1 AS id FROM intersecoes_dump
-				UNION
-				select id2 FROM intersecoes_dump
-			) as foo
-		),
-		good as (
-			select COUNT(DISTINCT id) AS cnt FROM (
-				select id1 AS id FROM existentes WHERE at_extremity
-				UNION
-				select id2 FROM existentes WHERE at_extremity
-			) as foo
+				SELECT id2 FROM classified WHERE status = 'valid'
+			) x
+			WHERE id NOT IN (SELECT id FROM bad_ids)
 		),
 		bad_rows AS (
 			INSERT INTO errors.seg_via_rodov_re_5_5_2
-				select * from {schema}.seg_via_rodov
-					where identificador in (
-						select id1 AS id FROM existentes WHERE NOT at_extremity
-						UNION
-						select id2 FROM existentes WHERE NOT at_extremity
-					) or identificador in (
-						select id1 AS id FROM all_intersecoes
-							WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
-						UNION
-						select id2 FROM all_intersecoes
-							WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
-					)
-				on conflict do nothing
-				RETURNING 1
+			SELECT * FROM {schema}.seg_via_rodov
+			WHERE identificador IN (SELECT id FROM bad_ids)
+			ON CONFLICT DO NOTHING
+			RETURNING 1
 		)
-		select total.cnt as total, good.cnt as good, (segmentos.cnt + linhas_duplicadas.cnt) as bad
-		from total, good, segmentos, linhas_duplicadas into count_all, count_good, count_bad;
+		SELECT
+			(SELECT COUNT(*) FROM (SELECT id1 FROM classified UNION SELECT id2 FROM classified) t) AS total,
+			(SELECT COUNT(*) FROM good_ids) AS good,
+			(SELECT COUNT(*) FROM bad_ids) AS bad
+		INTO count_all, count_good, count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
@@ -2613,90 +2588,63 @@ begin
 	CREATE SCHEMA IF NOT EXISTS errors;
 	CREATE TABLE IF NOT exists errors.seg_via_rodov_re_5_5_2 (like {schema}.seg_via_rodov INCLUDING ALL);
 
-	delete from errors.seg_via_rodov_re_5_5_2;
-
-	with 
-		extremes as (
-			select st_startpoint(geometria) as pt from {schema}.seg_via_rodov s1 WHERE ST_Intersects(s1.geometria, sect)
-			union
-			select st_endpoint(geometria) as pt from {schema}.seg_via_rodov s2 WHERE ST_Intersects(s2.geometria, sect)
-		),
-		all_intersecoes as (
-			select cf1.identificador AS id1, cf2.identificador AS id2,
-				st_intersection(cf1.geometria, cf2.geometria) AS geom_inter
-			from {schema}.seg_via_rodov cf1
-			join {schema}.seg_via_rodov cf2
-				on cf1.identificador < cf2.identificador
-					and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
-					and st_intersects(cf1.geometria, cf2.geometria)
+	WITH
+		intersection_pairs AS (
+			SELECT 
+				cf1.identificador AS id1,
+				cf2.identificador AS id2,
+				cf1.geometria AS geom1,
+				cf2.geometria AS geom2,
+				st_relate(cf1.geometria, cf2.geometria) AS de9im
+			FROM {schema}.seg_via_rodov cf1
+			JOIN {schema}.seg_via_rodov cf2
+				ON cf1.identificador < cf2.identificador
+				AND cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
+				AND st_intersects(cf1.geometria, cf2.geometria)
 			WHERE ST_Intersects(cf1.geometria, sect)
 		),
-		intersecoes_dump as (
-			select 
+		classified AS (
+			SELECT 
 				id1, id2,
-				(st_dump(geom_inter)).geom AS geom,
-				geometrytype(geom_inter) AS gtype
-			FROM all_intersecoes
+				CASE
+					-- Lines share interior points (overlap/duplicate)
+					WHEN st_relate(geom1, geom2, '1********') THEN 'duplicate'
+					-- Lines cross (interior intersects interior at point)
+					WHEN st_relate(geom1, geom2, '0********') THEN 'crossing'
+					-- Lines touch at boundary only (valid connection)
+					WHEN st_relate(geom1, geom2, 'FF*F*****') 
+					OR st_relate(geom1, geom2, 'FF*0F****') THEN 'valid'
+					ELSE 'valid'
+				END AS status
+			FROM intersection_pairs
 		),
-		ok_intersecoes as (
-			select id1, id2, geom 
-				FROM intersecoes_dump 
-				WHERE gtype IN ('POINT', 'MULTIPOINT')
-		),
-		existentes as (
-			select id1, id2, geom,
-				EXISTS (select 1 FROM extremes e WHERE e.pt && o.geom AND st_equals(e.pt, o.geom)) AS at_extremity
-			from ok_intersecoes o
-		),
-		segmentos as (
-			select COUNT(DISTINCT id) AS cnt FROM (
-				select id1 AS id FROM existentes WHERE NOT at_extremity
+		bad_ids AS (
+			SELECT DISTINCT id FROM (
+				SELECT id1 AS id FROM classified WHERE status IN ('duplicate', 'crossing')
 				UNION
-				select id2 FROM existentes WHERE NOT at_extremity
-			) as foo
+				SELECT id2 FROM classified WHERE status IN ('duplicate', 'crossing')
+			) x
 		),
-		linhas_duplicadas as (
-			select COUNT(DISTINCT id) AS cnt FROM (
-				select id1 AS id FROM all_intersecoes
-				WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
+		good_ids AS (
+			SELECT DISTINCT id FROM (
+				SELECT id1 AS id FROM classified WHERE status = 'valid'
 				UNION
-				select id2 FROM all_intersecoes
-				WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
-			) as foo
-		),
-		total as (
-			select COUNT(DISTINCT id) AS cnt FROM (
-				select id1 AS id FROM intersecoes_dump
-				UNION
-				select id2 FROM intersecoes_dump
-			) as foo
-		),
-		good as (
-			select COUNT(DISTINCT id) AS cnt FROM (
-				select id1 AS id FROM existentes WHERE at_extremity
-				UNION
-				select id2 FROM existentes WHERE at_extremity
-			) as foo
+				SELECT id2 FROM classified WHERE status = 'valid'
+			) x
+			WHERE id NOT IN (SELECT id FROM bad_ids)
 		),
 		bad_rows AS (
 			INSERT INTO errors.seg_via_rodov_re_5_5_2
-				select * from {schema}.seg_via_rodov
-					where identificador in (
-						select id1 AS id FROM existentes WHERE NOT at_extremity
-						UNION
-						select id2 FROM existentes WHERE NOT at_extremity
-					) or identificador in (
-						select id1 AS id FROM all_intersecoes
-							WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
-						UNION
-						select id2 FROM all_intersecoes
-							WHERE geometrytype(geom_inter) NOT IN ('POINT', 'MULTIPOINT')
-					)
-				on conflict do nothing
-				RETURNING 1
+			SELECT * FROM {schema}.seg_via_rodov
+			WHERE identificador IN (SELECT id FROM bad_ids)
+			ON CONFLICT DO NOTHING
+			RETURNING 1
 		)
-		select total.cnt as total, good.cnt as good, (segmentos.cnt + linhas_duplicadas.cnt) as bad
-		from total, good, segmentos, linhas_duplicadas into count_all, count_good, count_bad;
+		SELECT
+			(SELECT COUNT(*) FROM (SELECT id1 FROM classified UNION SELECT id2 FROM classified) t) AS total,
+			(SELECT COUNT(*) FROM good_ids) AS good,
+			(SELECT COUNT(*) FROM bad_ids) AS bad
+		INTO count_all, count_good, count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
@@ -2872,8 +2820,6 @@ begin
 		-- table without indexes
 		-- raise notice '%', tbl;
 	CREATE TABLE IF NOT exists errors.curva_de_nivel_re3_2 (like {schema}.curva_de_nivel INCLUDING ALL);
-
-	delete from errors.curva_de_nivel_re3_2;
 
 	execute format('select count(*) from {schema}.curva_de_nivel') into count_all;
 
@@ -3475,6 +3421,55 @@ begin
 	close tables;
 end; $$;
 
+
+CREATE OR REPLACE FUNCTION validation.check_geometries_extensions()
+RETURNS INTEGER AS $$
+DECLARE
+    tbl TEXT;
+    uuid_ossp_available BOOLEAN;
+    invalid_found BOOLEAN := FALSE;
+    row_invalid_count BIGINT;
+BEGIN
+    SELECT EXISTS(
+        SELECT 1 FROM pg_extension WHERE extname = 'uuid-ossp'
+    ) INTO uuid_ossp_available;
+    
+    IF NOT uuid_ossp_available THEN
+        RAISE WARNING 'Extension uuid-ossp is not installed.';
+        RETURN 1;
+    END IF;
+
+    FOR tbl IN 
+        SELECT c.table_name::TEXT
+        FROM information_schema.columns c
+        JOIN information_schema.tables t 
+            ON c.table_schema = t.table_schema 
+            AND c.table_name = t.table_name
+        WHERE c.table_schema = '{schema}'
+            AND c.column_name = 'geometria'
+            AND t.table_type = 'BASE TABLE'
+    LOOP
+        EXECUTE format(
+            'SELECT SUM(CASE WHEN geometria IS NOT NULL AND NOT ST_IsValid(geometria) THEN 1 ELSE 0 END)::BIGINT
+             FROM {schema}.%I',
+            tbl
+        ) INTO row_invalid_count;
+        
+        IF row_invalid_count > 0 THEN
+            RAISE WARNING 'Table % has % invalid geometries', tbl, row_invalid_count;
+            invalid_found := TRUE;
+        END IF;
+    END LOOP;
+
+    IF invalid_found THEN
+        RETURN 2;
+    END IF;
+
+    RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- drop index IF EXISTS validation.tin_geom_idx;
 -- create index tin_geom_idx ON validation.tin using gist(geometria);
 
@@ -3549,6 +3544,7 @@ CREATE TABLE IF NOT EXISTS errors.erros_3d (
 	geometria geometry(pointz, 3763) NULL
 );
 
+ALTER TABLE errors.erros_3d DROP CONSTRAINT IF EXISTS erros_3d_pk;
 ALTER TABLE errors.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, entidade, motivo, geometria);
 
 create or replace function validation.sort_asc(p_input double precision[]) 
