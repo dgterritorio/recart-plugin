@@ -825,6 +825,26 @@ recartStructure = {
     }
 }
 
+form_nullable_fields = {
+    'valor_estado_instalacao': ['*'],
+    'id_agua_lentica': ['*'],
+    'id_curso_de_agua_area': ['*'],
+    'valor_ficticio': ['*'],
+    'valor_persistencia_hidrologica': ['*'],
+    'inst_gestao_ambiental_id': ['*'],
+    'inst_producao_id': ['*'],
+    'valor_condicao_const': ['*'],
+    'valor_forma_edificio': ['*'],
+    'valor_restricao_infra_trans_aereo': ['*'],
+    'valor_tipo_uso_infra_trans_ferrov': ['*'],
+    'valor_tipo_nascente': ['*'],
+    'valor_via_ferrea': ['*'],
+    'valor_tipo_via_cabo': ['*'],
+    'valor_restricao_acesso': ['*'],
+    'equip_util_coletiva_id': ['Área artificializada'],
+    'edificio_id': ['numero_policia']
+}
+
 joins = {
     'lig_adm_publica_edificio': {
         'join_table': 'adm_publica',

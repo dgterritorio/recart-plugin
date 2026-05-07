@@ -46,7 +46,7 @@ import re
 
 from . import qgis_configs
 from .postgis_helper import PostgisUtils
-from .aux_export import displayList, recartStructure, fieldNameMap, joins
+from .aux_export import displayList, recartStructure, fieldNameMap, joins, form_nullable_fields
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'ui/main_dialog.ui'))
@@ -360,6 +360,15 @@ class MainDialog(QDialog, FORM_CLASS):
                     'Relation': rel.id(),
                     'ShowOpenFormButton': False
                 }
+                if field.name() not in form_nullable_fields:
+                    config['AllowNULL'] = False
+                else:
+                    r = False
+                    for t in form_nullable_fields[field.name()]:
+                        if t in rel.referencedLayer().name() or t in rel.referencingLayer().name() or t == '*':
+                            r = True
+                            break
+                    config['AllowNULL'] = r
                 widget_setup = QgsEditorWidgetSetup('RelationReference',config)
                 layer.setEditorWidgetSetup(field_idx, widget_setup)
                 # print( "Camada {} configurada com base na relação".format( layer.name() ) )
