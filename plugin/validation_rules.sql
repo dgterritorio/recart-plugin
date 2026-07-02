@@ -21,6 +21,7 @@ create table if not exists validation.rules (
 	versoes text[] not null default '{ "v1.1.2", "v2.0.1", "v2.0.2" }'
 );
 
+ALTER TABLE validation.rules DROP CONSTRAINT IF EXISTS rules_pky;
 ALTER TABLE validation.rules ADD CONSTRAINT rules_pky PRIMARY KEY (code, versoes);
 
 create table if not exists validation.rules_area (
@@ -41,6 +42,7 @@ create table if not exists validation.rules_area (
 	versoes text[] not null default '{ "v1.1.2", "v2.0.1", "v2.0.2" }'
 );
 
+ALTER TABLE validation.rules_area DROP CONSTRAINT IF EXISTS rules_area_pky;
 ALTER TABLE validation.rules_area ADD CONSTRAINT rules_area_pky PRIMARY KEY (code, versoes);
 
 create table if not exists validation.rules_area_report (

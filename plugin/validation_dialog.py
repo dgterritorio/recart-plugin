@@ -519,6 +519,39 @@ class ValidationDialog(QDialog, FORM_CLASS):
                                          offsety, QgsUnitTypes.LayoutMillimeters))
         table.addFrame(frame)
 
+    def addGeometriasInvalidasReportSection(self, layout, pages, footnote, tabOff, greport):
+        npage = QgsLayoutItemPage(layout)
+        npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
+        pages.addPage(npage)
+
+        section = QgsLayoutItemLabel(layout)
+        section.setText('Geometrias inválidas')
+        section.setFont(QFont('Arial', 14, 75))
+        section.adjustSizeToText()
+        section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
+        layout.addItem(section)
+
+        cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn(),
+                QgsLayoutTableColumn()]
+        cols[0].setHeading("Tabela")
+        cols[0].setWidth(80)
+        cols[1].setHeading("Identificador")
+        cols[1].setWidth(80)
+        cols[2].setHeading("Motivo")
+        cols[2].setWidth(90)
+
+        self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
+                         cols, greport)
+
+        time = QgsLayoutItemLabel(layout)
+        time.setText(footnote)
+        time.setFont(QFont('Arial', 10, 25))
+        time.adjustSizeToText()
+        time.attemptMove(QgsLayoutPoint(8, 230 + tabOff))
+        layout.addItem(time)
+
+        return tabOff + 220
+
     def getRule(self, rules, code):
         result = None
 
@@ -554,6 +587,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
             
             vq = "select tabela, atributo, valor, numero from validation.consistencia_valores_report order by tabela, atributo, valor;"
             vreport = self.pgutils.run_query_with_conn(self.actconn, vq)
+
+            gq = "select tabela, identificador::text, coalesce(motivo, '') from validation.geometrias_invalidas_report order by tabela, identificador;"
+            greport = self.pgutils.run_query_with_conn(self.actconn, gq)
 
             times = datetime.now()
             footnote = times.strftime("%Y-%m-%d %H:%M:%S") +\
@@ -768,6 +804,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
                     tabOff = tabOff + 220
 
+                if greport is not None and len(greport) > 0:
+                    tabOff = self.addGeometriasInvalidasReportSection(
+                        layout, pages, footnote, tabOff, greport)
+
                 for thm in sorted(themes):
                     npage = QgsLayoutItemPage(layout)
                     npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
@@ -802,6 +842,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     layout.addItem(time)
 
                     tabOff = tabOff + 220
+
+            elif greport is not None and len(greport) > 0:
+                self.addGeometriasInvalidasReportSection(
+                    layout, pages, footnote, 0, greport)
 
             title = self.lineEdit.text() if self.lineEdit.text() else "report"
 

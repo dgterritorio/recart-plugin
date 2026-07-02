@@ -3910,6 +3910,18 @@ begin
 end; $$;
 
 
+CREATE TABLE IF NOT EXISTS validation.geometrias_invalidas_report (
+    tabela       text NOT NULL,
+    identificador uuid NOT NULL,
+    motivo       text NULL,
+    geometria    geometry(Geometry, 3763) NULL,
+    CONSTRAINT geometrias_invalidas_report_pkey PRIMARY KEY (tabela, identificador)
+);
+
+CREATE INDEX IF NOT EXISTS geometrias_invalidas_report_geom_idx
+    ON validation.geometrias_invalidas_report USING GIST (geometria);
+
+
 CREATE OR REPLACE FUNCTION validation.check_geometries_extensions()
 RETURNS INTEGER AS $$
 DECLARE
@@ -3933,9 +3945,11 @@ BEGIN
     ) INTO postgis_raster_available;
     
     IF NOT postgis_raster_available THEN
-        RAISE WARNING 'Extension postgis_raster_available is not installed.';
+        RAISE WARNING 'Extension postgis_raster is not installed.';
         RETURN 3;
     END IF;
+
+	DELETE FROM validation.geometrias_invalidas_report;
 
     FOR tbl IN 
         SELECT c.table_name::TEXT
@@ -3948,15 +3962,17 @@ BEGIN
             AND t.table_type = 'BASE TABLE'
     LOOP
         EXECUTE format(
-            'SELECT SUM(CASE WHEN geometria IS NOT NULL AND NOT ST_IsValid(geometria) THEN 1 ELSE 0 END)::BIGINT
-             FROM {schema}.%I',
-            tbl
-        ) INTO row_invalid_count;
+            'INSERT INTO validation.geometrias_invalidas_report (tabela, identificador, motivo, geometria)
+			SELECT %L, identificador, ST_IsValidReason(geometria), geometria
+			FROM %I
+			WHERE geometria IS NOT NULL AND NOT ST_IsValid(geometria)',
+			tbl, tbl
+        );
         
-        IF row_invalid_count > 0 THEN
-            RAISE WARNING 'Table % has % invalid geometries', tbl, row_invalid_count;
-            invalid_found := TRUE;
-        END IF;
+        GET DIAGNOSTICS row_invalid_count = ROW_COUNT;
+		IF row_invalid_count > 0 THEN
+			invalid_found := TRUE;
+		END IF;
     END LOOP;
 
     IF invalid_found THEN
