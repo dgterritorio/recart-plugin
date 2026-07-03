@@ -1,6 +1,12 @@
 #!/usr/bin/bash
 
-service="<service>"
+if [ -z "${1:-}" ]; then
+    echo "Erro: falta o nome do serviço PG." >&2
+    echo "Uso: $0 <pg_service>" >&2
+    exit 1
+fi
+
+service="$1"
 schema="public"
 
 version="v2.0.2"

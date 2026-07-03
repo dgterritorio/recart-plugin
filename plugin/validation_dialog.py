@@ -30,7 +30,7 @@ from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QHeaderV
 from qgis.PyQt.QtCore import Qt, QThread, pyqtSlot, pyqtSignal, QMetaType
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QFont
 
-from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
+from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsStyle, QgsPrintLayout, QgsLayoutExporter, QgsLayoutItem, QgsLayoutItemTextTable, QgsLayoutTable, QgsLayoutTableColumn, QgsLayoutFrame, QgsLayoutSize, QgsLayoutPoint, QgsUnitTypes, QgsLayoutItemPage, QgsLayoutItemLabel, QgsCoordinateReferenceSystem, QgsFields, QgsField
 from qgis.gui import QgsFileWidget
 from qgis.utils import iface, pluginMetadata
 
@@ -505,7 +505,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     def createTable(self, layout, offsetx, offsety, size, columns, rows):
         table = QgsLayoutItemTextTable(layout)
-        table.setWrapBehavior(1)
+        table.setWrapBehavior(QgsLayoutTable.WrapText)
         layout.addMultiFrame(table)
 
         table.setColumns(columns)
@@ -586,10 +586,20 @@ class ValidationDialog(QDialog, FORM_CLASS):
             report = self.pgutils.run_query_with_conn(self.actconn, rq)
             
             vq = "select tabela, atributo, valor, numero from validation.consistencia_valores_report order by tabela, atributo, valor;"
-            vreport = self.pgutils.run_query_with_conn(self.actconn, vq)
+            vreport = None
+            try:
+                vreport = self.pgutils.run_query_with_conn(self.actconn, vq)
+            except Exception as e:
+                print(e)
+                vreport = None
 
             gq = "select tabela, identificador::text, coalesce(motivo, '') from validation.geometrias_invalidas_report order by tabela, identificador;"
-            greport = self.pgutils.run_query_with_conn(self.actconn, gq)
+            greport = None
+            try:
+                greport = self.pgutils.run_query_with_conn(self.actconn, gq)
+            except Exception as e:
+                print(e)
+                greport = None
 
             times = datetime.now()
             footnote = times.strftime("%Y-%m-%d %H:%M:%S") +\
