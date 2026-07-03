@@ -1,7 +1,6 @@
 #!/usr/bin/bash
 
 service="<service>"
-
 schema="public"
 
 version="v2.0.2"
