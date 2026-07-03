@@ -3500,7 +3500,7 @@ begin
 		for atgr in select * from validation.area_trabalho_grid loop
 			insert into validation.curva_nivel_tin (geometria)
 			with tin as (
-				SELECT ST_DelaunayTriangles(st_union(geometria)) as geom
+				SELECT ST_DelaunayTriangles(st_union(geometria), 0.1) as geom
 				from (
 					select geometria from validation.curva_de_nivel_points_interval_v2
 						where ST_Intersects(geometria, atgr.geometria)
