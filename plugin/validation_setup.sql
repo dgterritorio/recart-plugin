@@ -882,6 +882,8 @@ declare
 	count_bad integer := 0;
 	count_bad_points integer := 0;
 begin
+	delete from errors.erros_3d where rule_code = 're3_1_1';
+
 	with 
 		total as (select count(*) from {schema}.curva_de_nivel),
 		good as (select count(cdn.identificador)
@@ -901,15 +903,15 @@ begin
 	into count_all, count_good, count_bad;
 
 	WITH bad_points AS (
-		insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)
-		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', ST_StartPoint(cdn.geometria) as geometria
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
+		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_StartPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria))
 		union
-		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', ST_EndPoint(cdn.geometria) as geometria
+		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria))
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -945,15 +947,15 @@ begin
 	into count_all, count_good, count_bad;
 
 	WITH bad_points AS (
-		insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)
-		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', ST_StartPoint(cdn.geometria) as geometria
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
+		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_StartPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
 		union
-		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', ST_EndPoint(cdn.geometria) as geometria
+		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -970,6 +972,8 @@ declare
 	count_bad integer := 0;
 	count_bad_points integer := 0;
 begin
+	delete from errors.erros_3d where rule_code = 're3_1_2';
+
 	with 
 		total as (select count(*) from {schema}.curva_de_nivel),
 		bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria))
@@ -987,10 +991,10 @@ begin
 		FROM pontos 
 		GROUP by identificador),
 	bad_points AS (
-		insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)	
-		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, (dp).geom as geometria from pontos, media
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)	
+		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, 're3_1_2', (dp).geom as geometria from pontos, media
 		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing
 		RETURNING 1
 	)
 
@@ -1025,10 +1029,10 @@ begin
 		FROM pontos 
 		GROUP by identificador),
 	bad_points AS (
-		insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)	
-		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, (dp).geom as geometria from pontos, media
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)	
+		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, 're3_1_2', (dp).geom as geometria from pontos, media
 		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -1048,9 +1052,9 @@ begin
 		for var in 1..array_upper(_arr, 1)-1 loop
 			if _arr[var] < _arr[var+1] then
 				count_all := count_all + 1;
-				insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)
-				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', ST_PointN(_geo, var))
-				ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing;
+				insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
+				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', 're4_5_2', ST_PointN(_geo, var))
+				ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing;
 			end if;
 		end loop;
 	else
@@ -1058,9 +1062,9 @@ begin
 		for var in 1..array_upper(_arr, 1)-1 loop
 			if _arr[var] > _arr[var+1] then
 				count_all := count_all + 1;
-				insert into errors.erros_3d (identificador, entidade, indice, motivo, geometria)
-				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', ST_PointN(_geo, var))
-				ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing;
+				insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
+				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', 're4_5_2', ST_PointN(_geo, var))
+				ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing;
 			end if;
 		end loop;
 	end if;
@@ -1075,6 +1079,8 @@ declare
 	count_bad integer := 0;
 	count_bad_points integer := 0;
 begin
+	delete from errors.erros_3d where rule_code = 're4_5_2';
+
 	with 
 		aux as (select identificador, geometria, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
 		pontos as (select identificador, geometria, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador, geometria),
@@ -3961,11 +3967,16 @@ CREATE TABLE IF NOT EXISTS errors.erros_3d (
 	entidade text NULL,
 	indice integer NULL,
 	motivo text NULL,
+	rule_code varchar NULL,
 	geometria geometry(pointz, 3763) NULL
 );
 
+ALTER TABLE errors.erros_3d ADD COLUMN IF NOT EXISTS rule_code varchar;
+
 ALTER TABLE errors.erros_3d DROP CONSTRAINT IF EXISTS erros_3d_pk;
-ALTER TABLE errors.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, entidade, motivo, geometria);
+ALTER TABLE errors.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, entidade, rule_code, geometria);
+
+ALTER TABLE errors.erros_3d ALTER COLUMN rule_code SET NOT NULL;
 
 create or replace function validation.sort_asc(p_input double precision[]) 
   returns double precision[]
