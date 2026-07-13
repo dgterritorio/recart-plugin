@@ -911,7 +911,7 @@ begin
 		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria))
-		ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -955,7 +955,7 @@ begin
 		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
-		ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -994,7 +994,7 @@ begin
 		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)	
 		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, 're3_1_2', (dp).geom as geometria from pontos, media
 		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
-		ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
 		RETURNING 1
 	)
 
@@ -1032,7 +1032,7 @@ begin
 		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)	
 		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, 're3_1_2', (dp).geom as geometria from pontos, media
 		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
-		ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -1054,7 +1054,7 @@ begin
 				count_all := count_all + 1;
 				insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
 				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', 're4_5_2', ST_PointN(_geo, var))
-				ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing;
+				ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing;
 			end if;
 		end loop;
 	else
@@ -1064,7 +1064,7 @@ begin
 				count_all := count_all + 1;
 				insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
 				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', 're4_5_2', ST_PointN(_geo, var))
-				ON CONFLICT (identificador, entidade, rule_code, geometria) DO nothing;
+				ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing;
 			end if;
 		end loop;
 	end if;
@@ -3974,9 +3974,7 @@ CREATE TABLE IF NOT EXISTS errors.erros_3d (
 ALTER TABLE errors.erros_3d ADD COLUMN IF NOT EXISTS rule_code varchar;
 
 ALTER TABLE errors.erros_3d DROP CONSTRAINT IF EXISTS erros_3d_pk;
-ALTER TABLE errors.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, entidade, rule_code, geometria);
-
-ALTER TABLE errors.erros_3d ALTER COLUMN rule_code SET NOT NULL;
+ALTER TABLE errors.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, entidade, motivo, geometria);
 
 create or replace function validation.sort_asc(p_input double precision[]) 
   returns double precision[]
