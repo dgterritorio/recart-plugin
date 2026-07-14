@@ -950,8 +950,7 @@
         "geometria",
         "identificador",
         "inicio_objeto",
-        "valor_tipo_infra_trans_rodov",
-        "valor_tipo_servico"
+        "valor_tipo_infra_trans_rodov"
       ],
       "foreign_keys": [
         {
