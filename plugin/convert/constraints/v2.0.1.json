@@ -1,0 +1,3229 @@
+{
+  "version": "v2.0.1",
+  "tables": {
+    "adm_publica": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "inicio_objeto",
+        "nome",
+        "valor_tipo_adm_publica"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_adm_publica_id",
+          "columns": [
+            "valor_tipo_adm_publica"
+          ],
+          "references": {
+            "table": "valor_tipo_adm_publica",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "agua_lentica": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "cota_plena_armazenamento",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "mare",
+        "valor_agua_lentica"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_agua_lentica_id",
+          "columns": [
+            "valor_agua_lentica"
+          ],
+          "references": {
+            "table": "valor_agua_lentica",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_persistencia_hidrologica_id",
+          "columns": [
+            "valor_persistencia_hidrologica"
+          ],
+          "references": {
+            "table": "valor_persistencia_hidrologica",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "area_agricola_florestal_mato": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_areas_agricolas_florestais_matos"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_areas_agricolas_florestais_matos_id",
+          "columns": [
+            "valor_areas_agricolas_florestais_matos"
+          ],
+          "references": {
+            "table": "valor_areas_agricolas_florestais_matos",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "area_infra_trans_aereo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_area_infra_trans_aereo"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_area_infra_trans_aereo_id",
+          "columns": [
+            "valor_tipo_area_infra_trans_aereo"
+          ],
+          "references": {
+            "table": "valor_tipo_area_infra_trans_aereo",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "area_infra_trans_cabo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "area_infra_trans_ferrov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "infra_trans_ferrov_id",
+        "inicio_objeto"
+      ],
+      "foreign_keys": [
+        {
+          "name": "area_infra_trans_ferrov",
+          "columns": [
+            "infra_trans_ferrov_id"
+          ],
+          "references": {
+            "table": "infra_trans_ferrov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "area_infra_trans_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "infra_trans_rodov_id",
+        "inicio_objeto"
+      ],
+      "foreign_keys": [
+        {
+          "name": "area_infra_trans_rodov",
+          "columns": [
+            "infra_trans_rodov_id"
+          ],
+          "references": {
+            "table": "infra_trans_rodov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "area_infra_trans_via_navegavel": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_area_infra_trans_via_navegavel"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_area_infra_trans_via_navegavel_id",
+          "columns": [
+            "valor_tipo_area_infra_trans_via_navegavel"
+          ],
+          "references": {
+            "table": "valor_tipo_area_infra_trans_via_navegavel",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "area_trabalho": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "data",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "nome",
+        "nome_produtor",
+        "nome_proprietario",
+        "valor_nivel_de_detalhe"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_nivel_de_detalhe_id",
+          "columns": [
+            "valor_nivel_de_detalhe"
+          ],
+          "references": {
+            "table": "valor_nivel_de_detalhe",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "areas_artificializadas": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_areas_artificializadas"
+      ],
+      "foreign_keys": [
+        {
+          "name": "localizacao_equip_util_coletiva",
+          "columns": [
+            "equip_util_coletiva_id"
+          ],
+          "references": {
+            "table": "equip_util_coletiva",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "localizacao_instalacao_ambiental",
+          "columns": [
+            "inst_gestao_ambiental_id"
+          ],
+          "references": {
+            "table": "inst_gestao_ambiental",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "localizacao_instalacao_producao",
+          "columns": [
+            "inst_producao_id"
+          ],
+          "references": {
+            "table": "inst_producao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_areas_artificializadas_id",
+          "columns": [
+            "valor_areas_artificializadas"
+          ],
+          "references": {
+            "table": "valor_areas_artificializadas",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "barreira": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_barreira"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_barreira_id",
+          "columns": [
+            "valor_barreira"
+          ],
+          "references": {
+            "table": "valor_barreira",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_estado_instalacao_id_2",
+          "columns": [
+            "valor_estado_instalacao"
+          ],
+          "references": {
+            "table": "valor_estado_instalacao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "cabo_electrico": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_designacao_tensao",
+        "valor_posicao_vertical"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_designacao_tensao_id",
+          "columns": [
+            "valor_designacao_tensao"
+          ],
+          "references": {
+            "table": "valor_designacao_tensao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_posicao_vertical_id",
+          "columns": [
+            "valor_posicao_vertical"
+          ],
+          "references": {
+            "table": "valor_posicao_vertical",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "conduta_de_agua": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_conduta_agua",
+        "valor_posicao_vertical"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_conduta_agua_id",
+          "columns": [
+            "valor_conduta_agua"
+          ],
+          "references": {
+            "table": "valor_conduta_agua",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_posicao_vertical_id",
+          "columns": [
+            "valor_posicao_vertical"
+          ],
+          "references": {
+            "table": "valor_posicao_vertical",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "constru_linear": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "suporte",
+        "valor_construcao_linear"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_construcao_linear_id",
+          "columns": [
+            "valor_construcao_linear"
+          ],
+          "references": {
+            "table": "valor_construcao_linear",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "constru_na_margem": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_const_margem"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_estado_instalacao_id_3",
+          "columns": [
+            "valor_estado_instalacao"
+          ],
+          "references": {
+            "table": "valor_estado_instalacao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_tipo_const_margem_id",
+          "columns": [
+            "valor_tipo_const_margem"
+          ],
+          "references": {
+            "table": "valor_tipo_const_margem",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "constru_polig": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_construcao"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_construcao_id",
+          "columns": [
+            "valor_tipo_construcao"
+          ],
+          "references": {
+            "table": "valor_tipo_construcao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "curso_de_agua_area": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "delimitacao_conhecida",
+        "geometria",
+        "identificador",
+        "inicio_objeto"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "curso_de_agua_eixo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "delimitacao_conhecida",
+        "ficticio",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "navegavel_ou_flutuavel",
+        "valor_curso_de_agua",
+        "valor_natureza",
+        "valor_posicao_vertical"
+      ],
+      "foreign_keys": [
+        {
+          "name": "lig_agua_lentica_curso_agua_eixo",
+          "columns": [
+            "id_agua_lentica"
+          ],
+          "references": {
+            "table": "agua_lentica",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "lig_curso_agua_area_curso_agua_eixo",
+          "columns": [
+            "id_curso_de_agua_area"
+          ],
+          "references": {
+            "table": "curso_de_agua_area",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_curso_de_agua_id",
+          "columns": [
+            "valor_curso_de_agua"
+          ],
+          "references": {
+            "table": "valor_curso_de_agua",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_estado_instalacao_id",
+          "columns": [
+            "valor_estado_instalacao"
+          ],
+          "references": {
+            "table": "valor_estado_instalacao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_ficticio_id",
+          "columns": [
+            "valor_ficticio"
+          ],
+          "references": {
+            "table": "valor_ficticio",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_natureza_id",
+          "columns": [
+            "valor_natureza"
+          ],
+          "references": {
+            "table": "valor_natureza",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_persistencia_hidrologica_id",
+          "columns": [
+            "valor_persistencia_hidrologica"
+          ],
+          "references": {
+            "table": "valor_persistencia_hidrologica",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_posicao_vertical_id",
+          "columns": [
+            "valor_posicao_vertical"
+          ],
+          "references": {
+            "table": "valor_posicao_vertical",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "curva_de_nivel": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_curva"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_curva_id",
+          "columns": [
+            "valor_tipo_curva"
+          ],
+          "references": {
+            "table": "valor_tipo_curva",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "designacao_local": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "nome",
+        "valor_local_nomeado"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_local_nomeado_id",
+          "columns": [
+            "valor_local_nomeado"
+          ],
+          "references": {
+            "table": "valor_local_nomeado",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "distrito": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "codigo",
+        "data_publicacao",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "nome"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "edificio": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "altura_edificio",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_elemento_edificio_xy",
+        "valor_elemento_edificio_z"
+      ],
+      "foreign_keys": [
+        {
+          "name": "localizacao_instalacao_ambiental",
+          "columns": [
+            "inst_gestao_ambiental_id"
+          ],
+          "references": {
+            "table": "inst_gestao_ambiental",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "localizacao_instalacao_producao",
+          "columns": [
+            "inst_producao_id"
+          ],
+          "references": {
+            "table": "inst_producao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_condicao_const_id",
+          "columns": [
+            "valor_condicao_const"
+          ],
+          "references": {
+            "table": "valor_condicao_const",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_elemento_edificio_xy_id",
+          "columns": [
+            "valor_elemento_edificio_xy"
+          ],
+          "references": {
+            "table": "valor_elemento_edificio_xy",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_elemento_edificio_z_id",
+          "columns": [
+            "valor_elemento_edificio_z"
+          ],
+          "references": {
+            "table": "valor_elemento_edificio_z",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_forma_edificio_id",
+          "columns": [
+            "valor_forma_edificio"
+          ],
+          "references": {
+            "table": "valor_forma_edificio",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "elem_assoc_agua": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_elemento_associado_agua"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_elemento_associado_agua_id",
+          "columns": [
+            "valor_elemento_associado_agua"
+          ],
+          "references": {
+            "table": "valor_elemento_associado_agua",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "elem_assoc_eletricidade": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_elemento_associado_electricidade"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_elemento_associado_electricidade_id",
+          "columns": [
+            "valor_elemento_associado_electricidade"
+          ],
+          "references": {
+            "table": "valor_elemento_associado_electricidade",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "elem_assoc_pgq": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_elemento_associado_pgq"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_elemento_associado_pgq_id",
+          "columns": [
+            "valor_elemento_associado_pgq"
+          ],
+          "references": {
+            "table": "valor_elemento_associado_pgq",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "elem_assoc_telecomunicacoes": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_elemento_associado_telecomunicacoes"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_elemento_associado_telecomunicacoes_id",
+          "columns": [
+            "valor_elemento_associado_telecomunicacoes"
+          ],
+          "references": {
+            "table": "valor_elemento_associado_telecomunicacoes",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "equip_util_coletiva": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "inicio_objeto",
+        "nome"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "freguesia": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "codigo",
+        "data_publicacao",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "nome"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "fronteira": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "data_publicacao",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_estado_fronteira"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_estado_fronteira_id",
+          "columns": [
+            "valor_estado_fronteira"
+          ],
+          "references": {
+            "table": "valor_estado_fronteira",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "fronteira_terra_agua": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "data_fonte_dados",
+        "fonte_dados",
+        "geometria",
+        "identificador",
+        "ilha",
+        "inicio_objeto",
+        "valor_tipo_fronteira_terra_agua"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_fronteira_terra_agua_id",
+          "columns": [
+            "valor_tipo_fronteira_terra_agua"
+          ],
+          "references": {
+            "table": "valor_tipo_fronteira_terra_agua",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "infra_trans_aereo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_categoria_infra_trans_aereo",
+        "valor_tipo_infra_trans_aereo"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_categoria_infra_trans_aereo_id",
+          "columns": [
+            "valor_categoria_infra_trans_aereo"
+          ],
+          "references": {
+            "table": "valor_categoria_infra_trans_aereo",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_restricao_infra_trans_aereo_id",
+          "columns": [
+            "valor_restricao_infra_trans_aereo"
+          ],
+          "references": {
+            "table": "valor_restricao_infra_trans_aereo",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_tipo_infra_trans_aereo_id",
+          "columns": [
+            "valor_tipo_infra_trans_aereo"
+          ],
+          "references": {
+            "table": "valor_tipo_infra_trans_aereo",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "infra_trans_ferrov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_infra_trans_ferrov"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_infra_trans_ferrov_id",
+          "columns": [
+            "valor_tipo_infra_trans_ferrov"
+          ],
+          "references": {
+            "table": "valor_tipo_infra_trans_ferrov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_tipo_uso_infra_trans_ferrov_id",
+          "columns": [
+            "valor_tipo_uso_infra_trans_ferrov"
+          ],
+          "references": {
+            "table": "valor_tipo_uso_infra_trans_ferrov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "infra_trans_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_infra_trans_rodov"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_infra_trans_rodov_id",
+          "columns": [
+            "valor_tipo_infra_trans_rodov"
+          ],
+          "references": {
+            "table": "valor_tipo_infra_trans_rodov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "infra_trans_via_navegavel": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "nome",
+        "valor_tipo_infra_trans_via_navegavel"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_infra_trans_via_navegavel_id",
+          "columns": [
+            "valor_tipo_infra_trans_via_navegavel"
+          ],
+          "references": {
+            "table": "valor_tipo_infra_trans_via_navegavel",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "inst_gestao_ambiental": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "inicio_objeto",
+        "nome",
+        "valor_instalacao_gestao_ambiental"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_instalacao_gestao_ambiental_id",
+          "columns": [
+            "valor_instalacao_gestao_ambiental"
+          ],
+          "references": {
+            "table": "valor_instalacao_gestao_ambiental",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "inst_producao": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "inicio_objeto",
+        "nome",
+        "valor_instalacao_producao"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_instalacao_producao_id",
+          "columns": [
+            "valor_instalacao_producao"
+          ],
+          "references": {
+            "table": "valor_instalacao_producao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "lig_adm_publica_edificio": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "adm_publica_id",
+        "edificio_id",
+        "identificador"
+      ],
+      "foreign_keys": [
+        {
+          "name": "localizacao_servico_publico_2",
+          "columns": [
+            "adm_publica_id"
+          ],
+          "references": {
+            "table": "adm_publica",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "localizacao_servico_publico_1",
+          "columns": [
+            "edificio_id"
+          ],
+          "references": {
+            "table": "edificio",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        }
+      ],
+      "unique": [
+        {
+          "name": "adm_publica_id_edificio_id_uk",
+          "columns": [
+            "adm_publica_id",
+            "edificio_id"
+          ]
+        }
+      ]
+    },
+    "lig_equip_util_coletiva_edificio": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "edificio_id",
+        "equip_util_coletiva_id",
+        "identificador"
+      ],
+      "foreign_keys": [
+        {
+          "name": "localizacao_equip_util_coletiva_1",
+          "columns": [
+            "edificio_id"
+          ],
+          "references": {
+            "table": "edificio",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "localizacao_equip_util_coletiva_2",
+          "columns": [
+            "equip_util_coletiva_id"
+          ],
+          "references": {
+            "table": "equip_util_coletiva",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        }
+      ],
+      "unique": [
+        {
+          "name": "equip_util_coletiva_id_edificio_id_uk",
+          "columns": [
+            "equip_util_coletiva_id",
+            "edificio_id"
+          ]
+        }
+      ]
+    },
+    "lig_infratransferrov_notransferrov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "infra_trans_ferrov_id",
+        "no_trans_ferrov_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "lig_infratransferrov_notransferrov_2",
+          "columns": [
+            "infra_trans_ferrov_id"
+          ],
+          "references": {
+            "table": "infra_trans_ferrov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "lig_infratransferrov_notransferrov_1",
+          "columns": [
+            "no_trans_ferrov_id"
+          ],
+          "references": {
+            "table": "no_trans_ferrov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        }
+      ],
+      "unique": [
+        {
+          "name": "infra_trans_ferrov_id_no_trans_ferrov_id_uk",
+          "columns": [
+            "infra_trans_ferrov_id",
+            "no_trans_ferrov_id"
+          ]
+        }
+      ]
+    },
+    "lig_infratransrodov_notransrodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "infra_trans_rodov_id",
+        "no_trans_rodov_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "lig_infratransrodov_notransrodov_2",
+          "columns": [
+            "infra_trans_rodov_id"
+          ],
+          "references": {
+            "table": "infra_trans_rodov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "lig_infratransrodov_notransrodov_1",
+          "columns": [
+            "no_trans_rodov_id"
+          ],
+          "references": {
+            "table": "no_trans_rodov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        }
+      ],
+      "unique": [
+        {
+          "name": "infra_trans_rodov_id_no_trans_rodov_id_uk",
+          "columns": [
+            "infra_trans_rodov_id",
+            "no_trans_rodov_id"
+          ]
+        }
+      ]
+    },
+    "lig_segviaferrea_linhaferrea": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "linha_ferrea_id",
+        "seg_via_ferrea_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "lig_segviaferrea_linhaferrea_2",
+          "columns": [
+            "linha_ferrea_id"
+          ],
+          "references": {
+            "table": "linha_ferrea",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "lig_segviaferrea_linhaferrea_1",
+          "columns": [
+            "seg_via_ferrea_id"
+          ],
+          "references": {
+            "table": "seg_via_ferrea",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        }
+      ],
+      "unique": [
+        {
+          "name": "seg_via_ferrea_id_linha_ferrea_id_uk",
+          "columns": [
+            "seg_via_ferrea_id",
+            "linha_ferrea_id"
+          ]
+        }
+      ]
+    },
+    "lig_segviarodov_viarodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "seg_via_rodov_id",
+        "via_rodov_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "lig_segviarodov_viarodov_1",
+          "columns": [
+            "seg_via_rodov_id"
+          ],
+          "references": {
+            "table": "seg_via_rodov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "lig_segviarodov_viarodov_2",
+          "columns": [
+            "via_rodov_id"
+          ],
+          "references": {
+            "table": "via_rodov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        }
+      ],
+      "unique": [
+        {
+          "name": "seg_via_rodov_id_via_rodov_id_uk",
+          "columns": [
+            "seg_via_rodov_id",
+            "via_rodov_id"
+          ]
+        }
+      ]
+    },
+    "lig_segviarodov_viarodovlimite": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "seg_via_rodov_id",
+        "via_rodov_limite_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "lig_segviarodov_viarodovlimite_2",
+          "columns": [
+            "seg_via_rodov_id"
+          ],
+          "references": {
+            "table": "seg_via_rodov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "lig_segviarodov_viarodovlimite_1",
+          "columns": [
+            "via_rodov_limite_id"
+          ],
+          "references": {
+            "table": "via_rodov_limite",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        }
+      ],
+      "unique": [
+        {
+          "name": "seg_via_rodov_id_via_rodov_limite_id_uk",
+          "columns": [
+            "seg_via_rodov_id",
+            "via_rodov_limite_id"
+          ]
+        }
+      ]
+    },
+    "lig_valor_tipo_circulacao_seg_via_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "seg_via_rodov_id",
+        "valor_tipo_circulacao_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_circulacao_seg_via_rodov_seg_via_rodov",
+          "columns": [
+            "seg_via_rodov_id"
+          ],
+          "references": {
+            "table": "seg_via_rodov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "valor_tipo_circulacao_seg_via_rodov_valor_tipo_circulacao",
+          "columns": [
+            "valor_tipo_circulacao_id"
+          ],
+          "references": {
+            "table": "valor_tipo_circulacao",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "seg_via_rodov_id_valor_tipo_circulacao_id_uk",
+          "columns": [
+            "seg_via_rodov_id",
+            "valor_tipo_circulacao_id"
+          ]
+        }
+      ]
+    },
+    "lig_valor_tipo_equipamento_coletivo_equip_util_coletiva": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "equip_util_coletiva_id",
+        "identificador",
+        "valor_tipo_equipamento_coletivo_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "lig_valor_tipo_equipamento_coletivo_equip_util_coletiva_1",
+          "columns": [
+            "equip_util_coletiva_id"
+          ],
+          "references": {
+            "table": "equip_util_coletiva",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "lig_valor_tipo_equipamento_coletivo_equip_util_coletiva_2",
+          "columns": [
+            "valor_tipo_equipamento_coletivo_id"
+          ],
+          "references": {
+            "table": "valor_tipo_equipamento_coletivo",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "equip_util_coletiva_id_valor_tipo_equipamento_coletivo_id_uk",
+          "columns": [
+            "equip_util_coletiva_id",
+            "valor_tipo_equipamento_coletivo_id"
+          ]
+        }
+      ]
+    },
+    "lig_valor_tipo_servico_infra_trans_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "identificador",
+        "infra_trans_rodov_id",
+        "valor_tipo_servico_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_servico_infra_trans_rodov_infra_trans_rodov",
+          "columns": [
+            "infra_trans_rodov_id"
+          ],
+          "references": {
+            "table": "infra_trans_rodov",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "valor_tipo_servico_infra_trans_rodov_valor_tipo_servico",
+          "columns": [
+            "valor_tipo_servico_id"
+          ],
+          "references": {
+            "table": "valor_tipo_servico",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "infra_trans_rodov_id_valor_tipo_servico_id_uk",
+          "columns": [
+            "infra_trans_rodov_id",
+            "valor_tipo_servico_id"
+          ]
+        }
+      ]
+    },
+    "lig_valor_utilizacao_atual_edificio": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "edificio_id",
+        "identificador",
+        "valor_utilizacao_atual_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "lig_valor_utilizacao_atual_edificio_edificio",
+          "columns": [
+            "edificio_id"
+          ],
+          "references": {
+            "table": "edificio",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        },
+        {
+          "name": "lig_valor_utilizacao_atual_edificio_valor_utilizacao_atual",
+          "columns": [
+            "valor_utilizacao_atual_id"
+          ],
+          "references": {
+            "table": "valor_utilizacao_atual",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "edificio_id_valor_utilizacao_atual_id_uk",
+          "columns": [
+            "edificio_id",
+            "valor_utilizacao_atual_id"
+          ]
+        }
+      ]
+    },
+    "linha_de_quebra": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_classifica",
+        "valor_natureza_linha"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_classifica_id",
+          "columns": [
+            "valor_classifica"
+          ],
+          "references": {
+            "table": "valor_classifica",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_natureza_linha_id",
+          "columns": [
+            "valor_natureza_linha"
+          ],
+          "references": {
+            "table": "valor_natureza_linha",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "linha_ferrea": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "codigo_linha_ferrea",
+        "identificador",
+        "inicio_objeto",
+        "nome"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "mob_urbano_sinal": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_de_mob_urbano_sinal"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_de_mob_urbano_sinal_id",
+          "columns": [
+            "valor_tipo_de_mob_urbano_sinal"
+          ],
+          "references": {
+            "table": "valor_tipo_de_mob_urbano_sinal",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "municipio": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "codigo",
+        "data_publicacao",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "nome"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "nascente": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_persistencia_hidrologica_id",
+          "columns": [
+            "valor_persistencia_hidrologica"
+          ],
+          "references": {
+            "table": "valor_persistencia_hidrologica",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_tipo_nascente_id",
+          "columns": [
+            "valor_tipo_nascente"
+          ],
+          "references": {
+            "table": "valor_tipo_nascente",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "no_hidrografico": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_no_hidrografico"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_no_hidrografico_id",
+          "columns": [
+            "valor_tipo_no_hidrografico"
+          ],
+          "references": {
+            "table": "valor_tipo_no_hidrografico",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "no_trans_ferrov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_no_trans_ferrov"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_no_trans_ferrov_id",
+          "columns": [
+            "valor_tipo_no_trans_ferrov"
+          ],
+          "references": {
+            "table": "valor_tipo_no_trans_ferrov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "no_trans_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_no_trans_rodov"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_no_trans_rodov_id",
+          "columns": [
+            "valor_tipo_no_trans_rodov"
+          ],
+          "references": {
+            "table": "valor_tipo_no_trans_rodov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "nome_edificio": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "edificio_id",
+        "identificador",
+        "nome"
+      ],
+      "foreign_keys": [
+        {
+          "name": "nome_edificio_id_edificio_id",
+          "columns": [
+            "edificio_id"
+          ],
+          "references": {
+            "table": "edificio",
+            "columns": [
+              "identificador"
+            ]
+          },
+          "on_delete": "CASCADE"
+        }
+      ],
+      "unique": []
+    },
+    "numero_policia": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "numero",
+        "seg_via_rodov_id"
+      ],
+      "foreign_keys": [
+        {
+          "name": "numero_policia_id_edificio_id",
+          "columns": [
+            "edificio_id"
+          ],
+          "references": {
+            "table": "edificio",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "numero_policia_id_seg_via_rodov_id",
+          "columns": [
+            "seg_via_rodov_id"
+          ],
+          "references": {
+            "table": "seg_via_rodov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "obra_arte": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_obra_arte"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_obra_arte_id",
+          "columns": [
+            "valor_tipo_obra_arte"
+          ],
+          "references": {
+            "table": "valor_tipo_obra_arte",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "oleoduto_gasoduto_subtancias_quimicas": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_gasoduto_oleoduto_sub_quimicas",
+        "valor_posicao_vertical"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_gasoduto_oleoduto_sub_quimicas_id",
+          "columns": [
+            "valor_gasoduto_oleoduto_sub_quimicas"
+          ],
+          "references": {
+            "table": "valor_gasoduto_oleoduto_sub_quimicas",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_posicao_vertical_id",
+          "columns": [
+            "valor_posicao_vertical"
+          ],
+          "references": {
+            "table": "valor_posicao_vertical",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "ponto_cotado": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_classifica_las"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_classifica_las_id",
+          "columns": [
+            "valor_classifica_las"
+          ],
+          "references": {
+            "table": "valor_classifica_las",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "ponto_interesse": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_ponto_interesse"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_ponto_interesse_id",
+          "columns": [
+            "valor_tipo_ponto_interesse"
+          ],
+          "references": {
+            "table": "valor_tipo_ponto_interesse",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "queda_de_agua": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "seg_via_cabo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_via_cabo_id",
+          "columns": [
+            "valor_tipo_via_cabo"
+          ],
+          "references": {
+            "table": "valor_tipo_via_cabo",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "seg_via_ferrea": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "eletrific",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_categoria_bitola",
+        "valor_estado_linha_ferrea",
+        "valor_posicao_vertical_transportes",
+        "valor_tipo_linha_ferrea",
+        "valor_tipo_troco_via_ferrea"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_categoria_bitola_id",
+          "columns": [
+            "valor_categoria_bitola"
+          ],
+          "references": {
+            "table": "valor_categoria_bitola",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_estado_linha_ferrea_id",
+          "columns": [
+            "valor_estado_linha_ferrea"
+          ],
+          "references": {
+            "table": "valor_estado_linha_ferrea",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_posicao_vertical_transportes_id",
+          "columns": [
+            "valor_posicao_vertical_transportes"
+          ],
+          "references": {
+            "table": "valor_posicao_vertical_transportes",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_tipo_linha_ferrea_id",
+          "columns": [
+            "valor_tipo_linha_ferrea"
+          ],
+          "references": {
+            "table": "valor_tipo_linha_ferrea",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_tipo_troco_via_ferrea_id",
+          "columns": [
+            "valor_tipo_troco_via_ferrea"
+          ],
+          "references": {
+            "table": "valor_tipo_troco_via_ferrea",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_via_ferrea_id",
+          "columns": [
+            "valor_via_ferrea"
+          ],
+          "references": {
+            "table": "valor_via_ferrea",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "seg_via_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "num_vias_transito",
+        "pavimentado",
+        "valor_caract_fisica_rodov",
+        "valor_estado_via_rodov",
+        "valor_posicao_vertical_transportes",
+        "valor_sentido",
+        "valor_tipo_troco_rodoviario"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_caract_fisica_rodov_id",
+          "columns": [
+            "valor_caract_fisica_rodov"
+          ],
+          "references": {
+            "table": "valor_caract_fisica_rodov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_estado_via_rodov_id",
+          "columns": [
+            "valor_estado_via_rodov"
+          ],
+          "references": {
+            "table": "valor_estado_via_rodov",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_posicao_vertical_transportes_id",
+          "columns": [
+            "valor_posicao_vertical_transportes"
+          ],
+          "references": {
+            "table": "valor_posicao_vertical_transportes",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_restricao_acesso_id",
+          "columns": [
+            "valor_restricao_acesso"
+          ],
+          "references": {
+            "table": "valor_restricao_acesso",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_sentido_id",
+          "columns": [
+            "valor_sentido"
+          ],
+          "references": {
+            "table": "valor_sentido",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_tipo_troco_rodoviario_id",
+          "columns": [
+            "valor_tipo_troco_rodoviario"
+          ],
+          "references": {
+            "table": "valor_tipo_troco_rodoviario",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "sinal_geodesico": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "data_revisao",
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_categoria",
+        "valor_tipo_sinal_geodesico"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_categoria_id",
+          "columns": [
+            "valor_categoria"
+          ],
+          "references": {
+            "table": "valor_categoria",
+            "columns": [
+              "identificador"
+            ]
+          }
+        },
+        {
+          "name": "valor_tipo_sinal_geodesico_id",
+          "columns": [
+            "valor_tipo_sinal_geodesico"
+          ],
+          "references": {
+            "table": "valor_tipo_sinal_geodesico",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "terreno_marginal": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_terreno_marginal"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_terreno_marginal_id",
+          "columns": [
+            "valor_tipo_terreno_marginal"
+          ],
+          "references": {
+            "table": "valor_tipo_terreno_marginal",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "valor_agua_lentica": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_areas_agricolas_florestais_matos": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_areas_artificializadas": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_barreira": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_caract_fisica_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_categoria": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_categoria_bitola": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_categoria_infra_trans_aereo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_classifica": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_classifica_las": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_condicao_const": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_conduta_agua": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_construcao_linear": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_curso_de_agua": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_designacao_tensao": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_elemento_associado_agua": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_elemento_associado_electricidade": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_elemento_associado_pgq": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_elemento_associado_telecomunicacoes": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_elemento_edificio_xy": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_elemento_edificio_z": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_estado_fronteira": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_estado_instalacao": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_estado_linha_ferrea": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_estado_via_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_ficticio": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_forma_edificio": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_gasoduto_oleoduto_sub_quimicas": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_instalacao_gestao_ambiental": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_instalacao_producao": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_local_nomeado": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_natureza": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_natureza_linha": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_nivel_de_detalhe": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_persistencia_hidrologica": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_posicao_vertical": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_posicao_vertical_transportes": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_restricao_acesso": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_restricao_infra_trans_aereo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_sentido": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_adm_publica": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_area_infra_trans_aereo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_area_infra_trans_via_navegavel": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_circulacao": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_const_margem": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_construcao": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_curva": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_de_mob_urbano_sinal": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_equipamento_coletivo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_fronteira_terra_agua": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_infra_trans_aereo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_infra_trans_ferrov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_infra_trans_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_infra_trans_via_navegavel": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_limite": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_linha_ferrea": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_nascente": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_no_hidrografico": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_no_trans_ferrov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_no_trans_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_obra_arte": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_ponto_interesse": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_servico": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_sinal_geodesico": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_terreno_marginal": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_troco_rodoviario": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_troco_via_ferrea": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_uso_infra_trans_ferrov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_tipo_via_cabo": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_utilizacao_atual": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_via_ferrea": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "valor_zona_humida": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "descricao",
+        "identificador"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "via_rodov": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "codigo_via_rodov",
+        "data_cat",
+        "fonte_aquisicao_dados",
+        "identificador",
+        "inicio_objeto",
+        "nome",
+        "tipo_via_rodov_abv",
+        "tipo_via_rodov_c",
+        "tipo_via_rodov_d"
+      ],
+      "foreign_keys": [],
+      "unique": []
+    },
+    "via_rodov_limite": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "valor_tipo_limite"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_tipo_limite_id",
+          "columns": [
+            "valor_tipo_limite"
+          ],
+          "references": {
+            "table": "valor_tipo_limite",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    },
+    "zona_humida": {
+      "primary_key": [
+        "identificador"
+      ],
+      "not_null": [
+        "geometria",
+        "identificador",
+        "inicio_objeto",
+        "mare",
+        "valor_zona_humida"
+      ],
+      "foreign_keys": [
+        {
+          "name": "valor_zona_humida_id",
+          "columns": [
+            "valor_zona_humida"
+          ],
+          "references": {
+            "table": "valor_zona_humida",
+            "columns": [
+              "identificador"
+            ]
+          }
+        }
+      ],
+      "unique": []
+    }
+  }
+}

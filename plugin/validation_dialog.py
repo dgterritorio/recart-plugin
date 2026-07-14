@@ -69,6 +69,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.structure_errors = []
         self.value_list_errors = []
+        self.constraint_errors = []
 
         self.pgutils = None
         self.ruleSetup = False
@@ -747,6 +748,41 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
                     tabOff = tabOff + 220
 
+                if len(self.constraint_errors) > 0:
+                    npage = QgsLayoutItemPage(layout)
+                    npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
+                    pages.addPage(npage)
+
+                    section = QgsLayoutItemLabel(layout)
+                    section.setText('Erros de Constraints da Base de Dados')
+                    section.setFont(QFont('Arial', 14, 75))
+                    section.adjustSizeToText()
+                    section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
+                    layout.addItem(section)
+
+                    cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn(),
+                            QgsLayoutTableColumn(), QgsLayoutTableColumn()]
+                    cols[0].setHeading("Tabela")
+                    cols[0].setWidth(60)
+                    cols[1].setHeading("Tipo")
+                    cols[1].setWidth(40)
+                    cols[2].setHeading("Detalhe")
+                    cols[2].setWidth(110)
+                    cols[3].setHeading("Estado")
+                    cols[3].setWidth(30)
+
+                    self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
+                                    cols, self.constraint_errors)
+
+                    time = QgsLayoutItemLabel(layout)
+                    time.setText(footnote)
+                    time.setFont(QFont('Arial', 10, 25))
+                    time.adjustSizeToText()
+                    time.attemptMove(QgsLayoutPoint(8, 230+tabOff))
+                    layout.addItem(time)
+
+                    tabOff = tabOff + 220
+
                 if len(self.value_list_errors) > 0:
                     npage = QgsLayoutItemPage(layout)
                     npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
@@ -913,6 +949,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.structure_errors = self.validateProcess.structure_errors
         self.value_list_errors = self.validateProcess.value_list_errors
+        self.constraint_errors = self.validateProcess.constraint_errors
 
         if not self.validateProcess.cancel is True:
             # conString = qgis_configs.getConnString(self, self.getConnection())
@@ -1358,6 +1395,7 @@ class ValidateProcess(QThread):
         
         self.structure_errors = []
         self.value_list_errors = []
+        self.constraint_errors = []
         
         self.is_sections = is_sections
         self.areaTable = areaTable
@@ -1484,6 +1522,38 @@ class ValidateProcess(QThread):
                 except Exception as e:
                     self.write(
                         "Erro ao validar estrutura base.\n" + str(e))
+
+            constraints_path = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                'convert', 'constraints', self.vrs + '.json')
+            if os.path.isfile(constraints_path):
+                try:
+                    with open(constraints_path, encoding='utf-8') as constraints_file:
+                        manifest = json.load(constraints_file)
+                    manifest_json = json.dumps(manifest, ensure_ascii=False).replace("'", "''")
+                    res = self.pgutils.run_query_with_conn(
+                        self.actconn,
+                        "select validation.validate_schema_constraints('{}'::jsonb);".format(
+                            manifest_json))
+                    if res and len(res) > 0 and res[0][0]:
+                        errors = res[0][0]
+                        if isinstance(errors, str):
+                            errors = json.loads(errors)
+                        for err in errors:
+                            self.constraint_errors.append([
+                                err.get('tabela', ''),
+                                err.get('tipo', ''),
+                                err.get('detalhe', ''),
+                                err.get('estado', ''),
+                            ])
+                    if len(self.constraint_errors) > 0:
+                        self.write(
+                            "\t[Aviso] {} erro(s) de constraints da base de dados".format(
+                                len(self.constraint_errors)))
+                    else:
+                        self.write("\tConstraints da base de dados validadas")
+                except Exception as e:
+                    self.write("Erro ao validar constraints da base de dados.\n" + str(e))
 
             if interrupt:
                 self.write("[Erro] Estrutura base inválida")

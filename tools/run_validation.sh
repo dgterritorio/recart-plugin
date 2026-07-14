@@ -54,6 +54,7 @@ if [ -z "${1:-}" ]; then
 fi
 
 service="$1"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if $reset; then
     echo "Resetting validation and errors schema"
@@ -81,6 +82,28 @@ echo "Validation setup applied"
 psql service=$service -c "select validation.create_missing_gist_indexes()"
 
 psql service=$service -c "VACUUM (VERBOSE, ANALYZE);"
+
+export_constraints="$script_dir/reports/export_constraint_errors.py"
+if [ -f "$export_constraints" ]; then
+    constraint_tmp=$(mktemp /tmp/constraint_errors_XXXXXX.csv)
+    echo "$(date +%Y-%m-%d\ %H:%M:%S) Checking schema constraints"
+    if python3 "$export_constraints" \
+        --service "$service" \
+        --version "$version" \
+        --output "$constraint_tmp"; then
+        constraint_count=$(($(wc -l < "$constraint_tmp") - 1))
+        if [ "$constraint_count" -gt 0 ]; then
+            echo "Warning: $constraint_count constraint error(s) found (see $constraint_tmp)"
+        else
+            rm -f "$constraint_tmp"
+        fi
+    else
+        echo "Warning: constraint validation failed" >&2
+        rm -f "$constraint_tmp"
+    fi
+else
+    echo "Warning: export_constraint_errors.py not found; skipping constraint check"
+fi
 
 # get rows in validation.rules for version and call do_validation for each row
 rows=$(psql service=$service -t -A -F '|' -c "SELECT code, total FROM validation.rules WHERE '$version' = any(versoes) order by dorder;")
@@ -110,7 +133,6 @@ echo "Total validations: $total"
 
 # --- report generation (optional, -p) ---
 if $report; then
-    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     report_dir="$script_dir/reports"
     generate_report="$report_dir/generate_report.py"
 
@@ -182,6 +204,7 @@ PY
 
     export_value_lists="$report_dir/export_value_list_errors.py"
     export_structure="$report_dir/export_structure_errors.py"
+    export_constraints="$report_dir/export_constraint_errors.py"
     if [ -f "$export_structure" ]; then
         python3 "$export_structure" \
             --service "$service" \
@@ -197,6 +220,14 @@ PY
             --output "$output_dir/data/value_list_errors.csv"
     else
         echo "tabela|identificador|descricao" > "$output_dir/data/value_list_errors.csv"
+    fi
+    if [ -f "$export_constraints" ]; then
+        python3 "$export_constraints" \
+            --service "$service" \
+            --version "$version" \
+            --output "$output_dir/data/constraint_errors.csv"
+    else
+        echo "tabela|tipo|detalhe|estado" > "$output_dir/data/constraint_errors.csv"
     fi
 
     echo "$(date +%Y-%m-%d\ %H:%M:%S) Report data exported to $output_dir/data"

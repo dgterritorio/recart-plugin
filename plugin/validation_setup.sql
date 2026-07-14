@@ -141,6 +141,225 @@ begin
 	end if;
 end; $$;
 
+
+create or replace function validation.validate_schema_constraints(expected_constraints jsonb)
+returns jsonb
+language plpgsql
+as $function$
+declare
+	tables_json jsonb;
+	rec record;
+	expected_nn jsonb;
+	col text;
+	expected_pk text;
+	fk_elem jsonb;
+	fk_cols text;
+	fk_ref_table text;
+	fk_ref_cols text;
+	uq_elem jsonb;
+	expected_uq_cols text;
+	errors jsonb := '[]'::jsonb;
+	system_tables text[] := array[
+		'geography_columns', 'geometry_columns', 'spatial_ref_sys',
+		'raster_columns', 'raster_overviews'
+	];
+begin
+	tables_json := coalesce(expected_constraints -> 'tables', expected_constraints);
+
+	create temp table _vsc_tables on commit drop as
+		select tablename as table_name
+		from pg_tables
+		where schemaname = '{schema}';
+
+	create temp table _vsc_not_null on commit drop as
+		select c.relname as table_name, a.attname as column_name
+		from pg_class c
+		join pg_namespace n on n.oid = c.relnamespace
+		join pg_attribute a on a.attrelid = c.oid
+		where n.nspname = '{schema}'
+			and c.relkind = 'r'
+			and a.attnum > 0
+			and not a.attisdropped
+			and a.attnotnull;
+
+	create temp table _vsc_pk on commit drop as
+		select
+			src.relname as table_name,
+			string_agg(sa.attname, ',' order by src_u.ord) as pk_cols
+		from pg_constraint con
+		join pg_class src on src.oid = con.conrelid
+		join pg_namespace n on n.oid = src.relnamespace
+		join lateral unnest(con.conkey) with ordinality as src_u(attnum, ord) on true
+		join pg_attribute sa on sa.attrelid = src.oid and sa.attnum = src_u.attnum
+		where n.nspname = '{schema}'
+			and con.contype = 'p'
+		group by src.relname, con.conname;
+
+	create temp table _vsc_unique on commit drop as
+		select
+			src.relname as table_name,
+			string_agg(sa.attname, ',' order by src_u.ord) as uq_cols
+		from pg_constraint con
+		join pg_class src on src.oid = con.conrelid
+		join pg_namespace n on n.oid = src.relnamespace
+		join lateral unnest(con.conkey) with ordinality as src_u(attnum, ord) on true
+		join pg_attribute sa on sa.attrelid = src.oid and sa.attnum = src_u.attnum
+		where n.nspname = '{schema}'
+			and con.contype = 'u'
+		group by src.relname, con.conname;
+
+	create temp table _vsc_fk on commit drop as
+		select
+			src.relname as table_name,
+			string_agg(sa.attname, ',' order by src_u.ord) as src_cols,
+			tgt.relname as ref_table,
+			string_agg(ta.attname, ',' order by tgt_u.ord) as ref_cols
+		from pg_constraint con
+		join pg_class src on src.oid = con.conrelid
+		join pg_class tgt on tgt.oid = con.confrelid
+		join pg_namespace n on n.oid = src.relnamespace
+		join lateral unnest(con.conkey) with ordinality as src_u(attnum, ord) on true
+		join pg_attribute sa on sa.attrelid = src.oid and sa.attnum = src_u.attnum
+		join lateral unnest(con.confkey) with ordinality as tgt_u(attnum, ord)
+			on tgt_u.ord = src_u.ord
+		join pg_attribute ta on ta.attrelid = tgt.oid and ta.attnum = tgt_u.attnum
+		where n.nspname = '{schema}'
+			and con.contype = 'f'
+		group by src.relname, con.conname, tgt.relname;
+
+	for rec in
+		select key as table_name, value as table_spec
+		from jsonb_each(tables_json)
+		order by key
+	loop
+		if rec.table_name = any(system_tables) then
+			continue;
+		end if;
+
+		if not exists (select 1 from _vsc_tables t where t.table_name = rec.table_name) then
+			errors := errors || jsonb_build_array(jsonb_build_object(
+				'tabela', rec.table_name,
+				'tipo', 'tabela',
+				'detalhe', rec.table_name,
+				'estado', 'em falta'
+			));
+			continue;
+		end if;
+
+		expected_nn := coalesce(rec.table_spec -> 'not_null', '[]'::jsonb);
+		for col in
+			select jsonb_array_elements_text(expected_nn)
+		loop
+			if not exists (
+				select 1
+				from _vsc_not_null nn
+				where nn.table_name = rec.table_name
+					and nn.column_name = col
+			) then
+				errors := errors || jsonb_build_array(jsonb_build_object(
+					'tabela', rec.table_name,
+					'tipo', 'not_null',
+					'detalhe', col,
+					'estado', 'em falta'
+				));
+			end if;
+		end loop;
+
+		expected_pk := (
+			select string_agg(elem, ',' order by ord)
+			from (
+				select elem, ord
+				from jsonb_array_elements_text(coalesce(rec.table_spec -> 'primary_key', '[]'::jsonb))
+					with ordinality as t(elem, ord)
+			) s
+		);
+		if expected_pk is not null and expected_pk <> '' then
+			if not exists (
+				select 1
+				from _vsc_pk pk
+				where pk.table_name = rec.table_name
+					and pk.pk_cols = expected_pk
+			) then
+				errors := errors || jsonb_build_array(jsonb_build_object(
+					'tabela', rec.table_name,
+					'tipo', 'primary_key',
+					'detalhe', expected_pk,
+					'estado', 'em falta'
+				));
+			end if;
+		end if;
+
+		for fk_elem in
+			select value
+			from jsonb_array_elements(coalesce(rec.table_spec -> 'foreign_keys', '[]'::jsonb))
+		loop
+			fk_cols := (
+				select string_agg(elem, ',' order by ord)
+				from (
+					select elem, ord
+					from jsonb_array_elements_text(fk_elem -> 'columns')
+						with ordinality as t(elem, ord)
+				) s
+			);
+			fk_ref_table := fk_elem -> 'references' ->> 'table';
+			fk_ref_cols := (
+				select string_agg(elem, ',' order by ord)
+				from (
+					select elem, ord
+					from jsonb_array_elements_text(fk_elem -> 'references' -> 'columns')
+						with ordinality as t(elem, ord)
+				) s
+			);
+			if not exists (
+				select 1
+				from _vsc_fk fk
+				where fk.table_name = rec.table_name
+					and fk.src_cols = fk_cols
+					and fk.ref_table = fk_ref_table
+					and fk.ref_cols = fk_ref_cols
+			) then
+				errors := errors || jsonb_build_array(jsonb_build_object(
+					'tabela', rec.table_name,
+					'tipo', 'foreign_key',
+					'detalhe', fk_cols || ' -> ' || fk_ref_table || '(' || fk_ref_cols || ')',
+					'estado', 'em falta'
+				));
+			end if;
+		end loop;
+
+		for uq_elem in
+			select value
+			from jsonb_array_elements(coalesce(rec.table_spec -> 'unique', '[]'::jsonb))
+		loop
+			expected_uq_cols := (
+				select string_agg(elem, ',' order by ord)
+				from (
+					select elem, ord
+					from jsonb_array_elements_text(uq_elem -> 'columns')
+						with ordinality as t(elem, ord)
+				) s
+			);
+			if not exists (
+				select 1
+				from _vsc_unique uq
+				where uq.table_name = rec.table_name
+					and uq.uq_cols = expected_uq_cols
+			) then
+				errors := errors || jsonb_build_array(jsonb_build_object(
+					'tabela', rec.table_name,
+					'tipo', 'unique',
+					'detalhe', expected_uq_cols,
+					'estado', 'em falta'
+				));
+			end if;
+		end loop;
+	end loop;
+
+	return errors;
+end;
+$function$;
+
+
 /* create or replace procedure validation.do_validation(nd1 bool, area_tbl varchar, _code varchar, _sec_code varchar) language plpgsql as $$
 declare 
 	tbl text;

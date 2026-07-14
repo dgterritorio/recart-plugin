@@ -172,6 +172,7 @@ def build_pdf(input_dir: Path, output_path: Path, metadata: dict):
     summary_names = rule_name_map(summary)
 
     structure_rows = read_pipe_csv(input_dir / "structure_errors.csv")
+    constraint_rows = read_pipe_csv(input_dir / "constraint_errors.csv")
     value_list_rows = read_pipe_csv(input_dir / "value_list_errors.csv")
     domain_rows = read_pipe_csv(input_dir / "domain_errors.csv")
     geom_rows = read_pipe_csv(input_dir / "invalid_geometries.csv")
@@ -215,6 +216,23 @@ def build_pdf(input_dir: Path, output_path: Path, metadata: dict):
                 ])
         for chunk in chunk_rows(data[1:], 30):
             story.append(make_table([data[0]] + chunk, [45 * mm, 155 * mm], styles))
+            story.append(Spacer(1, 4 * mm))
+
+    if constraint_rows:
+        story.append(PageBreak())
+        story.append(Paragraph("Erros de Constraints da Base de Dados", heading_style))
+        story.append(Spacer(1, 3 * mm))
+        data = [["Tabela", "Tipo", "Detalhe", "Estado"]]
+        for row in constraint_rows:
+            if isinstance(row, dict):
+                data.append([
+                    row.get("tabela", ""),
+                    row.get("tipo", ""),
+                    row.get("detalhe", ""),
+                    row.get("estado", ""),
+                ])
+        for chunk in chunk_rows(data[1:], 30):
+            story.append(make_table([data[0]] + chunk, [40 * mm, 30 * mm, 90 * mm, 30 * mm], styles))
             story.append(Spacer(1, 4 * mm))
 
     if value_list_rows:
