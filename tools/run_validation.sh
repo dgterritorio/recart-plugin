@@ -200,7 +200,28 @@ PY
         "SELECT tabela, identificador::text, COALESCE(motivo, '') FROM validation.geometrias_invalidas_report ORDER BY tabela, identificador;"
 
     export_report_csv "rule_code|rule_name|entidade|numero" "$output_dir/data/errors_3d.csv" \
-        "SELECT e.rule_code, (SELECT r.name FROM validation.rules r WHERE r.code = e.rule_code AND '${version}' = ANY(r.versoes) LIMIT 1), e.entidade, COUNT(*)::text FROM errors.erros_3d e GROUP BY e.rule_code, e.entidade ORDER BY e.rule_code, e.entidade;"
+        "WITH normalized AS (
+            SELECT
+                COALESCE(
+                    e.rule_code,
+                    CASE
+                        WHEN e.entidade = 'curva_de_nivel' AND e.motivo = 'Ponto fora da linha da área de trabalho' THEN 're3_1_1'
+                        WHEN e.entidade = 'curva_de_nivel' AND e.motivo LIKE 'discrepância no valor de z:%' THEN 're3_1_2'
+                        WHEN e.entidade = 'curso_de_agua_eixo' AND e.motivo = 'ponto de inflexão' THEN 're4_5_2'
+                    END
+                ) AS rule_code,
+                e.entidade
+            FROM errors.erros_3d e
+        )
+        SELECT
+            n.rule_code,
+            (SELECT r.name FROM validation.rules r WHERE r.code = n.rule_code AND '${version}' = ANY(r.versoes) LIMIT 1),
+            n.entidade,
+            COUNT(*)::text
+        FROM normalized n
+        WHERE n.rule_code IS NOT NULL
+        GROUP BY n.rule_code, n.entidade
+        ORDER BY n.rule_code, n.entidade;"
 
     export_value_lists="$report_dir/export_value_list_errors.py"
     export_structure="$report_dir/export_structure_errors.py"

@@ -56,6 +56,8 @@ BASE_DIR_V112 = $(CONV_DIR)/base/v1.1.2
 BASE_DIR_V201 = $(CONV_DIR)/base/v2.0.1
 BASE_DIR_V202 = $(CONV_DIR)/base/v2.0.2
 
+CONSTRAINTS_DIR = convert/constraints
+
 SCM_DIR = convert/schemas
 SCM_FILES = \
 	$(SCM_DIR)/base_schema.json $(SCM_DIR)/mapping_schema.json
@@ -136,6 +138,7 @@ deploy: compile
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V112)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V201)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V202)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(CONSTRAINTS_DIR)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(SCM_DIR)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V112)
@@ -147,6 +150,7 @@ deploy: compile
 	cp -vrf $(BASE_DIR_V112)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V112)/
 	cp -vrf $(BASE_DIR_V201)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V201)/
 	cp -vrf $(BASE_DIR_V202)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(BASE_DIR_V202)/
+	cp -vrf $(CONSTRAINTS_DIR)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(CONSTRAINTS_DIR)/
 	cp -vf $(SCM_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(SCM_DIR)/
 	cp -vf $(PROC_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR)/
 	cp -vrf $(PROC_DIR_V112)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V112)/

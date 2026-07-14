@@ -553,6 +553,41 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         return tabOff + 220
 
+    def addErros3dReportSection(self, layout, pages, footnote, tabOff, ereport):
+        npage = QgsLayoutItemPage(layout)
+        npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
+        pages.addPage(npage)
+
+        section = QgsLayoutItemLabel(layout)
+        section.setText('Erros 3D')
+        section.setFont(QFont('Arial', 14, 75))
+        section.adjustSizeToText()
+        section.attemptMove(QgsLayoutPoint(8, 35 + tabOff))
+        layout.addItem(section)
+
+        cols = [QgsLayoutTableColumn(), QgsLayoutTableColumn(),
+                QgsLayoutTableColumn(), QgsLayoutTableColumn()]
+        cols[0].setHeading("Código")
+        cols[0].setWidth(20)
+        cols[1].setHeading("Regra")
+        cols[1].setWidth(150)
+        cols[2].setHeading("Objeto")
+        cols[2].setWidth(55)
+        cols[3].setHeading("Erros")
+        cols[3].setWidth(20)
+
+        self.createTable(layout, 12, 35 + tabOff, QgsLayoutSize(270, 190),
+                         cols, ereport)
+
+        time = QgsLayoutItemLabel(layout)
+        time.setText(footnote)
+        time.setFont(QFont('Arial', 10, 25))
+        time.adjustSizeToText()
+        time.attemptMove(QgsLayoutPoint(8, 230 + tabOff))
+        layout.addItem(time)
+
+        return tabOff + 220
+
     def getRule(self, rules, code):
         result = None
 
@@ -601,6 +636,33 @@ class ValidationDialog(QDialog, FORM_CLASS):
             except Exception as e:
                 print(e)
                 greport = None
+
+            eq = (
+                "WITH normalized AS ("
+                "    SELECT COALESCE("
+                "        e.rule_code,"
+                "        CASE"
+                "            WHEN e.entidade = 'curva_de_nivel' AND e.motivo = 'Ponto fora da linha da área de trabalho' THEN 're3_1_1'"
+                "            WHEN e.entidade = 'curva_de_nivel' AND e.motivo LIKE 'discrepância no valor de z:%' THEN 're3_1_2'"
+                "            WHEN e.entidade = 'curso_de_agua_eixo' AND e.motivo = 'ponto de inflexão' THEN 're4_5_2'"
+                "        END"
+                "    ) AS rule_code, e.entidade"
+                "    FROM errors.erros_3d e"
+                ") "
+                "SELECT n.rule_code, "
+                "(SELECT r.name FROM validation.rules r WHERE r.code = n.rule_code AND '{}' = ANY(r.versoes) LIMIT 1), "
+                "n.entidade, COUNT(*)::text "
+                "FROM normalized n "
+                "WHERE n.rule_code IS NOT NULL "
+                "GROUP BY n.rule_code, n.entidade "
+                "ORDER BY n.rule_code, n.entidade;"
+            ).format(self.vrs)
+            ereport = None
+            try:
+                ereport = self.pgutils.run_query_with_conn(self.actconn, eq)
+            except Exception as e:
+                print(e)
+                ereport = None
 
             times = datetime.now()
             footnote = times.strftime("%Y-%m-%d %H:%M:%S") +\
@@ -854,6 +916,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     tabOff = self.addGeometriasInvalidasReportSection(
                         layout, pages, footnote, tabOff, greport)
 
+                if ereport is not None and len(ereport) > 0:
+                    tabOff = self.addErros3dReportSection(
+                        layout, pages, footnote, tabOff, ereport)
+
                 for thm in sorted(themes):
                     npage = QgsLayoutItemPage(layout)
                     npage.setPageSize('A4', QgsLayoutItemPage.Landscape)
@@ -890,8 +956,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     tabOff = tabOff + 220
 
             elif greport is not None and len(greport) > 0:
-                self.addGeometriasInvalidasReportSection(
+                tabOff = self.addGeometriasInvalidasReportSection(
                     layout, pages, footnote, 0, greport)
+                if ereport is not None and len(ereport) > 0:
+                    tabOff = self.addErros3dReportSection(
+                        layout, pages, footnote, tabOff, ereport)
+            elif ereport is not None and len(ereport) > 0:
+                self.addErros3dReportSection(
+                    layout, pages, footnote, 0, ereport)
 
             title = self.lineEdit.text() if self.lineEdit.text() else "report"
 

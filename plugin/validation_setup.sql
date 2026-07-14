@@ -1101,7 +1101,8 @@ declare
 	count_bad integer := 0;
 	count_bad_points integer := 0;
 begin
-	delete from errors.erros_3d where rule_code = 're3_1_1';
+	delete from errors.erros_3d where rule_code = 're3_1_1'
+		or (rule_code is null and entidade = 'curva_de_nivel' and motivo = 'Ponto fora da linha da área de trabalho');
 
 	with 
 		total as (select count(*) from {schema}.curva_de_nivel),
@@ -1130,7 +1131,9 @@ begin
 		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria))
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
+			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
+			indice = EXCLUDED.indice
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -1174,7 +1177,9 @@ begin
 		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
+			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
+			indice = EXCLUDED.indice
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -1191,7 +1196,8 @@ declare
 	count_bad integer := 0;
 	count_bad_points integer := 0;
 begin
-	delete from errors.erros_3d where rule_code = 're3_1_2';
+	delete from errors.erros_3d where rule_code = 're3_1_2'
+		or (rule_code is null and entidade = 'curva_de_nivel' and motivo like 'discrepância no valor de z:%');
 
 	with 
 		total as (select count(*) from {schema}.curva_de_nivel),
@@ -1213,7 +1219,9 @@ begin
 		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)	
 		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, 're3_1_2', (dp).geom as geometria from pontos, media
 		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
+			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
+			indice = EXCLUDED.indice
 		RETURNING 1
 	)
 
@@ -1251,7 +1259,9 @@ begin
 		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)	
 		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, 're3_1_2', (dp).geom as geometria from pontos, media
 		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
+			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
+			indice = EXCLUDED.indice
 		RETURNING 1
 	)
 	SELECT count(*) FROM bad_points into count_bad_points;
@@ -1273,7 +1283,9 @@ begin
 				count_all := count_all + 1;
 				insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
 				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', 're4_5_2', ST_PointN(_geo, var))
-				ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing;
+				ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
+			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
+			indice = EXCLUDED.indice;
 			end if;
 		end loop;
 	else
@@ -1283,7 +1295,9 @@ begin
 				count_all := count_all + 1;
 				insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
 				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', 're4_5_2', ST_PointN(_geo, var))
-				ON CONFLICT (identificador, entidade, motivo, geometria) DO nothing;
+				ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
+			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
+			indice = EXCLUDED.indice;
 			end if;
 		end loop;
 	end if;
@@ -1298,7 +1312,8 @@ declare
 	count_bad integer := 0;
 	count_bad_points integer := 0;
 begin
-	delete from errors.erros_3d where rule_code = 're4_5_2';
+	delete from errors.erros_3d where rule_code = 're4_5_2'
+		or (rule_code is null and entidade = 'curso_de_agua_eixo' and motivo = 'ponto de inflexão');
 
 	with 
 		aux as (select identificador, geometria, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
@@ -4194,6 +4209,13 @@ ALTER TABLE errors.erros_3d ADD COLUMN IF NOT EXISTS rule_code varchar;
 
 ALTER TABLE errors.erros_3d DROP CONSTRAINT IF EXISTS erros_3d_pk;
 ALTER TABLE errors.erros_3d ADD CONSTRAINT erros_3d_pk PRIMARY KEY (identificador, entidade, motivo, geometria);
+
+UPDATE errors.erros_3d SET rule_code = 're3_1_1'
+WHERE rule_code IS NULL AND entidade = 'curva_de_nivel' AND motivo = 'Ponto fora da linha da área de trabalho';
+UPDATE errors.erros_3d SET rule_code = 're3_1_2'
+WHERE rule_code IS NULL AND entidade = 'curva_de_nivel' AND motivo LIKE 'discrepância no valor de z:%';
+UPDATE errors.erros_3d SET rule_code = 're4_5_2'
+WHERE rule_code IS NULL AND entidade = 'curso_de_agua_eixo' AND motivo = 'ponto de inflexão';
 
 create or replace function validation.sort_asc(p_input double precision[]) 
   returns double precision[]
