@@ -4060,9 +4060,13 @@ CREATE TABLE IF NOT EXISTS validation.geometrias_invalidas_report (
     tabela       text NOT NULL,
     identificador uuid NOT NULL,
     motivo       text NULL,
-    geometria    geometry(Geometry, 3763) NULL,
+    geometria    geometry NULL,
     CONSTRAINT geometrias_invalidas_report_pkey PRIMARY KEY (tabela, identificador)
 );
+
+ALTER TABLE validation.geometrias_invalidas_report
+    ALTER COLUMN geometria TYPE geometry
+    USING geometria::geometry;
 
 CREATE INDEX IF NOT EXISTS geometrias_invalidas_report_geom_idx
     ON validation.geometrias_invalidas_report USING GIST (geometria);

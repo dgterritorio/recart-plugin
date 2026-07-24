@@ -486,7 +486,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     self.testDbVersion()
                     self.testValidationRules()
                     self.getAreaTables()
+
                     self.newConn = False
+                    self.baseSetup = False
                 except Exception as error:
                     self.conString = None
                     self.plainTextEdit.appendPlainText(
