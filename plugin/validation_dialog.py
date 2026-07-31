@@ -166,6 +166,20 @@ class ValidationDialog(QDialog, FORM_CLASS):
     def getConnection(self):
         return self.connCombo.currentText()
 
+    def connection_log_context(self):
+        connection = self.getConnection()
+        if connection in ('Escolher conexão...', 'Sem conexões disponíveis', 'Atualizar conexões...', ''):
+            connection = '(sem conexão)'
+        return 'Conexão: {}'.format(connection)
+
+    def log_connection_context(self):
+        self.writeText(self.connection_log_context())
+
+    def clear_report_errors(self):
+        self.structure_errors = []
+        self.value_list_errors = []
+        self.constraint_errors = []
+
     def fillDataSources(self):
         self.connCombo.clear()
         dblist = qgis_configs.listDataSources()
@@ -486,7 +500,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     self.testDbVersion()
                     self.testValidationRules()
                     self.getAreaTables()
+                    self.log_connection_context()
 
+                    self.clear_report_errors()
                     self.newConn = False
                     self.baseSetup = False
                 except Exception as error:
@@ -1123,6 +1139,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.baseSetup = False
         self.ruleSetup = False
         self.isRunning = False
+        self.clear_report_errors()
 
         self.testValidationRules()
 
@@ -1156,6 +1173,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         if res == QMessageBox.StandardButton.Yes:
             self.writeText('[Aviso] Apaga os esquemas validation, errors e remove funções e procedimentos')
+            self.log_connection_context()
 
             # conString = qgis_configs.getConnString(self, self.getConnection())
             schema = str(self.schemaName.currentText())
@@ -1182,6 +1200,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         if self.testValidProcessing() and not self.isRunning:
             self.writeText("Validar base de dados...")
+            self.clear_report_errors()
+            self.log_connection_context()
             self.progressBar.setVisible(True)
 
             # conString = qgis_configs.getConnString(self, self.getConnection())

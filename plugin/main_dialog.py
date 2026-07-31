@@ -47,6 +47,12 @@ import re
 from . import qgis_configs
 from .postgis_helper import PostgisUtils
 from .aux_export import displayList, recartStructure, fieldNameMap, joins, form_nullable_fields
+from .gpkg_qgis_project import (
+    LABEL_VIEWS,
+    build_and_embed_recart_project,
+    create_gpkg_spatial_indexes,
+    write_gpkg_relationships,
+)
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'ui/main_dialog.ui'))
@@ -406,6 +412,20 @@ class MainDialog(QDialog, FORM_CLASS):
                 taGroupNode.setExpanded(False)
 
             self.writeText('Tarefas terminadas')
+        elif (
+            self.exportLayersProcess.outFormat == 'GeoPackage'
+            and self.exportLayersProcess.gpkg_path
+        ):
+            self.writeText('A construir projeto QGIS no GeoPackage...')
+            build_and_embed_recart_project(
+                self.exportLayersProcess.gpkg_path,
+                self.exportLayersProcess.layerList,
+                self.exportLayersProcess.vrs,
+                self.exportLayersProcess.exportSrsId,
+                self.writeText,
+                self.exportLayersProcess.exported_tables,
+            )
+            self.writeText('Tarefas terminadas')
 
 
 class LoadLayersProcess(QThread):
@@ -488,6 +508,8 @@ class ExportLayersProcess(QThread):
 
         self.flatLayers = recartStructure[self.vrs]
         self.fieldMap = fieldNameMap
+        self.gpkg_path = None
+        self.exported_tables = []
 
     def write(self, text):
         self.signal.emit(text)
@@ -509,6 +531,29 @@ class ExportLayersProcess(QThread):
         except Exception as e:
             self.write("[Erro -2]")
             self.write(("\tException: {}".format(str(e))))
+
+    def ensure_aux_views(self):
+        """Create aux label views in PostGIS when the user has CREATE on the schema."""
+        bp = os.path.dirname(os.path.realpath(__file__))
+        if (
+            self.postgisUtils is None
+            or self.schema not in self.postgisUtils.permissions
+            or self.postgisUtils.permissions[self.schema].get('create') is not True
+        ):
+            self.write(
+                'Aviso: o utilizador não tem permissões para criar views auxiliares na base de dados')
+            return False
+
+        self.actconn = self.postgisUtils.get_or_create_connection()
+        try:
+            with open(bp + '/convert/processing/aux_views.sql', encoding='utf-8') as av_file:
+                av_src = av_file.read()
+                views = re.sub(r"{schema}", self.schema, av_src)
+                self.postgisUtils.run_query_with_conn(self.actconn, views, None, True)
+            return True
+        except Exception as e:
+            self.write('Erro a criar views auxiliares: \'' + str(e) + '\'')
+            return False
 
     def get_group_layers(self, group):
         # print('- group: ' + group.name())
@@ -657,31 +702,81 @@ class ExportLayersProcess(QThread):
 
     def exportGeoPackage(self):
         exportedLayers = {}
+        self.gpkg_path = os.path.join(self.outDir, 'export.gpkg')
         driver = gdal.GetDriverByName('GPKG')
-        outdata = driver.Create(
-            self.outDir+'/export.gpkg', 0, 0, 0, gdal.GDT_Unknown)
+        if os.path.isfile(self.gpkg_path):
+            driver.Delete(self.gpkg_path)
+        outdata = driver.Create(self.gpkg_path, 0, 0, 0, gdal.GDT_Unknown)
+        # Defer spatial indexes until after FK rebuild (avoids rtree housekeeping)
+        copy_opts = ['SPATIAL_INDEX=NO']
 
-        self.write( 'A exportar para {}'.format( self.outDir+'/export.gpkg' ) )
+        self.write('A exportar para {}'.format(self.gpkg_path))
 
         for slayer in self.layerList:
             if slayer not in exportedLayers:
-                self.write( 'A exportar a camada {}'.format( slayer ) )
+                self.write('A exportar a camada {}'.format(slayer))
                 layertogo = self.datasource.GetLayerByName(slayer)
                 if layertogo:
-                    outdata.CopyLayer( layertogo, slayer)
+                    outdata.CopyLayer(layertogo, slayer, copy_opts)
                     exportedLayers[slayer] = 1
                     rTables = self.getRefTables(slayer)
                     for tb in rTables:
                         if tb not in exportedLayers:
-                            self.write( 'A exportar a tabela {}'.format( tb ) )
+                            self.write('A exportar a tabela {}'.format(tb))
                             tabletogo = self.datasource.GetLayerByName(tb)
                             if tabletogo:
-                                outdata.CopyLayer( tabletogo, tb)
+                                outdata.CopyLayer(tabletogo, tb, copy_opts)
                                 exportedLayers[tb] = 1
-                #             else:
-                #                 self.write( 'Erro a exportar a tabela {}'.format( tb ) )
-                # else:
-                #     self.write( 'Erro a exportar a camada {}'.format( slayer ) )
+
+        # Materialize label views into the GPKG for project joins / labeling parity
+        self.ensure_aux_views()
+        pg_ds = None
+        try:
+            gdal.UseExceptions()
+            pg_ds = gdal.OpenEx(
+                'PG:' + self.conn, gdal.OF_VECTOR,
+                open_options=['SCHEMAS=' + self.schema, 'LIST_ALL_TABLES=YES'])
+            for view in LABEL_VIEWS:
+                if view in exportedLayers:
+                    continue
+                self.write('A exportar a view de etiquetas {}'.format(view))
+                view_layer = None
+                if pg_ds is not None:
+                    view_layer = pg_ds.GetLayerByName(view)
+                if view_layer is None:
+                    view_layer = self.datasource.GetLayerByName(view)
+                if view_layer:
+                    outdata.CopyLayer(view_layer, view, copy_opts)
+                    exportedLayers[view] = 1
+                else:
+                    self.write(
+                        "[Aviso] View de etiquetas '{}' não disponível para exportação".format(view))
+        except Exception as e:
+            self.write("[Aviso] Não foi possível exportar views de etiquetas: {}".format(e))
+        finally:
+            pg_ds = None
+            outdata = None
+
+        self.exported_tables = list(exportedLayers.keys())
+
+        # Persist PostgreSQL FKs into the GPKG (SQLite FKs) for QGIS discoverRelations
+        exported_set = set(self.exported_tables)
+        try:
+            if self.postgisUtils is None:
+                self.write('[Aviso] Sem ligação PostGIS para ler foreign keys')
+            else:
+                fks = self.postgisUtils.list_foreign_keys(self.schema)
+                fks = [
+                    fk for fk in fks
+                    if fk['src_table'] in exported_set and fk['dst_table'] in exported_set
+                ]
+                self.write('Foreign keys PostgreSQL aplicáveis ao GPKG: {}'.format(len(fks)))
+                write_gpkg_relationships(self.gpkg_path, fks, self.write)
+        except Exception as e:
+            self.write(
+                "[Aviso] Não foi possível gravar foreign keys no GeoPackage: {}".format(e))
+
+        create_gpkg_spatial_indexes(self.gpkg_path, self.write)
 
     def getRefTables(self, layer):
         aux = []
@@ -689,11 +784,13 @@ class ExportLayersProcess(QThread):
             for l in self.flatLayers[layer]['ligs']:
                 if l[0] is not None:
                     aux.append(l[0])
+                    # if l[1] is not None:
                     if l[1] is not None and l[1] not in self.flatLayers:
                         aux.append(l[1])
                     for ll in l[3]:
                         if ll[0] is not None:
                             aux.append(ll[0])
+                            # if ll[1] is not None and '.' not in ll[1]:
                             if ll[1] is not None and ll[1] not in self.flatLayers and '.' not in ll[1]:
                                 aux.append(ll[1])
                 else:
