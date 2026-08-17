@@ -1259,6 +1259,19 @@ class AddLayersProcess(QThread):
         formated = times.strftime("%Y-%m-%d %H:%M:%S")
         self.signal.emit('{} {}'.format(formated, text))
 
+    def error_layer_uri(self, table_name, geom_type, slayer):
+        # intersecoes_3d uses PK(geometria); QGIS needs an integer fid for the attribute table.
+        con = self.conn + " srid=" + str(self.srsid) + " type=" + geom_type
+        if slayer == "intersecoes_3d":
+            sql = (
+                "(SELECT row_number() OVER () AS fid, id_1, id_2, tabela_1, tabela_2, "
+                "geometria, delta_z, regra FROM errors.{tbl})"
+            ).format(tbl=table_name)
+            con = con + " key='fid' estimatedmetadata=true table=\"" + sql + "\" (geometria) sql="
+        else:
+            con = con + " table='errors'.'" + table_name + "' (geometria) sql="
+        return con
+
     def run(self):
         self.actconn = self.pgutils.get_or_create_connection()
         try:
@@ -1302,10 +1315,7 @@ class AddLayersProcess(QThread):
                             for gt in displayList[slayer]["geom"]:
                                 ln = tb[0] if len(
                                     displayList[slayer]["geom"]) == 1 else tb[0] + " (" + self.trnl(gt) + ")"
-                                con = self.conn
-                                con = con + " srid=" + str(self.srsid) + " type=" + gt
-                                con = con + " table='errors'.'" + \
-                                    tb[0] + "' (geometria) sql="
+                                con = self.error_layer_uri(tb[0], gt, slayer)
                                 self.addLayer.emit(
                                     displayList[slayer]["name"], con, ln, slayer, displayList[slayer]["index"])
                         else:
@@ -1700,7 +1710,7 @@ class ValidateProcess(QThread):
                     text = "\tValidada a regra '" + \
                         str(line[0]) + " - " + str(line[1]) + "'\t"
                     text = text + "\n\t\tSem erros detetados." if (
-                        line[2] == line[3]) else text + "\n\t\tDetetados " + str(line[4]) + " erros."
+                         (line[4] or 0) == 0) else text + "\n\t\tDetetados " + str(line[4]) + " erros."
                     self.write(text)
 
             # SELECT f_table_name, f_geometry_column, "type" FROM geometry_columns WHERE f_table_schema = 'errors';
