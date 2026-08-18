@@ -2332,6 +2332,150 @@ begin
 end;
 $$ language plpgsql;
 
+-- RG4.2: Z coherence of line endpoints vs XY-coincident nodes (option B).
+-- kind: hidro | rodov | ferrov. sect NULL = whole dataset; otherwise one section.
+create or replace function validation.rg4_2_validation (ndd integer, kind text, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all int := 0;
+	count_good int := 0;
+	count_bad int := 0;
+	desvio_3D numeric := 0;
+	tabela_linha text;
+	tabela_no text;
+	codigo text;
+	tbl_erro text;
+begin
+	-- if ndd = 1 then
+	-- 	select coalesce(_args->>'desvio_3D', '0.028')::numeric into desvio_3D;
+	-- else
+	-- 	select coalesce(_args->>'desvio_3D', '0.141')::numeric into desvio_3D;
+	-- end if;
+
+	case kind
+		when 'hidro' then
+			tabela_linha := 'curso_de_agua_eixo';
+			tabela_no := 'no_hidrografico';
+			codigo := 'rg_4_2_1';
+		when 'rodov' then
+			tabela_linha := 'seg_via_rodov';
+			tabela_no := 'no_trans_rodov';
+			codigo := 'rg_4_2_2';
+		when 'ferrov' then
+			tabela_linha := 'seg_via_ferrea';
+			tabela_no := 'no_trans_ferrov';
+			codigo := 'rg_4_2_3';
+		else
+			raise exception 'rg4_2_validation: kind % desconhecido', kind;
+	end case;
+
+	tbl_erro := format('%I.%I', 'errors', 'intersecoes_3d_' || codigo);
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+
+	execute format($ct$
+		CREATE TABLE IF NOT EXISTS %s (
+			LIKE validation.intersecoes_3d INCLUDING DEFAULTS,
+			extremo text NOT NULL,
+			PRIMARY KEY (id_1, extremo)
+		)
+	$ct$, tbl_erro);
+
+	if sect is null then
+		execute format('DELETE FROM %s', tbl_erro);
+	else
+		execute format('DELETE FROM %s WHERE ST_Intersects(geometria, $1)', tbl_erro) using sect;
+	end if;
+
+	execute format($q$
+		WITH endpoints AS (
+			SELECT
+				e.identificador AS id_linha,
+				ep.extremo,
+				ep.geom AS geometria
+			FROM {schema}.%I e
+			CROSS JOIN LATERAL (VALUES
+				('start', ST_StartPoint(e.geometria)),
+				('end',   ST_EndPoint(e.geometria))
+			) AS ep(extremo, geom)
+			WHERE ($2::geometry IS NULL OR ST_Intersects(ep.geom, $2))
+		),
+		ligacoes AS (
+			SELECT
+				ep.id_linha,
+				ep.extremo,
+				ep.geometria AS p_linha,
+				n.identificador AS id_no,
+				n.geometria AS p_no,
+				abs(ST_Z(ep.geometria) - ST_Z(n.geometria)) AS delta_z
+			FROM endpoints ep
+			JOIN LATERAL (
+				SELECT n.identificador, n.geometria
+				FROM {schema}.%I n
+				WHERE ST_DWithin(n.geometria, ep.geometria, 0)
+				ORDER BY n.geometria <-> ep.geometria
+				LIMIT 1
+			) n ON true
+		)
+		INSERT INTO %s (
+			id_1, id_2, tabela_1, tabela_2,
+			geom_1, geom_2, geometria,
+			p1_intersecao, p2_intersecao,
+			delta_z, regra, extremo
+		)
+		SELECT
+			id_linha, id_no, %L, %L,
+			NULL, NULL, ST_Force3D(p_linha),
+			p_linha, p_no,
+			delta_z, %L, extremo
+		FROM ligacoes
+		WHERE delta_z > $1
+		ON CONFLICT (id_1, extremo) DO NOTHING
+	$q$, tabela_linha, tabela_no, tbl_erro, tabela_linha, tabela_no, codigo)
+	USING desvio_3D, sect;
+
+	execute format($q$
+		WITH endpoints AS (
+			SELECT
+				e.identificador AS id_linha,
+				ep.extremo,
+				ep.geom AS geometria
+			FROM {schema}.%I e
+			CROSS JOIN LATERAL (VALUES
+				('start', ST_StartPoint(e.geometria)),
+				('end',   ST_EndPoint(e.geometria))
+			) AS ep(extremo, geom)
+			WHERE ($2::geometry IS NULL OR ST_Intersects(ep.geom, $2))
+		),
+		ligacoes AS (
+			SELECT abs(ST_Z(ep.geometria) - ST_Z(n.geometria)) AS delta_z
+			FROM endpoints ep
+			JOIN LATERAL (
+				SELECT n.geometria
+				FROM {schema}.%I n
+				WHERE ST_DWithin(n.geometria, ep.geometria, 0)
+				ORDER BY n.geometria <-> ep.geometria
+				LIMIT 1
+			) n ON true
+		)
+		SELECT
+			count(*)::int,
+			count(*) FILTER (WHERE delta_z <= $1)::int,
+			count(*) FILTER (WHERE delta_z > $1)::int
+		FROM ligacoes
+	$q$, tabela_linha, tabela_no)
+	USING desvio_3D, sect
+	INTO count_all, count_good, count_bad;
+
+	return query select coalesce(count_all, 0), coalesce(count_good, 0), coalesce(count_bad, 0);
+end;
+$$ language plpgsql;
+
+create or replace function validation.rg4_2_validation (ndd integer, kind text, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.rg4_2_validation(ndd, kind, NULL::geometry, _args);
+end;
+$$ language plpgsql;
+
 create or replace function validation.rg4_3_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all int := 0;
