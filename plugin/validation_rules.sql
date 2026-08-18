@@ -167,19 +167,21 @@ petróleo, gás e substâncias químicas" e "Mobiliário urbano e sinalização"
 $$select * from validation.rg1_2_validation (2, 2, true, '%s'::geometry, '%s'::json )$$,
 $$select * from validation.rg1_2_validation (2, 2, false, '%s'::geometry, '%s'::json )$$ );
 
--- TODO
--- Eventualmente criar topologia com tolerância 0
 delete from validation.rules where code = 'rg_3';
-insert into validation.rules ( code, name, rule, scope ) 
-values ('rg_3', 'Tolerância de conetividade', 
+insert into validation.rules ( code, name, rule, scope, query, query_nd2 )
+values ('rg_3', 'Tolerância de conetividade',
 $$A tolerância de conetividade é 0 (zero).$$,
-$$Todas as entidades representadas através de objetos de geometria linha.$$ );
+$$seg_via_rodov, via_rodov_limite, seg_via_ferrea, curva_de_nivel, curso_de_agua_eixo.$$,
+$$select * from validation.rg_3_validation ()$$,
+$$select * from validation.rg_3_validation ()$$ );
 
 delete from validation.rules_area where code = 'rg_3';
-insert into validation.rules_area ( code, name, rule, scope ) 
-values ('rg_3', 'Tolerância de conetividade', 
+insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 )
+values ('rg_3', 'Tolerância de conetividade',
 $$A tolerância de conetividade é 0 (zero).$$,
-$$Todas as entidades representadas através de objetos de geometria linha.$$ );
+$$seg_via_rodov, via_rodov_limite, seg_via_ferrea, curva_de_nivel, curso_de_agua_eixo.$$,
+$$select * from validation.rg_3_validation ('%1$s'::geometry)$$,
+$$select * from validation.rg_3_validation ('%1$s'::geometry)$$ );
 
 -- Regras auxiliares
 -- Verificam outras caraterísticas que podem não estar explícitas nas Regras gerais e específicas da norma
