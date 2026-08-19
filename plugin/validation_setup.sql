@@ -2684,6 +2684,148 @@ end;
 $$ language plpgsql;
 
 
+create or replace function validation.re4_8_2_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.curso_de_agua_eixo_re4_8_2 (like {schema}.curso_de_agua_eixo INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.curso_de_agua_eixo_re4_8_2;
+	end if;
+
+	drop table if exists _re4_8_2_extremos;
+	drop table if exists _re4_8_2_ids;
+	drop table if exists _re4_8_2_nodes;
+	drop table if exists _re4_8_2_fluxo;
+	drop table if exists _re4_8_2_deg2;
+	drop table if exists _re4_8_2_classified;
+
+	create temp table _re4_8_2_extremos on commit drop as
+	select identificador, ST_Force2D(ST_StartPoint(geometria)) as geom
+	from {schema}.curso_de_agua_eixo
+	where geometria is not null
+	union all
+	select identificador, ST_Force2D(ST_EndPoint(geometria)) as geom
+	from {schema}.curso_de_agua_eixo
+	where geometria is not null;
+
+	delete from _re4_8_2_extremos where geom is null;
+	create index on _re4_8_2_extremos using gist (geom);
+	create index on _re4_8_2_extremos (identificador);
+	create index on _re4_8_2_extremos ((ST_X(geom)), (ST_Y(geom)));
+
+	create temp table _re4_8_2_ids (
+		identificador uuid primary key
+	) on commit drop;
+
+	insert into _re4_8_2_ids
+	select identificador
+	from {schema}.curso_de_agua_eixo
+	where sect is null or ST_Intersects(geometria, sect);
+
+	if sect is not null then
+		insert into _re4_8_2_ids
+		select distinct e.identificador
+		from _re4_8_2_extremos e
+		where exists (
+			select 1
+			from _re4_8_2_extremos seed
+			inner join _re4_8_2_ids s on s.identificador = seed.identificador
+			where ST_X(e.geom) = ST_X(seed.geom)
+			  and ST_Y(e.geom) = ST_Y(seed.geom)
+		)
+		on conflict do nothing;
+	end if;
+
+	create temp table _re4_8_2_nodes on commit drop as
+	select ST_X(e.geom) as x,
+	       ST_Y(e.geom) as y,
+	       count(distinct e.identificador) as degree,
+	       (array_agg(e.geom))[1] as geom,
+	       array_agg(distinct e.identificador) as ids
+	from _re4_8_2_extremos e
+	inner join _re4_8_2_ids w on w.identificador = e.identificador
+	group by ST_X(e.geom), ST_Y(e.geom);
+
+	create temp table _re4_8_2_fluxo on commit drop as
+	select case
+		when ST_Dimension(ST_Force2D(geometria)) = 2 then ST_Force2D(ST_Boundary(geometria))
+		else ST_Force2D(geometria)
+	end as geom
+	from {schema}.queda_de_agua
+	where geometria is not null
+	union all
+	select ST_Force2D(ST_Boundary(geometria))
+	from {schema}.zona_humida
+	where geometria is not null
+	union all
+	select case
+		when ST_Dimension(ST_Force2D(geometria)) = 2 then ST_Force2D(ST_Boundary(geometria))
+		else ST_Force2D(geometria)
+	end
+	from {schema}.barreira
+	where geometria is not null;
+
+	delete from _re4_8_2_fluxo where geom is null;
+	create index on _re4_8_2_fluxo using gist (geom);
+
+	create temp table _re4_8_2_deg2 on commit drop as
+	select n.geom, n.ids, n.ids[1] as id1, n.ids[2] as id2
+	from _re4_8_2_nodes n
+	where n.degree = 2;
+
+	create temp table _re4_8_2_classified on commit drop as
+	select d.ids,
+		not (
+			a.nome is not distinct from b.nome and
+			a.delimitacao_conhecida is not distinct from b.delimitacao_conhecida and
+			a.ficticio is not distinct from b.ficticio and
+			a.largura is not distinct from b.largura and
+			a.id_hidrografico is not distinct from b.id_hidrografico and
+			a.id_curso_de_agua_area is not distinct from b.id_curso_de_agua_area and
+			a.ordem_hidrologica is not distinct from b.ordem_hidrologica and
+			a.origem_natural is not distinct from b.origem_natural and
+			a.valor_curso_de_agua is not distinct from b.valor_curso_de_agua and
+			a.valor_persistencia_hidrologica is not distinct from b.valor_persistencia_hidrologica and
+			a.valor_posicao_vertical is not distinct from b.valor_posicao_vertical
+		) or exists (
+			select 1 from _re4_8_2_fluxo f
+			where ST_DWithin(d.geom, f.geom, 0)
+		) as justified
+	from _re4_8_2_deg2 d
+	inner join {schema}.curso_de_agua_eixo a on a.identificador = d.id1
+	inner join {schema}.curso_de_agua_eixo b on b.identificador = d.id2;
+
+	insert into errors.curso_de_agua_eixo_re4_8_2
+		select e.*
+		from {schema}.curso_de_agua_eixo e
+		where e.identificador in (
+			select unnest(c.ids) from _re4_8_2_classified c where not c.justified
+		)
+		on conflict do nothing;
+
+	select
+		count(*)::int,
+		count(*) filter (where justified)::int,
+		count(*) filter (where not justified)::int
+	into count_all, count_good, count_bad
+	from _re4_8_2_classified;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_8_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re4_8_2_validation(ndd, null::geometry, _args);
+end;
+$$ language plpgsql;
+
+
 create or replace function validation.re4_11_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
