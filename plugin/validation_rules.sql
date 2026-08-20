@@ -685,84 +685,26 @@ $$select * from validation.re3_2_new_validation(2, '%s'::geometry, '%s'::json)$$
 
 -- Pontos cotados
 delete from validation.rules where code = 're3_3';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('re3_3', 'Pontos cotados', 
 $$É recolhido pelo menos um "Ponto cotado" nas zonas planas onde a distância
 horizontal entre os objetos "Curva de nível" exceda os seguintes valores:
 NdD1: 100 m;
 NdD2: 500 m.$$, 
 $$"Ponto cotado".$$, 'ponto_cotado',
-$$with 
-total as (select count(*) from {schema}.ponto_cotado),
-good as (select count(*) from {schema}.ponto_cotado),
-bad as (with cdn_buffer as (select st_union(st_buffer(cdn.geometria, ('%1$s'::json->>'re3_3_ndd1')::int)) as geometria from {schema}.curva_de_nivel cdn),
-	pc_buffer as (select st_union(st_buffer(pc.geometria, ('%1$s'::json->>'re3_3_ndd1')::int)) as geometria from {schema}.ponto_cotado pc),
-	difference as (select (st_dump(st_difference( st_difference(adt.geometria, cdn_buffer.geometria), pc_buffer.geometria))).*
-		from validation.area_trabalho_multi adt, cdn_buffer, pc_buffer)
-	select count(d.*)
-	from difference d
-	where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10))
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-total as (select count(*) from {schema}.ponto_cotado),
-good as (select count(*) from {schema}.ponto_cotado),
-bad as (with cdn_buffer as (select st_union(st_buffer(cdn.geometria, ('%1$s'::json->>'re3_3_ndd2')::int)) as geometria from {schema}.curva_de_nivel cdn),
-	pc_buffer as (select st_union(st_buffer(pc.geometria, ('%1$s'::json->>'re3_3_ndd2')::int)) as geometria from {schema}.ponto_cotado pc),
-	difference as (select (st_dump(st_difference( st_difference(adt.geometria, cdn_buffer.geometria), pc_buffer.geometria))).*
-		from validation.area_trabalho_multi adt, cdn_buffer, pc_buffer)
-	select count(d.*)
-	from difference d
-	where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10))
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with cdn_buffer as (select st_union(st_buffer(cdn.geometria, ('%1$s'::json->>'re3_3_ndd1')::int)) as geometria from {schema}.curva_de_nivel cdn),
-pc_buffer as (select st_union(st_buffer(pc.geometria, ('%1$s'::json->>'re3_3_ndd1')::int)) as geometria from {schema}.ponto_cotado pc),
-difference as (select (st_dump(st_difference( st_difference(adt.geometria, cdn_buffer.geometria), pc_buffer.geometria))).*
-	from validation.area_trabalho_multi adt, cdn_buffer, pc_buffer)
-select uuid_generate_v1mc() as identificador, now() as inicio_objeto, null as fim_objeto, 1 as valor_classifica_las, ST_Force3D(st_centroid(d.geom)) as geometria
-from difference d
-where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)$$ );
+$$select * from validation.re3_3_validation(1, '%s'::json)$$,
+$$select * from validation.re3_3_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're3_3';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2 ) 
 values ('re3_3', 'Pontos cotados', 
 $$É recolhido pelo menos um "Ponto cotado" nas zonas planas onde a distância
 horizontal entre os objetos "Curva de nível" exceda os seguintes valores:
 NdD1: 100 m;
 NdD2: 500 m.$$, 
 $$"Ponto cotado".$$, 'ponto_cotado',
-$$with 
-total as (select count(*) from {schema}.ponto_cotado),
-good as (select count(*) from {schema}.ponto_cotado where ST_Intersects(geometria, '%1$s'::geometry)),
-bad as (with cdn_buffer as (select st_union(st_buffer(cdn.geometria, ('%2$s'::json->>'re3_3_ndd1')::int)) as geometria from {schema}.curva_de_nivel cdn where ST_Intersects(geometria, '%1$s'::geometry)),
-	pc_buffer as (select st_union(st_buffer(pc.geometria, ('%2$s'::json->>'re3_3_ndd1')::int)) as geometria from {schema}.ponto_cotado pc where ST_Intersects(geometria, '%1$s'::geometry)),
-	difference as (select (st_dump(st_difference( st_difference('%1$s', cdn_buffer.geometria), pc_buffer.geometria))).*
-		from cdn_buffer, pc_buffer)
-	select count(d.*)
-	from difference d
-	where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10))
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with 
-total as (select count(*) from {schema}.ponto_cotado),
-good as (select count(*) from {schema}.ponto_cotado where ST_Intersects(geometria, '%1$s'::geometry)),
-bad as (with cdn_buffer as (select st_union(st_buffer(cdn.geometria, ('%2$s'::json->>'re3_3_ndd2')::int)) as geometria from {schema}.curva_de_nivel cdn where ST_Intersects(geometria, '%1$s'::geometry)),
-	pc_buffer as (select st_union(st_buffer(pc.geometria, ('%2$s'::json->>'re3_3_ndd2')::int)) as geometria from {schema}.ponto_cotado pc where ST_Intersects(geometria, '%1$s'::geometry)),
-	difference as (select (st_dump(st_difference( st_difference('%1$s', cdn_buffer.geometria), pc_buffer.geometria))).*
-		from cdn_buffer, pc_buffer)
-	select count(d.*)
-	from difference d
-	where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10))
-select total.count as total, good.count as good, bad.count as bad
-from total, good, bad $$,
-$$with cdn_buffer as (select st_union(st_buffer(cdn.geometria, ('%2$s'::json->>'re3_3_ndd1')::int)) as geometria from {schema}.curva_de_nivel cdn where ST_Intersects(geometria, '%1$s'::geometry)),
-pc_buffer as (select st_union(st_buffer(pc.geometria, ('%2$s'::json->>'re3_3_ndd1')::int)) as geometria from {schema}.ponto_cotado pc where ST_Intersects(geometria, '%1$s'::geometry)),
-difference as (select (st_dump(st_difference( st_difference('%1$s', cdn_buffer.geometria), pc_buffer.geometria))).*
-	from cdn_buffer, pc_buffer)
-select uuid_generate_v1mc() as identificador, now() as inicio_objeto, null as fim_objeto, 1 as valor_classifica_las, ST_Force3D(st_centroid(d.geom)) as geometria
-from difference d
-where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)$$ );
+$$select * from validation.re3_3_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re3_3_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 -- Regras do tema Hidrografia
 
@@ -1194,10 +1136,12 @@ from {schema}.edificio e, {schema}.valor_forma_edificio vfe
 where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )$$ );
 
 
--- TODO
-delete from validation.rules where code = 're4_4';
-insert into validation.rules ( code, name, rule, scope, entity ) 
-values ('re4_4', 'Representação da área e do eixo do curso de água', 
+-- RE4.4: limiar de largura entre margens (NdD1: 1 m; NdD2: 5 m).
+-- Parte 1 (área): polígonos demasiado estreitos.
+-- Parte 2 (eixo): eixos com largura declarada >= limiar sem área associada.
+delete from validation.rules where code in ('re4_4', 're4_4_1', 're4_4_2');
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 )
+values ('re4_4_1', 'Representação da área e do eixo do curso de água (Parte 1 - Área)',
 $$A representação do curso de água resulta da aplicação dos critérios:
 NdD1: o "Curso de água - área" é representado através de um polígono,
 que traduz o limite das suas margens, se a distância entre as margens for
@@ -1209,12 +1153,12 @@ que traduz o limite das suas margens, se a distância entre as margens for
 igual ou superior a 5 m; se a distância entre as margens for inferior a 5 m
 então o curso de água é representado através de uma linha que traduz o
 seu eixo ("Curso de água – eixo").$$,
-$$"Curso de água - eixo" e "Curso de água - área".$$, 'curso_de_agua_area' );
+$$"Curso de água - área".$$, 'curso_de_agua_area',
+$$select * from validation.re4_4_1_validation(1, '%s'::json)$$,
+$$select * from validation.re4_4_1_validation(2, '%s'::json)$$ );
 
--- TODO
-delete from validation.rules_area where code = 're4_4';
-insert into validation.rules_area ( code, name, rule, scope, entity ) 
-values ('re4_4', 'Representação da área e do eixo do curso de água', 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 )
+values ('re4_4_2', 'Representação da área e do eixo do curso de água (Parte 2 - Eixo)',
 $$A representação do curso de água resulta da aplicação dos critérios:
 NdD1: o "Curso de água - área" é representado através de um polígono,
 que traduz o limite das suas margens, se a distância entre as margens for
@@ -1226,7 +1170,44 @@ que traduz o limite das suas margens, se a distância entre as margens for
 igual ou superior a 5 m; se a distância entre as margens for inferior a 5 m
 então o curso de água é representado através de uma linha que traduz o
 seu eixo ("Curso de água – eixo").$$,
-$$"Curso de água - eixo" e "Curso de água - área".$$, 'curso_de_agua_area' );
+$$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
+$$select * from validation.re4_4_2_validation(1, '%s'::json)$$,
+$$select * from validation.re4_4_2_validation(2, '%s'::json)$$ );
+
+delete from validation.rules_area where code in ('re4_4', 're4_4_1', 're4_4_2');
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 )
+values ('re4_4_1', 'Representação da área e do eixo do curso de água (Parte 1 - Área)',
+$$A representação do curso de água resulta da aplicação dos critérios:
+NdD1: o "Curso de água - área" é representado através de um polígono,
+que traduz o limite das suas margens, se a distância entre as margens for
+igual ou superior a 1 m; se a distância entre as margens for inferior a 1 m
+o curso de água é representado através de uma linha que traduz o seu
+eixo ("Curso de água - eixo");
+NdD2: o "Curso de água - área" é representado através de um polígono,
+que traduz o limite das suas margens, se a distância entre as margens for
+igual ou superior a 5 m; se a distância entre as margens for inferior a 5 m
+então o curso de água é representado através de uma linha que traduz o
+seu eixo ("Curso de água – eixo").$$,
+$$"Curso de água - área".$$, 'curso_de_agua_area',
+$$select * from validation.re4_4_1_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_4_1_validation(2, '%s'::geometry, '%s'::json)$$ );
+
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 )
+values ('re4_4_2', 'Representação da área e do eixo do curso de água (Parte 2 - Eixo)',
+$$A representação do curso de água resulta da aplicação dos critérios:
+NdD1: o "Curso de água - área" é representado através de um polígono,
+que traduz o limite das suas margens, se a distância entre as margens for
+igual ou superior a 1 m; se a distância entre as margens for inferior a 1 m
+o curso de água é representado através de uma linha que traduz o seu
+eixo ("Curso de água - eixo");
+NdD2: o "Curso de água - área" é representado através de um polígono,
+que traduz o limite das suas margens, se a distância entre as margens for
+igual ou superior a 5 m; se a distância entre as margens for inferior a 5 m
+então o curso de água é representado através de uma linha que traduz o
+seu eixo ("Curso de água – eixo").$$,
+$$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
+$$select * from validation.re4_4_2_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_4_2_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 -- TODO

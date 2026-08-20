@@ -1356,6 +1356,113 @@ begin
 end;
 $$ language plpgsql;
 
+
+create or replace function validation.re4_4_1_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	half double precision;
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	half := case when ndd = 1 then 0.5 else 2.5 end;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.curso_de_agua_area_re4_4_1 (LIKE {schema}.curso_de_agua_area INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.curso_de_agua_area_re4_4_1;
+	end if;
+
+	with src as (
+		select a.*, ST_IsEmpty(ST_Buffer(ST_Force2D(a.geometria), -half)) as is_narrow
+		from {schema}.curso_de_agua_area a
+		where sect is null or ST_Intersects(a.geometria, sect)
+	),
+	ins as (
+		insert into errors.curso_de_agua_area_re4_4_1
+		select a.*
+		from {schema}.curso_de_agua_area a
+		join src s on s.identificador = a.identificador
+		where s.is_narrow
+		on conflict do nothing
+		returning 1
+	)
+	select
+		(select count(*) from src)::int,
+		(select count(*) from src where not is_narrow)::int,
+		(select count(*) from src where is_narrow)::int
+	into count_all, count_good, count_bad
+	from (select count(*) from ins) as _force_ins;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_4_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re4_4_1_validation(ndd, null::geometry, _args);
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_4_2_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	limiar double precision;
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	limiar := case when ndd = 1 then 1.0 else 5.0 end;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.curso_de_agua_eixo_re4_4_2 (LIKE {schema}.curso_de_agua_eixo INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.curso_de_agua_eixo_re4_4_2;
+	end if;
+
+	with candidates as (
+		select e.*
+		from {schema}.curso_de_agua_eixo e
+		where e.largura is not null
+			and e.largura >= limiar
+			and e.ficticio = false
+			and (sect is null or ST_Intersects(e.geometria, sect))
+	),
+	classified as (
+		select c.*,
+			(c.id_curso_de_agua_area is not null
+			 or exists (
+				select 1 from {schema}.curso_de_agua_area a
+				where ST_Within(c.geometria, a.geometria)
+			 )) as has_area
+		from candidates c
+	),
+	ins as (
+		insert into errors.curso_de_agua_eixo_re4_4_2
+		select e.*
+		from {schema}.curso_de_agua_eixo e
+		join classified cl on cl.identificador = e.identificador
+		where not cl.has_area
+		on conflict do nothing
+		returning 1
+	)
+	select
+		(select count(*) from classified)::int,
+		(select count(*) from classified where has_area)::int,
+		(select count(*) from classified where not has_area)::int
+	into count_all, count_good, count_bad
+	from (select count(*) from ins) as _force_ins;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_4_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re4_4_2_validation(ndd, null::geometry, _args);
+end;
+$$ language plpgsql;
+
 -- select * from validation.rg5_validation ();
 create or replace function validation.rg5_validation () returns table (total int, good int, bad int) as $$
 declare
@@ -3642,6 +3749,70 @@ begin
 	select (count_bad + res.bad) into count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
+create or replace function validation.re3_3_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_bad integer := 0;
+	buffer_m integer;
+	work_area geometry;
+begin
+	if ndd = 1 then
+		select coalesce(_args->>'re3_3_ndd1', '100')::int into buffer_m;
+	else
+		select coalesce(_args->>'re3_3_ndd2', '500')::int into buffer_m;
+	end if;
+
+	if sect is null then
+		select geometria from validation.area_trabalho_multi into work_area;
+	else
+		work_area := sect;
+	end if;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.ponto_cotado_re3_3 (like {schema}.ponto_cotado INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.ponto_cotado_re3_3;
+	end if;
+
+	with cdn_buffer as (
+		select st_union(st_buffer(cdn.geometria, buffer_m)) as geometria
+		from {schema}.curva_de_nivel cdn
+		where sect is null or ST_Intersects(cdn.geometria, sect)
+	),
+	pc_buffer as (
+		select st_union(st_buffer(pc.geometria, buffer_m)) as geometria
+		from {schema}.ponto_cotado pc
+		where sect is null or ST_Intersects(pc.geometria, sect)
+	),
+	difference as (
+		select (st_dump(st_difference(st_difference(work_area, cdn_buffer.geometria), pc_buffer.geometria))).*
+		from cdn_buffer, pc_buffer
+	),
+	gaps as (
+		select d.geom
+		from difference d
+		where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)
+	),
+	bad_rows as (
+		insert into errors.ponto_cotado_re3_3 (identificador, inicio_objeto, fim_objeto, valor_classifica_las, geometria)
+		select uuid_generate_v1mc(), now(), null, 1, ST_Force3D(st_centroid(g.geom))
+		from gaps g
+		on conflict do nothing
+		returning 1
+	)
+	select count(*) from bad_rows into count_bad;
+
+	return query select -1, -1, coalesce(count_bad, 0);
+end;
+$$ language plpgsql;
+
+create or replace function validation.re3_3_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re3_3_validation(ndd, null::geometry, _args);
 end;
 $$ language plpgsql;
 
