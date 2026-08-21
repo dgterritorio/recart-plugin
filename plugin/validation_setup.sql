@@ -2751,6 +2751,59 @@ begin
 end;
 $$ language plpgsql;
 
+
+create or replace function validation.re7_8_validation (minv int, tipos text[], sect geometry) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.areas_artificializadas_re7_8 (LIKE {schema}.areas_artificializadas INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.areas_artificializadas_re7_8;
+	end if;
+
+	with src as (
+		select aa.*, (ST_Area(aa.geometria) < minv) as is_small
+		from {schema}.areas_artificializadas aa
+		where geometrytype(aa.geometria) = 'POLYGON'
+		  and aa.valor_areas_artificializadas = '7'
+		  and exists (
+			select 1
+			from {schema}.lig_valor_tipo_equipamento_coletivo_equip_util_coletiva lig
+			where lig.equip_util_coletiva_id = aa.equip_util_coletiva_id
+			  and lig.valor_tipo_equipamento_coletivo_id = any(tipos)
+		  )
+		  and (sect is null or ST_Intersects(aa.geometria, sect))
+	),
+	ins as (
+		insert into errors.areas_artificializadas_re7_8
+		select aa.*
+		from {schema}.areas_artificializadas aa
+		join src s on s.identificador = aa.identificador
+		where s.is_small
+		on conflict do nothing
+		returning 1
+	)
+	select
+		(select count(*) from src)::int,
+		(select count(*) from src where not is_small)::int,
+		(select count(*) from src where is_small)::int
+	into count_all, count_good, count_bad
+	from (select count(*) from ins) as _force_ins;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re7_8_validation (minv int, tipos text[]) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re7_8_validation(minv, tipos, null::geometry);
+end;
+$$ language plpgsql;
+
 -- RG4.2: Z coherence of line endpoints vs XY-coincident nodes (option B).
 -- kind: hidro | rodov | ferrov. sect NULL = whole dataset; otherwise one section.
 create or replace function validation.rg4_2_validation (ndd integer, kind text, sect geometry, _args json) returns table (total int, good int, bad int) as $$
@@ -3042,7 +3095,8 @@ begin
 			) AS has_bad
 		FROM {schema}.curso_de_agua_eixo a
 		JOIN {schema}.curso_de_agua_eixo b 
-			ON ST_Intersects(a.geometria, b.geometria)
+			ON a.valor_posicao_vertical = b.valor_posicao_vertical
+			AND ST_Intersects(a.geometria, b.geometria)
 		WHERE a.identificador != b.identificador
 		GROUP BY a.identificador
 	),
@@ -3081,7 +3135,8 @@ begin
 			) AS has_bad
 		FROM {schema}.curso_de_agua_eixo a
 		JOIN {schema}.curso_de_agua_eixo b 
-			ON ST_Intersects(a.geometria, b.geometria)
+			ON a.valor_posicao_vertical = b.valor_posicao_vertical
+			AND ST_Intersects(a.geometria, b.geometria)
 		WHERE ST_Intersects(a.geometria, sect) AND a.identificador != b.identificador
 		GROUP BY a.identificador
 	),
@@ -3585,6 +3640,58 @@ begin
 	select s.total, s.good, s.bad from estat s into count_all, count_good, count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
+create or replace function validation.re5_5_8_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	cvalue double precision;
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	if ndd = 1 then
+		cvalue := coalesce(_args->>'rg1_ndd1', '4')::double precision;
+	else
+		cvalue := coalesce(_args->>'rg1_ndd2', '20')::double precision;
+	end if;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.area_infra_trans_rodov_re5_5_8 (LIKE {schema}.area_infra_trans_rodov INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.area_infra_trans_rodov_re5_5_8;
+	end if;
+
+	with src as (
+		select a.*, (ST_Area(a.geometria) < cvalue) as is_small
+		from {schema}.area_infra_trans_rodov a
+		where sect is null or ST_Intersects(a.geometria, sect)
+	),
+	ins as (
+		insert into errors.area_infra_trans_rodov_re5_5_8
+		select a.*
+		from {schema}.area_infra_trans_rodov a
+		join src s on s.identificador = a.identificador
+		where s.is_small
+		on conflict do nothing
+		returning 1
+	)
+	select
+		(select count(*) from src)::int,
+		(select count(*) from src where not is_small)::int,
+		(select count(*) from src where is_small)::int
+	into count_all, count_good, count_bad
+	from (select count(*) from ins) as _force_ins;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re5_5_8_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re5_5_8_validation(ndd, null::geometry, _args);
 end;
 $$ language plpgsql;
 

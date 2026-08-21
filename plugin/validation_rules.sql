@@ -3033,54 +3033,28 @@ $$select * from {schema}.area_infra_trans_rodov where ST_Intersects(geometria, '
 
 
 delete from validation.rules where code = 're5_5_8';
-insert into validation.rules ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('re5_5_8', 'Representação da infraestrutura de transporte rodoviário', 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 )
+values ('re5_5_8', 'Representação da infraestrutura de transporte rodoviário',
 $$Se a "Área da infraestrutura de transporte rodoviário" não possuir dimensões
 para ser representada (RG2) a "Infraestrutura de transporte rodoviário" é
 sempre representada através da colocação de um ponto no centro do
-fenómeno a que diz respeito.$$, 
+fenómeno a que diz respeito.$$,
 $$"Área da infraestrutura de transporte rodoviário" e "Infraestrutura de
-transporte rodoviário".$$, 'infra_trans_rodov',
-$$with 
-total as (select * from {schema}.infra_trans_rodov itr
-where not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria ))),
-good as (select * from {schema}.infra_trans_rodov itr
-where not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria )))
-select total.count as total, good.count as good, 0 as bad
-from total, good $$,
-$$with 
-total as (select * from {schema}.infra_trans_rodov itr
-where not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria ))),
-good as (select * from {schema}.infra_trans_rodov itr
-where not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria )))
-select total.count as total, good.count as good, 0 as bad
-from total, good $$,
-$$ select * from {schema}.infra_trans_rodov where false $$ );
+transporte rodoviário".$$, 'area_infra_trans_rodov',
+$$select * from validation.re5_5_8_validation(1, '%s'::json)$$,
+$$select * from validation.re5_5_8_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're5_5_8';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
-values ('re5_5_8', 'Representação da infraestrutura de transporte rodoviário', 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 )
+values ('re5_5_8', 'Representação da infraestrutura de transporte rodoviário',
 $$Se a "Área da infraestrutura de transporte rodoviário" não possuir dimensões
 para ser representada (RG2) a "Infraestrutura de transporte rodoviário" é
 sempre representada através da colocação de um ponto no centro do
-fenómeno a que diz respeito.$$, 
+fenómeno a que diz respeito.$$,
 $$"Área da infraestrutura de transporte rodoviário" e "Infraestrutura de
-transporte rodoviário".$$, 'infra_trans_rodov',
-$$with 
-total as (select * from {schema}.infra_trans_rodov itr
-where not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria ))),
-good as (select * from {schema}.infra_trans_rodov itr
-where ST_Intersects(geometria, '%1$s'::geometry) and not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria )))
-select total.count as total, good.count as good, 0 as bad
-from total, good $$,
-$$with 
-total as (select * from {schema}.infra_trans_rodov itr
-where not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria ))),
-good as (select * from {schema}.infra_trans_rodov itr
-where ST_Intersects(geometria, '%1$s'::geometry) and not exists (select * from {schema}.area_infra_trans_rodov aitr  where st_contains(aitr.geometria,itr.geometria )))
-select total.count as total, good.count as good, 0 as bad
-from total, good $$,
-$$ select * from {schema}.infra_trans_rodov where false $$ );
+transporte rodoviário".$$, 'area_infra_trans_rodov',
+$$select * from validation.re5_5_8_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re5_5_8_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 delete from validation.rules where code = 're5_5_9';
@@ -3196,26 +3170,50 @@ $$select * from validation.rg_min_area ('re7_1', 'area_agricola_florestal_mato',
 
 
 delete from validation.rules where code = 're7_8';
-insert into validation.rules ( code, name, rule, scope, query, query_nd2 ) 
-values ('re7_8', 'Representação de parque, jardim e área verde',
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('re7_8', '{v1.1.2}', 'Representação de parque, jardim e área verde',
 $$O parque e jardim e a área verde são recolhidos e representados se possuírem
 uma área igual ou superior a:
  - NdD1: 100 m²;
  - NdD2: 1 000 m².$$,
 $$Área artificializada.$$,
-$$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%1$s'::json->>'re7_8_ndd1')::int)$$,
-$$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%1$s'::json->>'re7_8_ndd2')::int)$$ );
+$$select * from validation.re7_8_validation(('%1$s'::json->>'re7_8_ndd1')::int, ARRAY['7.1','7.2'])$$,
+$$select * from validation.re7_8_validation(('%1$s'::json->>'re7_8_ndd2')::int, ARRAY['7.1','7.2'])$$ );
+
+insert into validation.rules ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('re7_8', '{v2.0.1,v2.0.2}', 'Representação de instalação desportiva e de lazer',
+$$A instalação desportiva e de lazer, parque e jardim, área verde, campo de
+golfe e outros (desporto e lazer), são recolhidos e representados se possuírem
+uma área igual ou superior a:
+ - NdD1: 100 m²;
+ - NdD2: 1 000 m².
+O parque infantil é uma exceção a esta regra.$$,
+$$Área artificializada e Equipamento de utilização coletiva.$$,
+$$select * from validation.re7_8_validation(('%1$s'::json->>'re7_8_ndd1')::int, ARRAY['7.1','7.2','7.3','7.4'])$$,
+$$select * from validation.re7_8_validation(('%1$s'::json->>'re7_8_ndd2')::int, ARRAY['7.1','7.2','7.3','7.4'])$$ );
 
 delete from validation.rules_area where code = 're7_8';
-insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 ) 
-values ('re7_8', 'Representação de parque, jardim e área verde',
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('re7_8', '{v1.1.2}', 'Representação de parque, jardim e área verde',
 $$O parque e jardim e a área verde são recolhidos e representados se possuírem
 uma área igual ou superior a:
  - NdD1: 100 m²;
  - NdD2: 1 000 m².$$,
 $$Área artificializada.$$,
-$$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$s'::json->>'re7_8_ndd1')::int, '%1$s'::geometry)$$,
-$$select * from validation.rg_min_area ('re7_8', 'areas_artificializadas', ('%2$s'::json->>'re7_8_ndd2')::int, '%1$s'::geometry)$$ );
+$$select * from validation.re7_8_validation(('%2$s'::json->>'re7_8_ndd1')::int, ARRAY['7.1','7.2'], '%1$s'::geometry)$$,
+$$select * from validation.re7_8_validation(('%2$s'::json->>'re7_8_ndd2')::int, ARRAY['7.1','7.2'], '%1$s'::geometry)$$ );
+
+insert into validation.rules_area ( code, versoes, name, rule, scope, query, query_nd2 )
+values ('re7_8', '{v2.0.1,v2.0.2}', 'Representação de instalação desportiva e de lazer',
+$$A instalação desportiva e de lazer, parque e jardim, área verde, campo de
+golfe e outros (desporto e lazer), são recolhidos e representados se possuírem
+uma área igual ou superior a:
+ - NdD1: 100 m²;
+ - NdD2: 1 000 m².
+O parque infantil é uma exceção a esta regra.$$,
+$$Área artificializada e Equipamento de utilização coletiva.$$,
+$$select * from validation.re7_8_validation(('%2$s'::json->>'re7_8_ndd1')::int, ARRAY['7.1','7.2','7.3','7.4'], '%1$s'::geometry)$$,
+$$select * from validation.re7_8_validation(('%2$s'::json->>'re7_8_ndd2')::int, ARRAY['7.1','7.2','7.3','7.4'], '%1$s'::geometry)$$ );
 
 
 delete from validation.rules where code = 'pq1_1';
