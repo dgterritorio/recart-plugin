@@ -1463,6 +1463,318 @@ begin
 end;
 $$ language plpgsql;
 
+
+create or replace function validation.re4_6_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.agua_lentica_re4_6 (LIKE {schema}.agua_lentica INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.agua_lentica_re4_6;
+	end if;
+
+	drop table if exists _re4_6_lakes;
+	drop table if exists _re4_6_ends;
+	drop table if exists _re4_6_rings;
+	drop table if exists _re4_6_hits;
+	drop table if exists _re4_6_hit_class;
+	drop table if exists _re4_6_crossed;
+
+	create temp table _re4_6_lakes on commit drop as
+	select a.identificador,
+		ST_Force2D(a.geometria) as g2d,
+		ST_NPoints(a.geometria) as npts
+	from {schema}.agua_lentica a
+	where sect is null or ST_Intersects(a.geometria, sect);
+
+	create index on _re4_6_lakes using gist (g2d);
+	create index on _re4_6_lakes (identificador);
+
+	create temp table _re4_6_ends on commit drop as
+	select identificador, ST_Force2D(ST_StartPoint(geometria)) as geom
+	from {schema}.curso_de_agua_eixo
+	where geometria is not null
+	union all
+	select identificador, ST_Force2D(ST_EndPoint(geometria))
+	from {schema}.curso_de_agua_eixo
+	where geometria is not null;
+
+	delete from _re4_6_ends where geom is null;
+	create index on _re4_6_ends using gist (geom);
+
+	-- Whole ring is a single huge GIST box for reservoirs (100k+ vertices).
+	-- Dump those to segments; keep compact rings as one linestring.
+	create temp table _re4_6_rings on commit drop as
+	select l.identificador as lake_id, ST_Boundary(l.g2d) as geom
+	from _re4_6_lakes l
+	where l.npts < 500
+	union all
+	select l.identificador, (d).geom
+	from _re4_6_lakes l
+	cross join lateral ST_DumpSegments(ST_Boundary(l.g2d)) as d
+	where l.npts >= 500;
+
+	create index on _re4_6_rings using gist (geom);
+
+	create temp table _re4_6_hits on commit drop as
+	select distinct r.lake_id, p.identificador as eixo_id
+	from _re4_6_rings r
+	join _re4_6_ends p on ST_DWithin(p.geom, r.geom, 0.01);
+
+	create index on _re4_6_hits (lake_id);
+
+	-- Midpoint-in-polygon agrees with ST_Within on hit pairs and avoids
+	-- line-in-polygon against 50k–110k vertex reservoirs.
+	create temp table _re4_6_hit_class on commit drop as
+	select h.lake_id,
+		h.eixo_id,
+		case
+			when l.npts >= 500 then ST_Contains(l.g2d, ST_LineInterpolatePoint(ST_Force2D(e.geometria), 0.5))
+			else ST_Within(ST_Force2D(e.geometria), l.g2d)
+		end as is_within
+	from _re4_6_hits h
+	join _re4_6_lakes l on l.identificador = h.lake_id
+	join {schema}.curso_de_agua_eixo e on e.identificador = h.eixo_id;
+
+	create temp table _re4_6_crossed on commit drop as
+	select lake_id as identificador,
+		bool_or(is_within) as has_through_hit
+	from _re4_6_hit_class
+	group by lake_id
+	having count(*) filter (where not is_within) >= 2;
+
+	create index on _re4_6_crossed (identificador);
+
+	with through as (
+		select c.identificador
+		from _re4_6_crossed c
+		where c.has_through_hit
+			or exists (
+				select 1
+				from _re4_6_lakes l
+				join {schema}.curso_de_agua_eixo e
+					on e.geometria && l.g2d
+					and case
+						when l.npts >= 500 then ST_Contains(l.g2d, ST_LineInterpolatePoint(ST_Force2D(e.geometria), 0.5))
+						else ST_Within(ST_Force2D(e.geometria), l.g2d)
+					end
+				where l.identificador = c.identificador
+			)
+	),
+	classified as (
+		select c.identificador,
+			(t.identificador is not null) as has_through
+		from _re4_6_crossed c
+		left join through t on t.identificador = c.identificador
+	),
+	ins as (
+		insert into errors.agua_lentica_re4_6
+		select a.*
+		from {schema}.agua_lentica a
+		join classified cl on cl.identificador = a.identificador
+		where not cl.has_through
+		on conflict do nothing
+		returning 1
+	)
+	select
+		(select count(*) from classified)::int,
+		(select count(*) from classified where has_through)::int,
+		(select count(*) from classified where not has_through)::int
+	into count_all, count_good, count_bad
+	from (select count(*) from ins) as _force_ins;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_6_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re4_6_validation(ndd, null::geometry, _args);
+end;
+$$ language plpgsql;
+
+
+create or replace function validation.re4_7_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.curso_de_agua_eixo_re4_7 (LIKE {schema}.curso_de_agua_eixo INCLUDING ALL);
+	ALTER TABLE errors.curso_de_agua_eixo_re4_7 ADD COLUMN IF NOT EXISTS entidade text;
+	ALTER TABLE errors.curso_de_agua_eixo_re4_7 ADD COLUMN IF NOT EXISTS motivo text;
+	ALTER TABLE errors.curso_de_agua_eixo_re4_7 DROP CONSTRAINT IF EXISTS curso_de_agua_eixo_pkey;
+	ALTER TABLE errors.curso_de_agua_eixo_re4_7 DROP CONSTRAINT IF EXISTS curso_de_agua_eixo_re4_7_pkey;
+	ALTER TABLE errors.curso_de_agua_eixo_re4_7 ADD CONSTRAINT curso_de_agua_eixo_re4_7_pkey PRIMARY KEY (identificador, entidade, motivo);
+
+	if sect is null then
+		delete from errors.curso_de_agua_eixo_re4_7;
+	end if;
+
+	drop table if exists _re4_7_eixos;
+	drop table if exists _re4_7_water;
+	drop table if exists _re4_7_water_idx;
+	drop table if exists _re4_7_hits;
+	drop table if exists _re4_7_agg;
+	drop table if exists _re4_7_in_scope;
+
+	create temp table _re4_7_eixos on commit drop as
+	select e.identificador,
+		e.id_agua_lentica,
+		e.id_curso_de_agua_area,
+		ST_Force2D(e.geometria) as g2d
+	from {schema}.curso_de_agua_eixo e
+	where e.geometria is not null
+		and (sect is null or ST_Intersects(e.geometria, sect));
+
+	create index on _re4_7_eixos using gist (g2d);
+	create index on _re4_7_eixos (identificador);
+
+	create temp table _re4_7_water on commit drop as
+	select a.identificador as water_id,
+		'lentica'::text as kind,
+		ST_Force2D(a.geometria) as g2d,
+		ST_NPoints(a.geometria) as npts
+	from {schema}.agua_lentica a
+	where a.geometria is not null
+	union all
+	select ar.identificador,
+		'area'::text,
+		ST_Force2D(ar.geometria),
+		ST_NPoints(ar.geometria)
+	from {schema}.curso_de_agua_area ar
+	where ar.geometria is not null;
+
+	create index on _re4_7_water (water_id, kind);
+
+	-- Large water bodies have multi-km GIST boxes. Subdivide so && is selective;
+	-- exact Within/Touches/Crosses still use the full polygon in _re4_7_water.
+	create temp table _re4_7_water_idx on commit drop as
+	select w.water_id, w.kind, w.g2d as geom
+	from _re4_7_water w
+	where w.npts < 500
+	union all
+	select w.water_id, w.kind, s.geom
+	from _re4_7_water w
+	cross join lateral ST_Subdivide(w.g2d, 256) as s(geom)
+	where w.npts >= 500;
+
+	create index on _re4_7_water_idx using gist (geom);
+
+	create temp table _re4_7_hits on commit drop as
+	select e.identificador as eixo_id,
+		e.id_agua_lentica,
+		e.id_curso_de_agua_area,
+		w.water_id,
+		w.kind,
+		(ST_Intersects(e.g2d, w.g2d) and not ST_Touches(e.g2d, w.g2d)) as interior,
+		case
+			when w.npts >= 500 then ST_Contains(w.g2d, ST_LineInterpolatePoint(e.g2d, 0.5))
+			else ST_Within(e.g2d, w.g2d)
+		end as is_within
+	from (
+		select distinct e.identificador, i.water_id, i.kind
+		from _re4_7_eixos e
+		join _re4_7_water_idx i on ST_Intersects(e.g2d, i.geom)
+	) p
+	join _re4_7_eixos e on e.identificador = p.identificador
+	join _re4_7_water w on w.water_id = p.water_id and w.kind = p.kind;
+
+	create index on _re4_7_hits (eixo_id);
+
+	create temp table _re4_7_agg on commit drop as
+	select h.eixo_id,
+		bool_or(h.is_within) as within_some,
+		bool_or(h.interior) as interior_hit,
+		bool_or(h.kind = 'lentica' and h.is_within and h.id_agua_lentica is distinct from h.water_id) as uuid_lentica_bad,
+		bool_or(h.kind = 'area' and h.is_within and h.id_curso_de_agua_area is distinct from h.water_id) as uuid_area_bad,
+		count(*) as n_water
+	from _re4_7_hits h
+	group by h.eixo_id;
+
+	create index on _re4_7_agg (eixo_id);
+
+	create temp table _re4_7_in_scope on commit drop as
+	select a.eixo_id,
+		ST_Crosses(e.g2d, w.g2d) as geom_bad,
+		a.uuid_lentica_bad,
+		a.uuid_area_bad
+	from _re4_7_agg a
+	join _re4_7_eixos e on e.identificador = a.eixo_id
+	join _re4_7_hits h on h.eixo_id = a.eixo_id
+	join _re4_7_water w on w.water_id = h.water_id and w.kind = h.kind
+	where a.n_water = 1
+		and (a.interior_hit or a.within_some)
+	union all
+	select a.eixo_id,
+		ST_Crosses(e.g2d, u.water_union),
+		a.uuid_lentica_bad,
+		a.uuid_area_bad
+	from _re4_7_agg a
+	join _re4_7_eixos e on e.identificador = a.eixo_id
+	join (
+		select h.eixo_id, ST_UnaryUnion(ST_Collect(w.g2d)) as water_union
+		from _re4_7_agg a2
+		join _re4_7_hits h on h.eixo_id = a2.eixo_id
+		join _re4_7_water w on w.water_id = h.water_id and w.kind = h.kind
+		where a2.n_water > 1
+			and (a2.interior_hit or a2.within_some)
+		group by h.eixo_id
+	) u on u.eixo_id = a.eixo_id
+	where a.n_water > 1
+		and (a.interior_hit or a.within_some);
+
+	with failures as (
+		select s.eixo_id,
+			case h.kind when 'lentica' then 'agua_lentica' else 'curso_de_agua_area' end as entidade,
+			'não incluído'::text as motivo
+		from _re4_7_in_scope s
+		join (
+			select eixo_id, kind
+			from _re4_7_hits
+			where interior
+			group by eixo_id, kind
+		) h on h.eixo_id = s.eixo_id
+		where s.geom_bad
+		union all
+		select s.eixo_id, 'agua_lentica', 'uuid'
+		from _re4_7_in_scope s
+		where s.uuid_lentica_bad
+		union all
+		select s.eixo_id, 'curso_de_agua_area', 'uuid'
+		from _re4_7_in_scope s
+		where s.uuid_area_bad
+	),
+	ins as (
+		insert into errors.curso_de_agua_eixo_re4_7
+		select e.*, f.entidade, f.motivo
+		from {schema}.curso_de_agua_eixo e
+		join failures f on f.eixo_id = e.identificador
+		on conflict do nothing
+		returning 1
+	)
+	select
+		(select count(*) from _re4_7_in_scope)::int,
+		(select count(*) from _re4_7_in_scope where not geom_bad and not uuid_lentica_bad and not uuid_area_bad)::int,
+		(select count(*) from _re4_7_in_scope where geom_bad or uuid_lentica_bad or uuid_area_bad)::int
+	into count_all, count_good, count_bad
+	from (select count(*) from ins) as _force_ins;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_7_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re4_7_validation(ndd, null::geometry, _args);
+end;
+$$ language plpgsql;
+
 -- select * from validation.rg5_validation ();
 create or replace function validation.rg5_validation () returns table (total int, good int, bad int) as $$
 declare

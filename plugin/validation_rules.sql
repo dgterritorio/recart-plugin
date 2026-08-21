@@ -1287,41 +1287,47 @@ $$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
 $$select * from validation.re4_5_2_validation(1, '%s'::geometry, '%s'::json)$$,
 $$select * from validation.re4_5_2_validation(2, '%s'::geometry, '%s'::json)$$ );
 
--- TODO
 delete from validation.rules where code = 're4_6';
-insert into validation.rules ( code, name, rule, scope, entity ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_6', 'Representação do curso de água quando atravessa uma massa de água', 
 $$Quando um curso de água atravessa uma massa de água totalmente rodeada
 por terra ou localizada junto à costa ("Água lêntica") então também é
 representado o curso de água pelo seu eixo através do objeto "Curso de água -
 eixo" (Figura 29).$$,
-$$"Curso de água - eixo" e "Água lêntica".$$, 'curso_de_agua_eixo' );
+$$"Curso de água - eixo" e "Água lêntica".$$, 'agua_lentica',
+$$select * from validation.re4_6_validation(1, '%s'::json)$$,
+$$select * from validation.re4_6_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're4_6';
-insert into validation.rules_area ( code, name, rule, scope, entity ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_6', 'Representação do curso de água quando atravessa uma massa de água', 
 $$Quando um curso de água atravessa uma massa de água totalmente rodeada
 por terra ou localizada junto à costa ("Água lêntica") então também é
 representado o curso de água pelo seu eixo através do objeto "Curso de água -
 eixo" (Figura 29).$$,
-$$"Curso de água - eixo" e "Água lêntica".$$, 'curso_de_agua_eixo' );
+$$"Curso de água - eixo" e "Água lêntica".$$, 'agua_lentica',
+$$select * from validation.re4_6_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_6_validation(2, '%s'::geometry, '%s'::json)$$ );
 
--- TODO
 delete from validation.rules where code = 're4_7';
-insert into validation.rules ( code, name, rule, scope, entity ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_7', 'Traçado do eixo do curso de água quando atravessa uma massa de água', 
 $$O eixo de curso de água ("Curso de água - eixo") está totalmente incluído nos
 polígonos que representam o "Curso de água - área" ou a "Água lêntica"
 (Figura 30).$$,
-$$"Curso de água - eixo".$$, 'curso_de_agua_eixo' );
+$$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
+$$select * from validation.re4_7_validation(1, '%s'::json)$$,
+$$select * from validation.re4_7_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're4_7';
-insert into validation.rules_area ( code, name, rule, scope, entity ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 ) 
 values ('re4_7', 'Traçado do eixo do curso de água quando atravessa uma massa de água', 
 $$O eixo de curso de água ("Curso de água - eixo") está totalmente incluído nos
 polígonos que representam o "Curso de água - área" ou a "Água lêntica"
 (Figura 30).$$,
-$$"Curso de água - eixo".$$, 'curso_de_agua_eixo' );
+$$"Curso de água - eixo".$$, 'curso_de_agua_eixo',
+$$select * from validation.re4_7_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re4_7_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 /* delete from validation.rules where code = 're4_8';
 insert into validation.rules (code, name, rule, scope, entity, query, query_nd2, report) 

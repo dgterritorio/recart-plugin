@@ -1260,12 +1260,19 @@ class AddLayersProcess(QThread):
         self.signal.emit('{} {}'.format(formated, text))
 
     def error_layer_uri(self, table_name, geom_type, slayer):
-        # intersecoes_3d uses PK(geometria); QGIS needs an integer fid for the attribute table.
+        # Composite/geometry PKs are not unique integer FIDs; QGIS collapses rows
+        # (e.g. several vertices sharing identificador). Wrap with row_number().
         con = self.conn + " srid=" + str(self.srsid) + " type=" + geom_type
         if slayer == "intersecoes_3d":
             sql = (
                 "(SELECT row_number() OVER () AS fid, id_1, id_2, tabela_1, tabela_2, "
                 "geometria, delta_z, regra FROM errors.{tbl})"
+            ).format(tbl=table_name)
+            con = con + " key='fid' estimatedmetadata=true table=\"" + sql + "\" (geometria) sql="
+        elif slayer == "erros_3d":
+            sql = (
+                "(SELECT row_number() OVER () AS fid, identificador, entidade, indice, "
+                "motivo, rule_code, geometria FROM errors.{tbl})"
             ).format(tbl=table_name)
             con = con + " key='fid' estimatedmetadata=true table=\"" + sql + "\" (geometria) sql="
         else:
