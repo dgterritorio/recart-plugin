@@ -181,6 +181,68 @@ class PostgisUtils:
 
         return self.conn
 
+    def list_foreign_keys(self, schema):
+        """
+        Read-only list of foreign keys in a schema.
+
+        Returns a list of dicts:
+          name, src_table, src_cols (list), dst_table, dst_cols (list)
+        """
+        sql = """
+            SELECT
+              c.conname AS name,
+              src.relname AS src_table,
+              ARRAY(
+                SELECT a.attname
+                FROM unnest(c.conkey) WITH ORDINALITY AS cols(attnum, ord)
+                JOIN pg_attribute a
+                  ON a.attrelid = c.conrelid AND a.attnum = cols.attnum
+                ORDER BY cols.ord
+              ) AS src_cols,
+              dst.relname AS dst_table,
+              ARRAY(
+                SELECT a.attname
+                FROM unnest(c.confkey) WITH ORDINALITY AS cols(attnum, ord)
+                JOIN pg_attribute a
+                  ON a.attrelid = c.confrelid AND a.attnum = cols.attnum
+                ORDER BY cols.ord
+              ) AS dst_cols
+            FROM pg_constraint c
+            JOIN pg_class src ON src.oid = c.conrelid
+            JOIN pg_namespace nsrc ON nsrc.oid = src.relnamespace
+            JOIN pg_class dst ON dst.oid = c.confrelid
+            JOIN pg_namespace ndst ON ndst.oid = dst.relnamespace
+            WHERE c.contype = 'f'
+              AND nsrc.nspname = %s
+              AND ndst.nspname = %s
+            ORDER BY src.relname, c.conname
+        """
+        conn = None
+        cur = None
+        try:
+            conn = psycopg2.connect(self.conString)
+            cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute(sql, (schema, schema))
+            rows = cur.fetchall()
+            result = []
+            for row in rows:
+                result.append({
+                    'name': row['name'],
+                    'src_table': row['src_table'],
+                    'src_cols': list(row['src_cols']),
+                    'dst_table': row['dst_table'],
+                    'dst_cols': list(row['dst_cols']),
+                })
+            return result
+        except (Exception, psycopg2.Error) as error:
+            raise ValueError(
+                "Error while listing foreign keys: {0}".format(error))
+        finally:
+            if cur is not None:
+                cur.close()
+            if conn is not None:
+                conn.close()
+
     def run_query_with_conn(self, conn, sql, writer=None, ignore_result=False):
         res = None
         try:

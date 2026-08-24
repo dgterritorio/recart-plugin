@@ -35,6 +35,7 @@ PY_FILES = \
 	qgis_configs.py\
 	postgis_helper.py\
 	aux_export.py\
+	gpkg_qgis_project.py\
 	main_dialog.py\
 	convert_dialog.py\
 	validation_dialog.py
