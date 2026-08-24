@@ -1102,7 +1102,7 @@ declare
 	count_bad_points integer := 0;
 begin
 	delete from errors.erros_3d where rule_code = 're3_1_1'
-		or (rule_code is null and entidade = 'curva_de_nivel' and motivo = 'Ponto fora da linha da área de trabalho');
+		or (rule_code is null and entidade = 'curva_de_nivel' and motivo = 'Descontinuidade fora da linha da área de trabalho');
 
 	with 
 		total as (select count(*) from {schema}.curva_de_nivel),
@@ -1124,11 +1124,11 @@ begin
 
 	WITH bad_points AS (
 		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
-		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_StartPoint(cdn.geometria) as geometria
+		select cdn.identificador, 'curva_de_nivel', 0, 'Descontinuidade fora da linha da área de trabalho', 're3_1_1', ST_StartPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria))
 		union
-		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
+		select cdn.identificador, 'curva_de_nivel', -1, 'Descontinuidade fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria))
 		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
