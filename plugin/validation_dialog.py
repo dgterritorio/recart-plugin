@@ -58,6 +58,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.buttonBox.button(
             QDialogButtonBox.StandardButton.Reset).clicked.connect(self.reset)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Reset).setEnabled(False)
+
+        self.addLayersButton.clicked.connect(self.addExistingErrorLayers)
 
         self.ndCombo.addItems(['NdD1', 'NdD2'])
         self.vrsCombo.addItems(['Desconhecida', 'v1.1.2', 'v2.0.1', 'v2.0.2'])
@@ -66,6 +69,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.validateProcess = None
         self.createProcess = None
+        self.addLayersProcess = None
+        self.addLayersFromValidation = False
+        self.conString = None
 
         self.structure_errors = []
         self.value_list_errors = []
@@ -77,6 +83,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.srsid = 0
         self.vrs = 'Desconhecida'
+        self.isRunning = False
 
     def showEvent(self, event):
         super(ValidationDialog, self).showEvent(event)
@@ -91,6 +98,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setText("Validar")
             self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogOkButton))
             self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Reset).setEnabled(False)
 
             self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
             self.tableView.horizontalHeader().setStretchLastSection(True)
@@ -116,12 +124,14 @@ class ValidationDialog(QDialog, FORM_CLASS):
         if self.createProcess is not None:
             self.createProcess.setCancel(True)
             self.isRunning = False
+            self.updateConnectionDependentButtons()
         elif self.validateProcess is not None:
             self.validateProcess.setCancel(True)
             self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Fechar")
             self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
             self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
             self.isRunning = False
+            self.updateConnectionDependentButtons()
         else:
             self.plainTextEdit.clear()
             super(ValidationDialog, self).reject()
@@ -488,6 +498,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
                         self.plainTextEdit.appendPlainText("[Aviso] {0}\n".format("Conexão inválida"))
                         self.fillDataSources()
                         self.tabWidget.setCurrentIndex(1)
+                        self.conString = None
+                        self.updateConnectionDependentButtons()
                         return
 
                     self.schemaName.addItems(schemas)
@@ -505,13 +517,28 @@ class ValidationDialog(QDialog, FORM_CLASS):
                     self.clear_report_errors()
                     self.newConn = False
                     self.baseSetup = False
+                    self.updateConnectionDependentButtons()
                 except Exception as error:
                     self.conString = None
                     self.plainTextEdit.appendPlainText(
                         "[Erro 6]: {0}\n".format(error))
                     self.tabWidget.setCurrentIndex(1)
+                    self.updateConnectionDependentButtons()
             else:
                 self.conString = None
+                self.updateConnectionDependentButtons()
+
+    def hasUsableConnection(self):
+        con = self.getConnection()
+        return (
+            con not in ('Escolher conexão...', 'Sem conexões disponíveis', '')
+            and self.conString is not None
+        )
+
+    def updateConnectionDependentButtons(self):
+        enabled = self.hasUsableConnection() and not self.isRunning
+        self.addLayersButton.setEnabled(enabled)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Reset).setEnabled(enabled)
 
     def testValidProcessing(self):
         res = True
@@ -1042,27 +1069,51 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.constraint_errors = self.validateProcess.constraint_errors
 
         if not self.validateProcess.cancel is True:
-            # conString = qgis_configs.getConnString(self, self.getConnection())
-            self.schema = str(self.schemaName.currentText())
-
-            self.addLayersProcess = AddLayersProcess(self.conString, self.schema, self.srsid)
-            self.addLayersProcess.signal.connect(self.writeText)
-            self.addLayersProcess.addLayer.connect(self.addLayer)
-            self.addLayersProcess.finished.connect(self.finishedAddLayers)
-            self.addLayersProcess.start()
+            self.startAddErrorLayers(from_validation=True)
         else:
             self.isRunning = False
             self.progressBar.setVisible(False)
             self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+            self.updateConnectionDependentButtons()
 
         self.validateProcess = None
+
+    def addExistingErrorLayers(self):
+        if self.isRunning or not self.hasUsableConnection():
+            return
+
+        self.tabWidget.setCurrentIndex(1)
+        self.startAddErrorLayers(from_validation=False)
+
+    def startAddErrorLayers(self, from_validation=False):
+        self.addLayersFromValidation = from_validation
+        self.schema = str(self.schemaName.currentText())
+        srsid = self.mQgsProjectionSelectionWidget.crs()
+        self.srsid = srsid.postgisSrid()
+
+        if not from_validation:
+            self.writeText('Adicionar camadas de erro com o SRS {}'.format(self.srsid))
+            self.progressBar.setVisible(True)
+            self.isRunning = True
+            self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+            self.updateConnectionDependentButtons()
+
+        self.addLayersProcess = AddLayersProcess(self.conString, self.schema, self.srsid)
+        self.addLayersProcess.signal.connect(self.writeText)
+        self.addLayersProcess.addLayer.connect(self.addLayer)
+        self.addLayersProcess.finished.connect(self.finishedAddLayers)
+        self.addLayersProcess.start()
 
     def finishedAddLayers(self):
         self.isRunning = False
         self.progressBar.setVisible(False)
         self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+        self.updateConnectionDependentButtons()
 
-        self.writeText("Terminada a validação")
+        if self.addLayersFromValidation:
+            self.writeText("Terminada a validação")
+        else:
+            self.writeText("Camadas de erro adicionadas")
 
 
     def getOp(self, op):
@@ -1131,6 +1182,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
             self.progressBar.setVisible(False)
             self.createProcess = None
+            self.updateConnectionDependentButtons()
 
     def finishedReset(self):
         if self.resetProcess is not None:
@@ -1140,6 +1192,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         self.ruleSetup = False
         self.isRunning = False
         self.clear_report_errors()
+        self.updateConnectionDependentButtons()
 
         self.testValidationRules()
 
@@ -1151,6 +1204,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
         layerGroup = root.findGroup("DGT Recart - Erros Validação")
         if not layerGroup:
             layerGroup = root.insertGroup(0, "DGT Recart - Erros Validação")
+
+        for existing in layerGroup.findLayers():
+            if existing.name() == layerName:
+                return
 
         treeGroup = layerGroup.findGroup(group)
         if not treeGroup:
@@ -1169,6 +1226,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
         iface.layerTreeView().refreshLayerSymbology(qlayer.id())
 
     def reset(self):
+        if not self.hasUsableConnection() or self.isRunning:
+            return
+
         res = QMessageBox.question(self,'', "Tem a cereteza que quer remover os esquemas, as tabelas e as funções de validação?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 
         if res == QMessageBox.StandardButton.Yes:
@@ -1192,6 +1252,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             # self.iface.messageBar().pushMessage("Criar estrutura de validação.")
             self.writeText("\tA apagar a estrutura de validação e erros anteriores...")
             self.isRunning = True
+            self.updateConnectionDependentButtons()
             self.resetProcess.start()
 
     def process(self):
@@ -1225,6 +1286,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setText("Cancelar")
             self.buttonBox.button(QDialogButtonBox.StandardButton.Cancel).setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogDiscardButton))
             self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+            self.updateConnectionDependentButtons()
         else:
             self.writeText('[Aviso] Configuração inválida')
 
@@ -1279,6 +1341,26 @@ class AddLayersProcess(QThread):
         formated = times.strftime("%Y-%m-%d %H:%M:%S")
         self.signal.emit('{} {}'.format(formated, text))
 
+    def error_layer_uri(self, table_name, geom_type, slayer):
+        # Composite/geometry PKs are not unique integer FIDs; QGIS collapses rows
+        # (e.g. several vertices sharing identificador). Wrap with row_number().
+        con = self.conn + " srid=" + str(self.srsid) + " type=" + geom_type
+        if slayer == "intersecoes_3d":
+            sql = (
+                "(SELECT row_number() OVER () AS fid, id_1, id_2, tabela_1, tabela_2, "
+                "geometria, delta_z, regra FROM errors.{tbl})"
+            ).format(tbl=table_name)
+            con = con + " key='fid' estimatedmetadata=true table=\"" + sql + "\" (geometria) sql="
+        elif slayer == "erros_3d":
+            sql = (
+                "(SELECT row_number() OVER () AS fid, identificador, entidade, indice, "
+                "motivo, rule_code, geometria FROM errors.{tbl})"
+            ).format(tbl=table_name)
+            con = con + " key='fid' estimatedmetadata=true table=\"" + sql + "\" (geometria) sql="
+        else:
+            con = con + " table='errors'.'" + table_name + "' (geometria) sql="
+        return con
+
     def run(self):
         self.actconn = self.pgutils.get_or_create_connection()
         try:
@@ -1322,10 +1404,7 @@ class AddLayersProcess(QThread):
                             for gt in displayList[slayer]["geom"]:
                                 ln = tb[0] if len(
                                     displayList[slayer]["geom"]) == 1 else tb[0] + " (" + self.trnl(gt) + ")"
-                                con = self.conn
-                                con = con + " srid=" + str(self.srsid) + " type=" + gt
-                                con = con + " table='errors'.'" + \
-                                    tb[0] + "' (geometria) sql="
+                                con = self.error_layer_uri(tb[0], gt, slayer)
                                 self.addLayer.emit(
                                     displayList[slayer]["name"], con, ln, slayer, displayList[slayer]["index"])
                         else:
@@ -1333,6 +1412,8 @@ class AddLayersProcess(QThread):
                             con = con + " table='errors'.'" + tb[0] + "'"
                             self.addLayer.emit(
                                 displayList[slayer]["name"], con, tb[0], slayer, displayList[slayer]["index"])
+            else:
+                self.write("[Aviso] Não existem tabelas de erro para adicionar")
 
         except Exception as e:
             self.write("[Erro 9]")
@@ -1720,7 +1801,7 @@ class ValidateProcess(QThread):
                     text = "\tValidada a regra '" + \
                         str(line[0]) + " - " + str(line[1]) + "'\t"
                     text = text + "\n\t\tSem erros detetados." if (
-                        line[2] == line[3]) else text + "\n\t\tDetetados " + str(line[4]) + " erros."
+                         (line[4] or 0) == 0) else text + "\n\t\tDetetados " + str(line[4]) + " erros."
                     self.write(text)
 
             # SELECT f_table_name, f_geometry_column, "type" FROM geometry_columns WHERE f_table_schema = 'errors';
