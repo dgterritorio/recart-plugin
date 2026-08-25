@@ -85,15 +85,15 @@ No segundo passo, mais lento, as curvas de nível que não foram cruzadas por ne
 
 ### Regra específica 3.3 - Pontos cotados
 
-A validação desta regra desenvolve-se em duas fases. Na primeira fase, identificam-se aŕeas, dentro da área de trabalho, onde não há nem curvas de nível, nem pontos cotados a menos de 100m/500m, consoante o NDD.
+A validação desta regra desenvolve-se em duas fases. Na primeira fase, identificam-se aŕeas, dentro da área de trabalho, onde não há nem curvas de nível, nem pontos cotados a menos de 100m/500m, consoante o NDD. Polígonos de `agua_lentica` e `curso_de_agua_area` são excluídos dessas áreas.
 
 Exemplo das áreas (a vermelho) onde não há pontos cotados e provavelmente devera haver:
 
 ![](../images/areas_re3_3.png)
 
-Depois de calculadas essas áreas, é colocado um ponto cotado no centróide da mesma, que serve para indicar a área onde constar um ponto cotado. É uma posição meramente indicativa. Estes ponto indicativas são gerados na tabela `errors.ponto_cotado_re3_3`.
+Depois de calculadas essas áreas, é colocado um ponto cotado na superfície da área (`ST_PointOnSurface`), que serve para indicar a área onde constar um ponto cotado. É uma posição meramente indicativa. Estes ponto indicativas são gerados na tabela `errors.ponto_cotado_re3_3`.
 
-Exemplos dos pontos criados, no centróide das áreas anteriormente identificadas;
+Exemplos dos pontos criados nas áreas anteriormente identificadas;
 
 ![](../images/pontos_re3_3.png)
 

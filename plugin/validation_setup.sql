@@ -1464,6 +1464,106 @@ end;
 $$ language plpgsql;
 
 
+CREATE OR REPLACE PROCEDURE validation.create_agua_lentica_2d()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF (SELECT count(*) FROM information_schema.tables
+		WHERE table_schema = 'validation' AND table_name = 'agua_lentica_2d') > 0 THEN
+		RAISE NOTICE 'A tabela validation.agua_lentica_2d já existe. Nada a fazer.';
+		RETURN;
+	END IF;
+
+	CREATE UNLOGGED TABLE validation.agua_lentica_2d (
+		identificador uuid,
+		g2d geometry,
+		npts integer
+	);
+
+	INSERT INTO validation.agua_lentica_2d (identificador, g2d, npts)
+	SELECT a.identificador,
+		ST_Force2D(a.geometria),
+		ST_NPoints(a.geometria)
+	FROM {schema}.agua_lentica a
+	WHERE a.geometria IS NOT NULL;
+
+	CREATE INDEX idx_agua_lentica_2d_g2d ON validation.agua_lentica_2d USING GIST (g2d);
+	CREATE INDEX idx_agua_lentica_2d_id ON validation.agua_lentica_2d (identificador);
+	ANALYZE validation.agua_lentica_2d;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE validation.create_curso_de_agua_eixo_extremos()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF (SELECT count(*) FROM information_schema.tables
+		WHERE table_schema = 'validation' AND table_name = 'curso_de_agua_eixo_extremos') > 0 THEN
+		RAISE NOTICE 'A tabela validation.curso_de_agua_eixo_extremos já existe. Nada a fazer.';
+		RETURN;
+	END IF;
+
+	CREATE UNLOGGED TABLE validation.curso_de_agua_eixo_extremos (
+		identificador uuid,
+		geom geometry
+	);
+
+	INSERT INTO validation.curso_de_agua_eixo_extremos (identificador, geom)
+	SELECT identificador, ST_Force2D(ST_StartPoint(geometria))
+	FROM {schema}.curso_de_agua_eixo
+	WHERE geometria IS NOT NULL
+	UNION ALL
+	SELECT identificador, ST_Force2D(ST_EndPoint(geometria))
+	FROM {schema}.curso_de_agua_eixo
+	WHERE geometria IS NOT NULL;
+
+	DELETE FROM validation.curso_de_agua_eixo_extremos WHERE geom IS NULL;
+
+	CREATE INDEX idx_curso_de_agua_eixo_extremos_geom
+		ON validation.curso_de_agua_eixo_extremos USING GIST (geom);
+	CREATE INDEX idx_curso_de_agua_eixo_extremos_id
+		ON validation.curso_de_agua_eixo_extremos (identificador);
+	CREATE INDEX idx_curso_de_agua_eixo_extremos_xy
+		ON validation.curso_de_agua_eixo_extremos ((ST_X(geom)), (ST_Y(geom)));
+	ANALYZE validation.curso_de_agua_eixo_extremos;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE validation.create_agua_lentica_anel(max_vertices integer DEFAULT 16)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF max_vertices < 8 THEN
+		RAISE EXCEPTION 'max_vertices % é demasiado baixo; o mínimo é 8', max_vertices;
+	END IF;
+
+	CALL validation.create_agua_lentica_2d();
+
+	IF (SELECT count(*) FROM information_schema.tables
+		WHERE table_schema = 'validation' AND table_name = 'agua_lentica_anel') > 0 THEN
+		RAISE NOTICE 'A tabela validation.agua_lentica_anel já existe. Nada a fazer.';
+		RETURN;
+	END IF;
+
+	-- Whole ring is a single huge GIST box for reservoirs (100k+ vertices).
+	-- ST_Subdivide keeps small boxes without one row per segment.
+	CREATE UNLOGGED TABLE validation.agua_lentica_anel AS
+	SELECT l.identificador AS lake_id, ST_Boundary(l.g2d) AS geom
+	FROM validation.agua_lentica_2d l
+	WHERE l.npts < 500
+	UNION ALL
+	SELECT l.identificador, g AS geom
+	FROM validation.agua_lentica_2d l
+	CROSS JOIN LATERAL ST_Subdivide(ST_Boundary(l.g2d), max_vertices) AS g
+	WHERE l.npts >= 500;
+
+	CREATE INDEX idx_agua_lentica_anel_geom ON validation.agua_lentica_anel USING GIST (geom);
+	CREATE INDEX idx_agua_lentica_anel_lake ON validation.agua_lentica_anel (lake_id);
+	ANALYZE validation.agua_lentica_anel;
+END;
+$$;
+
+
 create or replace function validation.re4_6_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
@@ -1477,53 +1577,20 @@ begin
 		delete from errors.agua_lentica_re4_6;
 	end if;
 
-	drop table if exists _re4_6_lakes;
-	drop table if exists _re4_6_ends;
-	drop table if exists _re4_6_rings;
+	CALL validation.create_agua_lentica_2d();
+	CALL validation.create_curso_de_agua_eixo_extremos();
+	CALL validation.create_agua_lentica_anel(16);
+
 	drop table if exists _re4_6_hits;
 	drop table if exists _re4_6_hit_class;
 	drop table if exists _re4_6_crossed;
 
-	create temp table _re4_6_lakes on commit drop as
-	select a.identificador,
-		ST_Force2D(a.geometria) as g2d,
-		ST_NPoints(a.geometria) as npts
-	from {schema}.agua_lentica a
-	where sect is null or ST_Intersects(a.geometria, sect);
-
-	create index on _re4_6_lakes using gist (g2d);
-	create index on _re4_6_lakes (identificador);
-
-	create temp table _re4_6_ends on commit drop as
-	select identificador, ST_Force2D(ST_StartPoint(geometria)) as geom
-	from {schema}.curso_de_agua_eixo
-	where geometria is not null
-	union all
-	select identificador, ST_Force2D(ST_EndPoint(geometria))
-	from {schema}.curso_de_agua_eixo
-	where geometria is not null;
-
-	delete from _re4_6_ends where geom is null;
-	create index on _re4_6_ends using gist (geom);
-
-	-- Whole ring is a single huge GIST box for reservoirs (100k+ vertices).
-	-- Dump those to segments; keep compact rings as one linestring.
-	create temp table _re4_6_rings on commit drop as
-	select l.identificador as lake_id, ST_Boundary(l.g2d) as geom
-	from _re4_6_lakes l
-	where l.npts < 500
-	union all
-	select l.identificador, (d).geom
-	from _re4_6_lakes l
-	cross join lateral ST_DumpSegments(ST_Boundary(l.g2d)) as d
-	where l.npts >= 500;
-
-	create index on _re4_6_rings using gist (geom);
-
 	create temp table _re4_6_hits on commit drop as
 	select distinct r.lake_id, p.identificador as eixo_id
-	from _re4_6_rings r
-	join _re4_6_ends p on ST_DWithin(p.geom, r.geom, 0.01);
+	from validation.agua_lentica_anel r
+	join validation.curso_de_agua_eixo_extremos p on ST_DWithin(p.geom, r.geom, 0.01)
+	join validation.agua_lentica_2d l on l.identificador = r.lake_id
+	where sect is null or ST_Intersects(l.g2d, sect);
 
 	create index on _re4_6_hits (lake_id);
 
@@ -1537,7 +1604,7 @@ begin
 			else ST_Within(ST_Force2D(e.geometria), l.g2d)
 		end as is_within
 	from _re4_6_hits h
-	join _re4_6_lakes l on l.identificador = h.lake_id
+	join validation.agua_lentica_2d l on l.identificador = h.lake_id
 	join {schema}.curso_de_agua_eixo e on e.identificador = h.eixo_id;
 
 	create temp table _re4_6_crossed on commit drop as
@@ -1555,7 +1622,7 @@ begin
 		where c.has_through_hit
 			or exists (
 				select 1
-				from _re4_6_lakes l
+				from validation.agua_lentica_2d l
 				join {schema}.curso_de_agua_eixo e
 					on e.geometria && l.g2d
 					and case
@@ -1616,6 +1683,8 @@ begin
 		delete from errors.curso_de_agua_eixo_re4_7;
 	end if;
 
+	CALL validation.create_agua_lentica_2d();
+
 	drop table if exists _re4_7_eixos;
 	drop table if exists _re4_7_water;
 	drop table if exists _re4_7_water_idx;
@@ -1636,12 +1705,11 @@ begin
 	create index on _re4_7_eixos (identificador);
 
 	create temp table _re4_7_water on commit drop as
-	select a.identificador as water_id,
+	select l.identificador as water_id,
 		'lentica'::text as kind,
-		ST_Force2D(a.geometria) as g2d,
-		ST_NPoints(a.geometria) as npts
-	from {schema}.agua_lentica a
-	where a.geometria is not null
+		l.g2d,
+		l.npts
+	from validation.agua_lentica_2d l
 	union all
 	select ar.identificador,
 		'area'::text,
@@ -3171,26 +3239,13 @@ begin
 		delete from errors.curso_de_agua_eixo_re4_8_2;
 	end if;
 
-	drop table if exists _re4_8_2_extremos;
+	CALL validation.create_curso_de_agua_eixo_extremos();
+
 	drop table if exists _re4_8_2_ids;
 	drop table if exists _re4_8_2_nodes;
 	drop table if exists _re4_8_2_fluxo;
 	drop table if exists _re4_8_2_deg2;
 	drop table if exists _re4_8_2_classified;
-
-	create temp table _re4_8_2_extremos on commit drop as
-	select identificador, ST_Force2D(ST_StartPoint(geometria)) as geom
-	from {schema}.curso_de_agua_eixo
-	where geometria is not null
-	union all
-	select identificador, ST_Force2D(ST_EndPoint(geometria)) as geom
-	from {schema}.curso_de_agua_eixo
-	where geometria is not null;
-
-	delete from _re4_8_2_extremos where geom is null;
-	create index on _re4_8_2_extremos using gist (geom);
-	create index on _re4_8_2_extremos (identificador);
-	create index on _re4_8_2_extremos ((ST_X(geom)), (ST_Y(geom)));
 
 	create temp table _re4_8_2_ids (
 		identificador uuid primary key
@@ -3204,10 +3259,10 @@ begin
 	if sect is not null then
 		insert into _re4_8_2_ids
 		select distinct e.identificador
-		from _re4_8_2_extremos e
+		from validation.curso_de_agua_eixo_extremos e
 		where exists (
 			select 1
-			from _re4_8_2_extremos seed
+			from validation.curso_de_agua_eixo_extremos seed
 			inner join _re4_8_2_ids s on s.identificador = seed.identificador
 			where ST_X(e.geom) = ST_X(seed.geom)
 			  and ST_Y(e.geom) = ST_Y(seed.geom)
@@ -3221,7 +3276,7 @@ begin
 	       count(distinct e.identificador) as degree,
 	       (array_agg(e.geom))[1] as geom,
 	       array_agg(distinct e.identificador) as ids
-	from _re4_8_2_extremos e
+	from validation.curso_de_agua_eixo_extremos e
 	inner join _re4_8_2_ids w on w.identificador = e.identificador
 	group by ST_X(e.geom), ST_Y(e.geom);
 
@@ -4216,10 +4271,34 @@ begin
 		from difference d
 		where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)
 	),
+	water as (
+		select st_union(st_makevalid(st_force2d(w.geometria))) as geometria
+		from (
+			select geometria from {schema}.agua_lentica
+			where sect is null or ST_Intersects(geometria, sect)
+			union all
+			select geometria from {schema}.curso_de_agua_area
+			where sect is null or ST_Intersects(geometria, sect)
+		) w
+	),
+	land_pieces as (
+		select (st_dump(
+			case
+				when w.geometria is null then g.geom
+				else st_difference(st_force2d(g.geom), w.geometria)
+			end
+		)).*
+		from gaps g, water w
+	),
+	land_gaps as (
+		select d.geom
+		from land_pieces d
+		where st_area(d.geom) > 3000 and ST_MaxDistance(d.geom, d.geom) < (st_area(d.geom)/10)
+	),
 	bad_rows as (
 		insert into errors.ponto_cotado_re3_3 (identificador, inicio_objeto, fim_objeto, valor_classifica_las, geometria)
-		select uuid_generate_v1mc(), now(), null, 1, ST_Force3D(st_centroid(g.geom))
-		from gaps g
+		select uuid_generate_v1mc(), now(), null, 1, ST_Force3D(ST_PointOnSurface(g.geom))
+		from land_gaps g
 		on conflict do nothing
 		returning 1
 	)
