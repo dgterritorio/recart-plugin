@@ -54,6 +54,7 @@ class PostgisUtils:
     def read_db_schemas_keep_conn(self):
         """Create, open and read schemas from database"""
         schemas = []
+        cur = None
         try:
             if self.conn is not None:
                 self.conn.close()
@@ -88,13 +89,17 @@ class PostgisUtils:
             raise ValueError(
                 "Error while connecting to PostgreSQL {0}".format(error))
         finally:
-            if (self.conn):
-                cur.close()
+            if cur is not None:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
 
-            return schemas
+        return schemas
 
     def run_file(self, path):
         conn = None
+        cur = None
         try:
             conn = psycopg2.connect(self.conString)
             # make sure other inserts will run if just one fails
@@ -110,12 +115,17 @@ class PostgisUtils:
             raise ValueError(
                 "Error while connecting to PostgreSQL {0}".format(error))
         finally:
-            if (conn):
-                cur.close()
+            if cur is not None:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
+            if conn is not None:
                 conn.close()
 
     def run_query(self, sql, writer=None, no_fetch=False):
         conn = None
+        cur = None
         res = None
         try:
             conn = psycopg2.connect(self.conString)
@@ -133,14 +143,19 @@ class PostgisUtils:
             raise ValueError(
                 "Error while connecting to PostgreSQL {0}".format(error))
         finally:
-            if (conn):
-                cur.close()
+            if cur is not None:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
+            if conn is not None:
                 conn.close()
 
         return res
 
     def run_query_autocommit(self, sql, writer=None):
         conn = None
+        cur = None
         res = None
         try:
             conn = psycopg2.connect(self.conString)
@@ -158,8 +173,12 @@ class PostgisUtils:
             raise ValueError(
                 "Error while connecting to PostgreSQL {0}".format(error))
         finally:
-            if (conn):
-                cur.close()
+            if cur is not None:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
+            if conn is not None:
                 conn.close()
 
         return res
@@ -175,7 +194,19 @@ class PostgisUtils:
 
         return conn
 
+    def _invalidate_connection(self):
+        if self.conn is None:
+            return
+        old = self.conn
+        self.conn = None
+        try:
+            old.close()
+        except Exception:
+            pass
+
     def get_or_create_connection(self):
+        if self.conn is not None and self.conn.closed:
+            self._invalidate_connection()
         if self.conn is None:
             self.conn = self.get_connection()
 
@@ -239,12 +270,16 @@ class PostgisUtils:
                 "Error while listing foreign keys: {0}".format(error))
         finally:
             if cur is not None:
-                cur.close()
+                try:
+                    cur.close()
+                except Exception:
+                    pass
             if conn is not None:
                 conn.close()
 
     def run_query_with_conn(self, conn, sql, writer=None, ignore_result=False):
         res = None
+        cur = None
         try:
             cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             if len(sql) > 1:
@@ -255,15 +290,22 @@ class PostgisUtils:
                 if re.match(r'^SELECT [1-9]+', cur.statusmessage) and ignore_result is not True:
                     res = cur.fetchall()
         except (Exception, psycopg2.Error) as error:
+            if isinstance(error, (psycopg2.OperationalError, psycopg2.InterfaceError)):
+                if conn is self.conn:
+                    self._invalidate_connection()
             raise ValueError(
                 "Error while connecting to PostgreSQL {0}".format(error))
         finally:
-            if (cur):
-                cur.close()
+            if cur is not None:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
 
         return res
 
     def run_file_with_conn(self, conn, path):
+        cur = None
         try:
             cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             with open(path, "r", encoding='utf-8') as f:
@@ -272,8 +314,14 @@ class PostgisUtils:
                 cur.execute(cnt)
                 # conn.commit()
         except (Exception, psycopg2.Error) as error:
+            if isinstance(error, (psycopg2.OperationalError, psycopg2.InterfaceError)):
+                if conn is self.conn:
+                    self._invalidate_connection()
             raise ValueError(
                 "Error while connecting to PostgreSQL {0}".format(error))
         finally:
-            if (cur):
-                cur.close()
+            if cur is not None:
+                try:
+                    cur.close()
+                except Exception:
+                    pass
