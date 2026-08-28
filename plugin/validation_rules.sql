@@ -2911,75 +2911,25 @@ $$select * from validation.re5_5_4_validation(2, '%s'::geometry, '%s'::json)$$ )
 
 -- RE5.5.5
 delete from validation.rules where code = 're5_5_5';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 )
 values ('re5_5_5', 'Hierarquia dos nós da via rodoviária', 
 $$Quando um “Segmento da via rodoviária” interseta outro e, simultaneamente, observa-se uma alteração de atributos, o “Nó de transporte
 rodoviário” assume o valor “Junção” (#1 valorTipoNoTransRodov). Apenas é inserido um nó que assume o valor “Junção” ” (#1 valorTipoNoTransRodov)
 prevalecendo este sobre o valor “Pseudo-nó ” (#3 valorTipoNoTransRodov).$$, 
 $$"“Segmento da via rodoviária” e “Nó de transporte rodoviário”".$$, 'no_trans_rodov',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.seg_via_rodov l2 on l1.identificador <> l2.identificador and l1.valor_posicao_vertical_transportes = l2.valor_posicao_vertical_transportes
-			and (st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria))
-		group by st_intersection(l1.geometria, l2.geometria)
-),
-total as (
-	select count(*) from {schema}.no_trans_rodov n1 where geometria in (select geom from inter where count > 2)
-),
-good as (
-	select count(*) from {schema}.no_trans_rodov n1
-	where (valor_tipo_no_trans_rodov = '1' or valor_tipo_no_trans_rodov = '5') and geometria in (select geom from inter where count > 2)
-		and geometria not in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador)
-),
-bad as (
-	select count(*) from {schema}.no_trans_rodov n1
-	where geometria in (select geom from inter where count > 2)
-		and ((valor_tipo_no_trans_rodov <> '1' and valor_tipo_no_trans_rodov <> '5') or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.seg_via_rodov l2 on l1.identificador <> l2.identificador and l1.valor_posicao_vertical_transportes = l2.valor_posicao_vertical_transportes
-			and (st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria))
-		group by st_intersection(l1.geometria, l2.geometria)
-)select * from {schema}.no_trans_rodov n1
-	where geometria in (select geom from inter where count > 2)
-		and ((valor_tipo_no_trans_rodov <> '1' or valor_tipo_no_trans_rodov <> '5') or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))$$ );
+$$select * from validation.re5_5_5_validation (1, '%s'::json)$$,
+$$select * from validation.re5_5_5_validation (2, '%s'::json)$$ );
 
 
 delete from validation.rules_area where code = 're5_5_5';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, report ) 
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 )
 values ('re5_5_5', 'Hierarquia dos nós da via rodoviária', 
 $$Quando um “Segmento da via rodoviária” interseta outro e, simultaneamente, observa-se uma alteração de atributos, o “Nó de transporte
 rodoviário” assume o valor “Junção” (#1 valorTipoNoTransRodov). Apenas é inserido um nó que assume o valor “Junção” ” (#1 valorTipoNoTransRodov)
 prevalecendo este sobre o valor “Pseudo-nó ” (#3 valorTipoNoTransRodov).$$, 
 $$"“Segmento da via rodoviária” e “Nó de transporte rodoviário”".$$, 'no_trans_rodov',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.seg_via_rodov l2 on l1.identificador <> l2.identificador and l1.valor_posicao_vertical_transportes = l2.valor_posicao_vertical_transportes
-			and (st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria))
-		group by st_intersection(l1.geometria, l2.geometria)
-),
-total as (
-	select count(*) from {schema}.no_trans_rodov n1 where geometria in (select geom from inter where count > 2)
-),
-good as (
-	select count(*) from {schema}.no_trans_rodov n1
-	where ST_Intersects(n1.geometria, '%1$s') and (valor_tipo_no_trans_rodov = '1' or valor_tipo_no_trans_rodov = '5') and geometria in (select geom from inter where count > 2)
-		and geometria not in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador)
-),
-bad as (
-	select count(*) from {schema}.no_trans_rodov n1
-	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and ((valor_tipo_no_trans_rodov <> '1' and valor_tipo_no_trans_rodov <> '5') or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_rodov l1
-		join {schema}.seg_via_rodov l2 on l1.identificador <> l2.identificador and l1.valor_posicao_vertical_transportes = l2.valor_posicao_vertical_transportes
-			and (st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria))
-		group by st_intersection(l1.geometria, l2.geometria)
-)select * from {schema}.no_trans_rodov n1
-	where ST_Intersects(n1.geometria, '%1$s') and geometria in (select geom from inter where count > 2)
-		and ((valor_tipo_no_trans_rodov <> '1' and valor_tipo_no_trans_rodov <> '5')+ or geometria in (select geometria from {schema}.no_trans_rodov n2 where n1.identificador <> n2.identificador))$$ );
+$$select * from validation.re5_5_5_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re5_5_5_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 -- RE5.5.7

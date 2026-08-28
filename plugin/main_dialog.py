@@ -544,8 +544,8 @@ class ExportLayersProcess(QThread):
                 'Aviso: o utilizador não tem permissões para criar views auxiliares na base de dados')
             return False
 
-        self.actconn = self.postgisUtils.get_or_create_connection()
         try:
+            self.actconn = self.postgisUtils.get_or_create_connection()
             with open(bp + '/convert/processing/aux_views.sql', encoding='utf-8') as av_file:
                 av_src = av_file.read()
                 views = re.sub(r"{schema}", self.schema, av_src)
@@ -580,8 +580,8 @@ class ExportLayersProcess(QThread):
 
         bp = os.path.dirname(os.path.realpath(__file__))
         if self.schema in self.postgisUtils.permissions and self.postgisUtils.permissions[self.schema]['create'] is True:
-            self.actconn = self.postgisUtils.get_or_create_connection()
             try:
+                self.actconn = self.postgisUtils.get_or_create_connection()
                 with open(bp + '/convert/processing/{0}/layer_styles.sql'.format(self.vrs), encoding='utf-8') as pp_file:
                     pp_src = pp_file.read()
                     styles = re.sub(r"{schema}", self.schema, pp_src)
@@ -591,6 +591,7 @@ class ExportLayersProcess(QThread):
                     'Erro a inserir os estilos em base de dados: \'' + str(e) + '\'')
 
             try:
+                self.actconn = self.postgisUtils.get_or_create_connection()
                 with open(bp + '/convert/processing/aux_views.sql', encoding='utf-8') as av_file:
                     av_src = av_file.read()
                     views = re.sub(r"{schema}", self.schema, av_src)

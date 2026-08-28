@@ -200,9 +200,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
     # a checkbox está disabled na UI, pelo que este método nunca é invocado
     def validate3dChange(self, state):
-        self.actconn = self.pgutils.get_or_create_connection()
         if state is False and self.ruleSetup:
             try:
+                self.actconn = self.pgutils.get_or_create_connection()
                 self.pgutils.run_query_with_conn(self.actconn,
                     "update validation.rules set run = false \
                         where '{}' =any(versoes) and \
@@ -214,9 +214,9 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.tabWidget.setCurrentIndex(1)
 
     def validateAllChange(self, state):
-        self.actconn = self.pgutils.get_or_create_connection()
         if state is True and self.ruleSetup:
             try:
+                self.actconn = self.pgutils.get_or_create_connection()
                 self.pgutils.run_query_with_conn(self.actconn,
                     "update validation.rules_area set run = true\
                         where '{}' =any(versoes);".format(self.vrs))
@@ -231,6 +231,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.writeText(("\tException: {}".format(e)))        
         if state is False and self.ruleSetup:
             try:
+                self.actconn = self.pgutils.get_or_create_connection()
                 self.pgutils.run_query_with_conn(self.actconn,
                     "update validation.rules_area set run = false \
                         where '{}' =any(versoes);".format(self.vrs))
@@ -245,11 +246,11 @@ class ValidationDialog(QDialog, FORM_CLASS):
                 self.tabWidget.setCurrentIndex(1)
 
     def setRuleState(self, state):
-        self.actconn = self.pgutils.get_or_create_connection()
         rcode = self.sender().property("code")
         rstate = 'true' if state else 'false'
 
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             self.pgutils.run_query_with_conn(self.actconn, "update validation.rules_area set run = {} \
                 where '{}' =any(versoes) and code ilike '{}';".format(rstate, self.vrs, rcode))
             self.pgutils.run_query_with_conn(self.actconn, "update validation.rules set run = {} \
@@ -263,8 +264,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.tabWidget.setCurrentIndex(1)
 
     def updateTable(self):
-        self.actconn = self.pgutils.get_or_create_connection()
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             report = self.pgutils.run_query_with_conn(self.actconn,
                 "select code, name, total, good, bad, run from {} \
@@ -301,11 +302,11 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.tabWidget.setCurrentIndex(1)
 
     def getAreaTables(self):
-        self.actconn = self.pgutils.get_or_create_connection()
         tables = []
 
         self.areaComboBox.clear()
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             tables = self.pgutils.run_query_with_conn(self.actconn,
                 "with aggr_cols as (\
 	                SELECT table_schema, table_name, string_agg(column_name::varchar, '|') as cols FROM information_schema.columns\
@@ -335,8 +336,8 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.comboBoxOps.addItems(['Igual', 'Diferente'])
 
     def areaTableChange(self, text):
-        self.actconn = self.pgutils.get_or_create_connection()
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             aux = text.split('.')
             if len(aux) != 2:
                 return
@@ -375,7 +376,6 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.tabWidget.setCurrentIndex(1)
 
     def testDbVersion(self):
-        self.actconn = self.pgutils.get_or_create_connection()
         finddbquery = 'select count(*), substring( version() from \'P\\w+ \\w+\') as versao from {schema}.valor_construcao_linear;'
         
         self.schema = str(self.schemaName.currentText())
@@ -383,6 +383,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
         cnt = re.sub(r"{schema}", self.schema, finddbquery)
 
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             result = self.pgutils.run_query_with_conn(self.actconn, cnt)
             if result and len(result) > 0:
                 if result[0][0] == 9:
@@ -410,7 +411,6 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.vrsCombo.setEnabled(True)
 
     def testValidationRules(self):
-        self.actconn = self.pgutils.get_or_create_connection()
         allChecked = True
 
         if iface.pluginManagerInterface().pluginMetadata('recartDGT') is not None:
@@ -420,6 +420,7 @@ class ValidationDialog(QDialog, FORM_CLASS):
 
         self.writeText("A carregar a versão das regras {}...".format(self.vrs if self.vrs is not None else 'Desconhecida'))
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
 
             report = self.pgutils.run_query_with_conn(self.actconn,
@@ -650,11 +651,11 @@ class ValidationDialog(QDialog, FORM_CLASS):
         return fn
 
     def exportRel(self):
-        self.actconn = self.pgutils.get_or_create_connection()
         if not self.ruleSetup:
             self.writeText("[Aviso] Não é possível imprimir relatório")
             return
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             report_table = "validation.rules_area_report_view" if self.is_sections.isChecked() else "validation.rules"
             summary = self.pgutils.run_query_with_conn(self.actconn,
                 "select code, name, total, good, bad from {} \
@@ -1043,10 +1044,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
             self.testDbVersion()
 
     def setupRules(self):
-        self.actconn = self.pgutils.get_or_create_connection()
         self.bp = os.path.dirname(os.path.realpath(__file__))
         self.schema = str(self.schemaName.currentText())
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             with open(self.bp + '/validation_rules.sql', 'r', encoding='utf-8') as f:
                 cnt = f.read()
             cnt = re.sub(r"{schema}", self.schema, cnt)
@@ -1362,8 +1363,8 @@ class AddLayersProcess(QThread):
         return con
 
     def run(self):
-        self.actconn = self.pgutils.get_or_create_connection()
         try:
+            self.actconn = self.pgutils.get_or_create_connection()
             tables = self.pgutils.run_query_with_conn(self.actconn,
                 'WITH tbl AS (\
 	                SELECT Table_Schema, Table_Name FROM information_schema.Tables \

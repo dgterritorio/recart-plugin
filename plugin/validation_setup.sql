@@ -3699,6 +3699,130 @@ end;
 $$ language plpgsql;
 
 
+create or replace function validation.re5_5_5_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.no_trans_rodov_re5_5_5 (like {schema}.no_trans_rodov INCLUDING ALL);
+
+	delete from errors.no_trans_rodov_re5_5_5;
+
+	WITH endpoints AS (
+		SELECT identificador, valor_posicao_vertical_transportes AS zpos,
+			ST_StartPoint(geometria) AS pt
+		FROM {schema}.seg_via_rodov
+		UNION ALL
+		SELECT identificador, valor_posicao_vertical_transportes,
+			ST_EndPoint(geometria)
+		FROM {schema}.seg_via_rodov
+	),
+	junctions AS (
+		SELECT pt
+		FROM endpoints
+		GROUP BY pt, zpos
+		HAVING COUNT(DISTINCT identificador) > 2
+	),
+	nos AS (
+		SELECT n.identificador, n.valor_tipo_no_trans_rodov,
+			COUNT(*) OVER (PARTITION BY n.geometria) AS n_at_pt
+		FROM {schema}.no_trans_rodov n
+		JOIN junctions j ON n.geometria = j.pt
+	),
+	estat AS (
+		SELECT
+			COUNT(*) AS total,
+			COUNT(*) FILTER (
+				WHERE n_at_pt = 1 AND valor_tipo_no_trans_rodov IN ('1', '5')
+			) AS good,
+			COUNT(*) FILTER (
+				WHERE n_at_pt > 1 OR valor_tipo_no_trans_rodov NOT IN ('1', '5')
+			) AS bad
+		FROM nos
+	),
+	bad_rows AS (
+		INSERT INTO errors.no_trans_rodov_re5_5_5
+			SELECT n.*
+			FROM {schema}.no_trans_rodov n
+			WHERE n.identificador IN (
+				SELECT identificador FROM nos
+				WHERE n_at_pt > 1 OR valor_tipo_no_trans_rodov NOT IN ('1', '5')
+			)
+			ON CONFLICT DO NOTHING
+			RETURNING 1
+	)
+	SELECT s.total, s.good, s.bad FROM estat s INTO count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re5_5_5_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.no_trans_rodov_re5_5_5 (like {schema}.no_trans_rodov INCLUDING ALL);
+
+	WITH endpoints AS (
+		SELECT identificador, valor_posicao_vertical_transportes AS zpos,
+			ST_StartPoint(geometria) AS pt
+		FROM {schema}.seg_via_rodov
+		UNION ALL
+		SELECT identificador, valor_posicao_vertical_transportes,
+			ST_EndPoint(geometria)
+		FROM {schema}.seg_via_rodov
+	),
+	junctions AS (
+		SELECT pt
+		FROM endpoints
+		GROUP BY pt, zpos
+		HAVING COUNT(DISTINCT identificador) > 2
+	),
+	nos_all AS (
+		SELECT n.identificador, n.valor_tipo_no_trans_rodov, n.geometria,
+			COUNT(*) OVER (PARTITION BY n.geometria) AS n_at_pt
+		FROM {schema}.no_trans_rodov n
+		JOIN junctions j ON n.geometria = j.pt
+	),
+	nos AS (
+		SELECT identificador, valor_tipo_no_trans_rodov, n_at_pt
+		FROM nos_all
+		WHERE ST_Intersects(geometria, sect)
+	),
+	estat AS (
+		SELECT
+			COUNT(*) AS total,
+			COUNT(*) FILTER (
+				WHERE n_at_pt = 1 AND valor_tipo_no_trans_rodov IN ('1', '5')
+			) AS good,
+			COUNT(*) FILTER (
+				WHERE n_at_pt > 1 OR valor_tipo_no_trans_rodov NOT IN ('1', '5')
+			) AS bad
+		FROM nos
+	),
+	bad_rows AS (
+		INSERT INTO errors.no_trans_rodov_re5_5_5
+			SELECT n.*
+			FROM {schema}.no_trans_rodov n
+			WHERE n.identificador IN (
+				SELECT identificador FROM nos
+				WHERE n_at_pt > 1 OR valor_tipo_no_trans_rodov NOT IN ('1', '5')
+			)
+			ON CONFLICT DO NOTHING
+			RETURNING 1
+	)
+	SELECT s.total, s.good, s.bad FROM estat s INTO count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
 create or replace function validation.re5_5_8_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
 declare
 	cvalue double precision;
