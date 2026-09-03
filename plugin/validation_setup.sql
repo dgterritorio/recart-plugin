@@ -1493,6 +1493,35 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE PROCEDURE validation.create_curso_de_agua_area_2d()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF (SELECT count(*) FROM information_schema.tables
+		WHERE table_schema = 'validation' AND table_name = 'curso_de_agua_area_2d') > 0 THEN
+		RAISE NOTICE 'A tabela validation.curso_de_agua_area_2d já existe. Nada a fazer.';
+		RETURN;
+	END IF;
+
+	CREATE UNLOGGED TABLE validation.curso_de_agua_area_2d (
+		identificador uuid,
+		g2d geometry,
+		npts integer
+	);
+
+	INSERT INTO validation.curso_de_agua_area_2d (identificador, g2d, npts)
+	SELECT a.identificador,
+		ST_Force2D(a.geometria),
+		ST_NPoints(a.geometria)
+	FROM {schema}.curso_de_agua_area a
+	WHERE a.geometria IS NOT NULL;
+
+	CREATE INDEX idx_curso_de_agua_area_2d_g2d ON validation.curso_de_agua_area_2d USING GIST (g2d);
+	CREATE INDEX idx_curso_de_agua_area_2d_id ON validation.curso_de_agua_area_2d (identificador);
+	ANALYZE validation.curso_de_agua_area_2d;
+END;
+$$;
+
 CREATE OR REPLACE PROCEDURE validation.create_curso_de_agua_eixo_extremos()
 LANGUAGE plpgsql
 AS $$
@@ -1560,6 +1589,63 @@ BEGIN
 	CREATE INDEX idx_agua_lentica_anel_geom ON validation.agua_lentica_anel USING GIST (geom);
 	CREATE INDEX idx_agua_lentica_anel_lake ON validation.agua_lentica_anel (lake_id);
 	ANALYZE validation.agua_lentica_anel;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE validation.create_agua_water_idx(max_vertices integer DEFAULT 256)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	CALL validation.create_agua_lentica_2d();
+	CALL validation.create_curso_de_agua_area_2d();
+
+	IF (SELECT count(*) FROM information_schema.tables
+		WHERE table_schema = 'validation' AND table_name = 'agua_water_idx') > 0 THEN
+		RAISE NOTICE 'A tabela validation.agua_water_idx já existe. Nada a fazer.';
+		RETURN;
+	END IF;
+
+	CREATE UNLOGGED TABLE validation.agua_water_idx (
+		water_id uuid,
+		kind text,
+		npts integer,
+		geom geometry
+	);
+
+	INSERT INTO validation.agua_water_idx (water_id, kind, npts, geom)
+	SELECT l.identificador,
+		'lentica'::text,
+		l.npts,
+		l.g2d
+	FROM validation.agua_lentica_2d l
+	WHERE l.npts < 500
+	UNION ALL
+	SELECT l.identificador,
+		'lentica'::text,
+		l.npts,
+		s.geom
+	FROM validation.agua_lentica_2d l
+	CROSS JOIN LATERAL ST_Subdivide(l.g2d, max_vertices) AS s(geom)
+	WHERE l.npts >= 500
+	UNION ALL
+	SELECT a.identificador,
+		'area'::text,
+		a.npts,
+		a.g2d
+	FROM validation.curso_de_agua_area_2d a
+	WHERE a.npts < 500
+	UNION ALL
+	SELECT a.identificador,
+		'area'::text,
+		a.npts,
+		s.geom
+	FROM validation.curso_de_agua_area_2d a
+	CROSS JOIN LATERAL ST_Subdivide(a.g2d, max_vertices) AS s(geom)
+	WHERE a.npts >= 500;
+
+	CREATE INDEX idx_agua_water_idx_geom ON validation.agua_water_idx USING GIST (geom);
+	CREATE INDEX idx_agua_water_idx_id ON validation.agua_water_idx (water_id, kind);
+	ANALYZE validation.agua_water_idx;
 END;
 $$;
 
@@ -1684,10 +1770,10 @@ begin
 	end if;
 
 	CALL validation.create_agua_lentica_2d();
+	CALL validation.create_curso_de_agua_area_2d();
+	CALL validation.create_agua_water_idx(256);
 
 	drop table if exists _re4_7_eixos;
-	drop table if exists _re4_7_water;
-	drop table if exists _re4_7_water_idx;
 	drop table if exists _re4_7_hits;
 	drop table if exists _re4_7_agg;
 	drop table if exists _re4_7_in_scope;
@@ -1704,54 +1790,42 @@ begin
 	create index on _re4_7_eixos using gist (g2d);
 	create index on _re4_7_eixos (identificador);
 
-	create temp table _re4_7_water on commit drop as
-	select l.identificador as water_id,
-		'lentica'::text as kind,
-		l.g2d,
-		l.npts
-	from validation.agua_lentica_2d l
-	union all
-	select ar.identificador,
-		'area'::text,
-		ST_Force2D(ar.geometria),
-		ST_NPoints(ar.geometria)
-	from {schema}.curso_de_agua_area ar
-	where ar.geometria is not null;
-
-	create index on _re4_7_water (water_id, kind);
-
-	-- Large water bodies have multi-km GIST boxes. Subdivide so && is selective;
-	-- exact Within/Touches/Crosses still use the full polygon in _re4_7_water.
-	create temp table _re4_7_water_idx on commit drop as
-	select w.water_id, w.kind, w.g2d as geom
-	from _re4_7_water w
-	where w.npts < 500
-	union all
-	select w.water_id, w.kind, s.geom
-	from _re4_7_water w
-	cross join lateral ST_Subdivide(w.g2d, 256) as s(geom)
-	where w.npts >= 500;
-
-	create index on _re4_7_water_idx using gist (geom);
-
 	create temp table _re4_7_hits on commit drop as
 	select e.identificador as eixo_id,
 		e.id_agua_lentica,
 		e.id_curso_de_agua_area,
 		w.water_id,
 		w.kind,
-		(ST_Intersects(e.g2d, w.g2d) and not ST_Touches(e.g2d, w.g2d)) as interior,
+		p.interior,
 		case
-			when w.npts >= 500 then ST_Contains(w.g2d, ST_LineInterpolatePoint(e.g2d, 0.5))
+			when p.npts >= 500 then p.mid_in
 			else ST_Within(e.g2d, w.g2d)
 		end as is_within
 	from (
-		select distinct e.identificador, i.water_id, i.kind
+		select e.identificador,
+			i.water_id,
+			i.kind,
+			max(i.npts) as npts,
+			bool_or(not ST_Touches(e.g2d, i.geom)) as interior,
+			bool_or(ST_Contains(i.geom, ST_LineInterpolatePoint(e.g2d, 0.5))) as mid_in
 		from _re4_7_eixos e
-		join _re4_7_water_idx i on ST_Intersects(e.g2d, i.geom)
+		join validation.agua_water_idx i on ST_Intersects(e.g2d, i.geom)
+		group by e.identificador, i.water_id, i.kind
 	) p
 	join _re4_7_eixos e on e.identificador = p.identificador
-	join _re4_7_water w on w.water_id = p.water_id and w.kind = p.kind;
+	join (
+		select l.identificador as water_id,
+			'lentica'::text as kind,
+			l.g2d,
+			l.npts
+		from validation.agua_lentica_2d l
+		union all
+		select a.identificador as water_id,
+			'area'::text as kind,
+			a.g2d,
+			a.npts
+		from validation.curso_de_agua_area_2d a
+	) w on w.water_id = p.water_id and w.kind = p.kind;
 
 	create index on _re4_7_hits (eixo_id);
 
@@ -1760,8 +1834,7 @@ begin
 		bool_or(h.is_within) as within_some,
 		bool_or(h.interior) as interior_hit,
 		bool_or(h.kind = 'lentica' and h.is_within and h.id_agua_lentica is distinct from h.water_id) as uuid_lentica_bad,
-		bool_or(h.kind = 'area' and h.is_within and h.id_curso_de_agua_area is distinct from h.water_id) as uuid_area_bad,
-		count(*) as n_water
+		bool_or(h.kind = 'area' and h.is_within and h.id_curso_de_agua_area is distinct from h.water_id) as uuid_area_bad
 	from _re4_7_hits h
 	group by h.eixo_id;
 
@@ -1769,33 +1842,11 @@ begin
 
 	create temp table _re4_7_in_scope on commit drop as
 	select a.eixo_id,
-		ST_Crosses(e.g2d, w.g2d) as geom_bad,
+		(a.interior_hit and not a.within_some) as geom_bad,
 		a.uuid_lentica_bad,
 		a.uuid_area_bad
 	from _re4_7_agg a
-	join _re4_7_eixos e on e.identificador = a.eixo_id
-	join _re4_7_hits h on h.eixo_id = a.eixo_id
-	join _re4_7_water w on w.water_id = h.water_id and w.kind = h.kind
-	where a.n_water = 1
-		and (a.interior_hit or a.within_some)
-	union all
-	select a.eixo_id,
-		ST_Crosses(e.g2d, u.water_union),
-		a.uuid_lentica_bad,
-		a.uuid_area_bad
-	from _re4_7_agg a
-	join _re4_7_eixos e on e.identificador = a.eixo_id
-	join (
-		select h.eixo_id, ST_UnaryUnion(ST_Collect(w.g2d)) as water_union
-		from _re4_7_agg a2
-		join _re4_7_hits h on h.eixo_id = a2.eixo_id
-		join _re4_7_water w on w.water_id = h.water_id and w.kind = h.kind
-		where a2.n_water > 1
-			and (a2.interior_hit or a2.within_some)
-		group by h.eixo_id
-	) u on u.eixo_id = a.eixo_id
-	where a.n_water > 1
-		and (a.interior_hit or a.within_some);
+	where a.interior_hit or a.within_some;
 
 	with failures as (
 		select s.eixo_id,
