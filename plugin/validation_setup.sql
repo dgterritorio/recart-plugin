@@ -1562,10 +1562,6 @@ CREATE OR REPLACE PROCEDURE validation.create_agua_lentica_anel(max_vertices int
 LANGUAGE plpgsql
 AS $$
 BEGIN
-	IF max_vertices < 8 THEN
-		RAISE EXCEPTION 'max_vertices % é demasiado baixo; o mínimo é 8', max_vertices;
-	END IF;
-
 	CALL validation.create_agua_lentica_2d();
 
 	IF (SELECT count(*) FROM information_schema.tables
@@ -1574,8 +1570,6 @@ BEGIN
 		RETURN;
 	END IF;
 
-	-- Whole ring is a single huge GIST box for reservoirs (100k+ vertices).
-	-- ST_Subdivide keeps small boxes without one row per segment.
 	CREATE UNLOGGED TABLE validation.agua_lentica_anel AS
 	SELECT l.identificador AS lake_id, ST_Boundary(l.g2d) AS geom
 	FROM validation.agua_lentica_2d l
@@ -1794,38 +1788,24 @@ begin
 	select e.identificador as eixo_id,
 		e.id_agua_lentica,
 		e.id_curso_de_agua_area,
-		w.water_id,
-		w.kind,
+		p.water_id,
+		p.kind,
 		p.interior,
-		case
-			when p.npts >= 500 then p.mid_in
-			else ST_Within(e.g2d, w.g2d)
-		end as is_within
+		(p.is_covered and p.interior) as is_within
 	from (
 		select e.identificador,
 			i.water_id,
 			i.kind,
-			max(i.npts) as npts,
 			bool_or(not ST_Touches(e.g2d, i.geom)) as interior,
-			bool_or(ST_Contains(i.geom, ST_LineInterpolatePoint(e.g2d, 0.5))) as mid_in
+			coalesce(ST_Length(ST_Difference(
+				e.g2d,
+				ST_UnaryUnion(ST_Collect(i.geom))
+			)), 0) < 0.01 as is_covered
 		from _re4_7_eixos e
 		join validation.agua_water_idx i on ST_Intersects(e.g2d, i.geom)
-		group by e.identificador, i.water_id, i.kind
+		group by e.identificador, i.water_id, i.kind, e.g2d
 	) p
-	join _re4_7_eixos e on e.identificador = p.identificador
-	join (
-		select l.identificador as water_id,
-			'lentica'::text as kind,
-			l.g2d,
-			l.npts
-		from validation.agua_lentica_2d l
-		union all
-		select a.identificador as water_id,
-			'area'::text as kind,
-			a.g2d,
-			a.npts
-		from validation.curso_de_agua_area_2d a
-	) w on w.water_id = p.water_id and w.kind = p.kind;
+	join _re4_7_eixos e on e.identificador = p.identificador;
 
 	create index on _re4_7_hits (eixo_id);
 
