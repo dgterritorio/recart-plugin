@@ -158,9 +158,32 @@ class MainDialog(QDialog, FORM_CLASS):
                         "[Erro]: {0}\n".format(error))
 
     def selectAll(self, state):
-        if state != 0:
+        if Qt.CheckState(state) == Qt.CheckState.Checked:
             self.treeView.expandAll()
             self.treeView.selectAll()
+        else:
+            self.treeView.clearSelection()
+
+    def onTreeSelectionChanged(self, selected=None, deselected=None):
+        model = self.treeView.model()
+        sel = self.treeView.selectionModel()
+        if model is None or sel is None:
+            return
+
+        selectable = 0
+        selected_count = 0
+        for row in range(model.rowCount()):
+            group = model.index(row, 0)
+            for child_row in range(model.rowCount(group)):
+                child = model.index(child_row, 0, group)
+                selectable += 1
+                if sel.isSelected(child):
+                    selected_count += 1
+
+        self.selectACheckBox.blockSignals(True)
+        self.selectACheckBox.setChecked(
+            selectable > 0 and selected_count == selectable)
+        self.selectACheckBox.blockSignals(False)
 
     def onChangeFormat(self, fmt):
         if fmt == 'Projeto QGIS':
@@ -244,6 +267,10 @@ class MainDialog(QDialog, FORM_CLASS):
 
         self.treeView.setModel(model)
         # self.treeView.expandAll()
+        sel = self.treeView.selectionModel()
+        sel.selectionChanged.connect(self.onTreeSelectionChanged)
+        self.onTreeSelectionChanged()
+
         if not found:
             self.writeText("[Aviso] Não foram encontradas camadas válidas")
 
