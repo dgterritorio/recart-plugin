@@ -50,6 +50,7 @@ from .aux_export import displayList, recartStructure, fieldNameMap, joins, form_
 from .gpkg_qgis_project import (
     LABEL_VIEWS,
     build_and_embed_recart_project,
+    copy_layer_as_attributes,
     create_gpkg_spatial_indexes,
     write_gpkg_relationships,
 )
@@ -747,8 +748,12 @@ class ExportLayersProcess(QThread):
                 if view_layer is None:
                     view_layer = self.datasource.GetLayerByName(view)
                 if view_layer:
-                    outdata.CopyLayer(view_layer, view, copy_opts)
-                    exportedLayers[view] = 1
+                    if copy_layer_as_attributes(
+                            view_layer, outdata, view, self.write):
+                        exportedLayers[view] = 1
+                    else:
+                        self.write(
+                            "[Aviso] View de etiquetas '{}' não copiada como tabela de atributos".format(view))
                 else:
                     self.write(
                         "[Aviso] View de etiquetas '{}' não disponível para exportação".format(view))
