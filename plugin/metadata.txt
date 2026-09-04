@@ -3,7 +3,7 @@ name=RecartDGT
 qgisMinimumVersion=3.14
 qgisMaximumVersion=4.99
 description=Convert, import, export cartography datasets based on CartTop specification
-version=v1.10.2.1
+version=v1.10.3.2.1
 author=Geomaster
 email=geral@geomaster.pt
 
