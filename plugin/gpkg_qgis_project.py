@@ -28,6 +28,55 @@ LABEL_VIEWS = (
     'ls_seg_via_ferrea_label_view',
 )
 
+
+def copy_layer_as_attributes(src_layer, dest_ds, dest_name, log_cb=None):
+    """Copy an OGR layer into dest_ds as a geometryless attribute table."""
+    from osgeo import ogr
+
+    def log(msg):
+        if log_cb:
+            log_cb(msg)
+
+    if src_layer is None or dest_ds is None:
+        log("[Aviso] copy_layer_as_attributes: camada ou dataset em falta")
+        return False
+
+    src_defn = src_layer.GetLayerDefn()
+    dst_layer = dest_ds.CreateLayer(
+        dest_name, geom_type=ogr.wkbNone, options=['SPATIAL_INDEX=NO'])
+    if dst_layer is None:
+        log("[Aviso] Falha a criar tabela de atributos '{}'".format(dest_name))
+        return False
+
+    for i in range(src_defn.GetFieldCount()):
+        if dst_layer.CreateField(src_defn.GetFieldDefn(i)) != 0:
+            log("[Aviso] Falha a criar campo em '{}': {}".format(
+                dest_name, src_defn.GetFieldDefn(i).GetName()))
+            return False
+
+    dst_defn = dst_layer.GetLayerDefn()
+    src_layer.ResetReading()
+    try:
+        for feat in src_layer:
+            if feat is None:
+                continue
+            new_feat = ogr.Feature(dst_defn)
+            new_feat.SetFrom(feat, True)
+            if new_feat.GetGeometryRef() is not None:
+                new_feat.SetGeometry(None)
+            err = dst_layer.CreateFeature(new_feat)
+            new_feat = None
+            if err != 0:
+                log("[Aviso] Falha a copiar feature para '{}'".format(dest_name))
+                return False
+    except Exception as e:
+        log("[Aviso] Falha a copiar '{}' como tabela de atributos: {}".format(
+            dest_name, e))
+        return False
+
+    return True
+
+
 _INSERT_HEADER = re.compile(
     r"INSERT INTO public\.layer_styles \( f_table_catalog, f_table_schema, "
     r"f_table_name, f_geometry_column, stylename, styleqml, stylesld, "
