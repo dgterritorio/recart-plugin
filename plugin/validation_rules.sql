@@ -172,16 +172,16 @@ insert into validation.rules ( code, name, rule, scope, query, query_nd2 )
 values ('rg_3', 'Tolerância de conetividade',
 $$A tolerância de conetividade é 0 (zero).$$,
 $$seg_via_rodov, via_rodov_limite, seg_via_ferrea, curva_de_nivel, curso_de_agua_eixo.$$,
-$$select * from validation.rg_3_validation ()$$,
-$$select * from validation.rg_3_validation ()$$ );
+$$select * from validation.rg_3_validation (0.2)$$,
+$$select * from validation.rg_3_validation (1)$$ );
 
 delete from validation.rules_area where code = 'rg_3';
 insert into validation.rules_area ( code, name, rule, scope, query, query_nd2 )
 values ('rg_3', 'Tolerância de conetividade',
 $$A tolerância de conetividade é 0 (zero).$$,
 $$seg_via_rodov, via_rodov_limite, seg_via_ferrea, curva_de_nivel, curso_de_agua_eixo.$$,
-$$select * from validation.rg_3_validation ('%1$s'::geometry)$$,
-$$select * from validation.rg_3_validation ('%1$s'::geometry)$$ );
+$$select * from validation.rg_3_validation ('%1$s'::geometry, 0.2)$$,
+$$select * from validation.rg_3_validation ('%1$s'::geometry, 1)$$ );
 
 -- Regras auxiliares
 -- Verificam outras caraterísticas que podem não estar explícitas nas Regras gerais e específicas da norma
@@ -2137,10 +2137,10 @@ ferroviário" e "Nó de transporte ferroviário".$$, 'seg_via_ferrea',
 $$with 
 all_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria)),
+	where cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria)),
 ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+	where cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
 total as (select count(*) from all_intersecoes),
 good as (select count(*) from 
@@ -2152,7 +2152,7 @@ good as (select count(*) from
 linhas_duplicadas as (
 select count(cf1.*)
 from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+where cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
 inexistentes as (
 	select count(*) from 
@@ -2168,10 +2168,10 @@ from total, good, bad $$,
 $$with 
 all_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria)),
+	where cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria)),
 ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+	where cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
 total as (select count(*) from all_intersecoes),
 good as (select count(*) from 
@@ -2183,7 +2183,7 @@ good as (select count(*) from
 linhas_duplicadas as (
 select count(cf1.*)
 from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+where cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
 inexistentes as (
 	select count(*) from 
@@ -2199,12 +2199,12 @@ from total, good, bad $$,
 $$ with 
 ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+	where cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
 linhas_duplicadas as (
 select cf1.*
 from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-where cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+where cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
 inexistentes as (
 	select * from 
@@ -2234,10 +2234,10 @@ ferroviário" e "Nó de transporte ferroviário".$$, 'seg_via_ferrea',
 $$with 
 all_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria)),
+	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria)),
 ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
 total as (select count(*) from all_intersecoes),
 good as (select count(*) from 
@@ -2249,7 +2249,7 @@ good as (select count(*) from
 linhas_duplicadas as (
 select count(cf1.*)
 from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-where ST_Intersects(cf1.geometria, '%1$s') and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+where ST_Intersects(cf1.geometria, '%1$s') and cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
 inexistentes as (
 	select count(*) from 
@@ -2265,10 +2265,10 @@ from total, good, bad $$,
 $$with 
 all_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria)),
+	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria)),
 ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
 total as (select count(*) from all_intersecoes),
 good as (select count(*) from 
@@ -2280,7 +2280,7 @@ good as (select count(*) from
 linhas_duplicadas as (
 select count(cf1.*)
 from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
 inexistentes as (
 	select count(*) from 
@@ -2296,12 +2296,12 @@ from total, good, bad $$,
 $$ with 
 ok_intersecoes as (select (st_dump(st_intersection(cf1.geometria, cf2.geometria))).*
 	from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+	where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 	and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) in ('POINT' , 'MULTIPOINT')),
 linhas_duplicadas as (
 select cf1.*
 from {schema}.seg_via_ferrea cf1, {schema}.seg_via_ferrea cf2
-where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and st_intersects(cf1.geometria, cf2.geometria) 
+where ST_Intersects(cf1.geometria, '%1$s'::geometry) and cf1.identificador != cf2.identificador and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes and st_intersects(cf1.geometria, cf2.geometria) 
 and geometrytype(st_intersection(cf1.geometria, cf2.geometria)) not in ('POINT' , 'MULTIPOINT')),
 inexistentes as (
 	select * from 
@@ -2489,53 +2489,25 @@ $$ select *
 
 -- RE5.2.4
 delete from validation.rules where code = 're5_2_4';
-insert into validation.rules ( code, name, rule, scope, entity, query, report ) 
-values ('re5_2_4', 'Nós terminais da via-férrea', 
-$$Quando um “Segmento da via-férrea” tem o seu fim numa “Infraestrutura de transporte ferroviário” é colocado um “Nó de transporte ferroviário” 
-correspondente ao fim da via e um outro “Nó de transporte ferroviário” correspondente à infraestrutura. 
-Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via-férrea” em conformidade com a topologia implícita.$$, 
-$$"Segmento da via-férrea, Infraestrutura de transporte ferroviário, Nó de transporte ferroviário".$$, 'no_trans_ferrov',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
-		join {schema}.infra_trans_ferrov l2 on st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-), total as (
-	select count(*) from inter
-), good as (
-	select count(*) from inter where (select count(*) from {schema}.no_trans_ferrov where geom=geometria) = 2
-), bad as (
-	select count(*) from inter where (select count(*) from {schema}.no_trans_ferrov where geom=geometria) <> 2
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
-		join {schema}.infra_trans_ferrov l2 on st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_trans_ferrov where geometria in (select geom from inter where (select count(*) from {schema}.no_trans_ferrov where geom=geometria) <> 2)$$ );
-
-
-delete from validation.rules_area where code = 're5_2_4';
-insert into validation.rules_area ( code, name, rule, scope, entity, query, report )
+insert into validation.rules ( code, name, rule, scope, entity, query, query_nd2 )
 values ('re5_2_4', 'Nós terminais da via-férrea',
 $$Quando um “Segmento da via-férrea” tem o seu fim numa “Infraestrutura de transporte ferroviário” é colocado um “Nó de transporte ferroviário”
 correspondente ao fim da via e um outro “Nó de transporte ferroviário” correspondente à infraestrutura.
 Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via-férrea” em conformidade com a topologia implícita.$$,
-$$"Segmento da via-férrea, Infraestrutura de transporte ferroviário, Nó de transporte ferroviário".$$, 'no_trans_ferrov',
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
-		join {schema}.infra_trans_ferrov l2 on st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-), total as (
-	select count(*) from inter
-), good as (
-	select count(*) from inter where ST_Intersects(geom, '%1$s') and (select count(*) from {schema}.no_trans_ferrov where geom=geometria) = 2
-), bad as (
-	select count(*) from inter where ST_Intersects(geom, '%1$s') and (select count(*) from {schema}.no_trans_ferrov where geom=geometria) <> 2
-) select total.count as total, good.count as good, bad.count as bad from total, good, bad$$,
-$$with inter as (
-	select st_intersection(l1.geometria, l2.geometria) as geom, count(*) from {schema}.seg_via_ferrea l1
-		join {schema}.infra_trans_ferrov l2 on st_intersects(ST_StartPoint(l1.geometria), l2.geometria) or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-		group by st_intersection(l1.geometria, l2.geometria)
-) select * from {schema}.no_trans_ferrov n1 where ST_Intersects(n1.geometria, '%1$s') and n1.geometria in (select geom from inter where (select count(*) from {schema}.no_trans_ferrov n2 where geom=n2geometria) <> 2)$$ );
+$$"Segmento da via-férrea, Infraestrutura de transporte ferroviário, Nó de transporte ferroviário".$$, 'infra_trans_ferrov',
+$$select * from validation.re5_2_4_validation(1, '%s'::json)$$,
+$$select * from validation.re5_2_4_validation(2, '%s'::json)$$ );
+
+
+delete from validation.rules_area where code = 're5_2_4';
+insert into validation.rules_area ( code, name, rule, scope, entity, query, query_nd2 )
+values ('re5_2_4', 'Nós terminais da via-férrea',
+$$Quando um “Segmento da via-férrea” tem o seu fim numa “Infraestrutura de transporte ferroviário” é colocado um “Nó de transporte ferroviário”
+correspondente ao fim da via e um outro “Nó de transporte ferroviário” correspondente à infraestrutura.
+Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via-férrea” em conformidade com a topologia implícita.$$,
+$$"Segmento da via-férrea, Infraestrutura de transporte ferroviário, Nó de transporte ferroviário".$$, 'infra_trans_ferrov',
+$$select * from validation.re5_2_4_validation(1, '%s'::geometry, '%s'::json)$$,
+$$select * from validation.re5_2_4_validation(2, '%s'::geometry, '%s'::json)$$ );
 
 
 -- RE5.2.5
@@ -2893,7 +2865,7 @@ values ('re5_5_4', 'Nós terminais da via rodoviária',
 $$Quando um “Segmento da via rodoviária” tem o seu fim numa “Infraestrutura de transporte rodoviário” é colocado um “Nó de transporte rodoviário” 
 correspondente ao fim da via e um outro “Nó de transporte rodoviário” correspondente à infraestrutura. 
 Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via rodoviária” em conformidade com a topologia implícita.$$, 
-$$"“Segmento da via rodoviária”, “Infraestrutura de transporte rodoviário” e “Nó de transporte rodoviário”".$$, 'no_trans_rodov',
+$$"“Segmento da via rodoviária”, “Infraestrutura de transporte rodoviário” e “Nó de transporte rodoviário”".$$, 'infra_trans_rodov',
 $$select * from validation.re5_5_4_validation (1, '%s'::json)$$,
 $$select * from validation.re5_5_4_validation (2, '%s'::json)$$ );
 
@@ -2904,7 +2876,7 @@ values ('re5_5_4', 'Nós terminais da via rodoviária',
 $$Quando um “Segmento da via rodoviária” tem o seu fim numa “Infraestrutura de transporte rodoviário” é colocado um “Nó de transporte rodoviário” 
 correspondente ao fim da via e um outro “Nó de transporte rodoviário” correspondente à infraestrutura. 
 Os nós são colocados nas mesmas coordenadas (mesma localização) no “Segmento da via rodoviária” em conformidade com a topologia implícita.$$, 
-$$"“Segmento da via rodoviária”, “Infraestrutura de transporte rodoviário” e “Nó de transporte rodoviário”".$$, 'no_trans_rodov',
+$$"“Segmento da via rodoviária”, “Infraestrutura de transporte rodoviário” e “Nó de transporte rodoviário”".$$, 'infra_trans_rodov',
 $$select * from validation.re5_5_4_validation(1, '%s'::geometry, '%s'::json)$$,
 $$select * from validation.re5_5_4_validation(2, '%s'::geometry, '%s'::json)$$ );
 
