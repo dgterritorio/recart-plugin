@@ -24,6 +24,7 @@ import os.path
 from qgis.PyQt.QtCore import QT_VERSION_STR, QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.core import QgsApplication
 from qgis.utils import pluginMetadata
 
 from .main_dialog import MainDialog
@@ -98,8 +99,26 @@ class recartDGT:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('recartDGT', message)
 
+    def _plugin_svg_dir(self):
+        return os.path.join(self.plugin_dir, 'svg')
+
+    def _register_svg_paths(self):
+        """Let QGIS resolve simbolos/*.svg from the plugin, on any machine."""
+        svg_dir = self._plugin_svg_dir()
+        paths = QgsApplication.svgPaths()
+        if svg_dir not in paths:
+            QgsApplication.setSvgPaths(paths + [svg_dir])
+
+    def _unregister_svg_paths(self):
+        svg_dir = os.path.normpath(self._plugin_svg_dir())
+        QgsApplication.setSvgPaths([
+            p for p in QgsApplication.svgPaths()
+            if os.path.normpath(p) != svg_dir
+        ])
+
     def initGui(self):
         """Create the menu entries inside the QGIS GUI."""
+        self._register_svg_paths()
         icon_path = ':/plugins/recartDGT/export.svg'
         icon = QIcon(icon_path)
         action = QAction(icon, self.tr(u'CartTop para QGIS, GPKG, JSON e SHP'),
@@ -128,6 +147,7 @@ class recartDGT:
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
+        self._unregister_svg_paths()
         for action in self.actions:
             self.iface.removePluginMenu(
                 self.tr(u'&recartDGT'),

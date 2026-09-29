@@ -68,6 +68,17 @@ sed -i '/^--/d' "$dump"
 sed -i '/\\restrict/d' "$dump"
 sed -i '/\\unrestrict/d' "$dump"
 
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+if command -v python3 >/dev/null 2>&1; then
+    py=python3
+elif command -v python >/dev/null 2>&1; then
+    py=python
+else
+    echo "Error: python3 or python is required to normalize SVG paths." >&2
+    exit 1
+fi
+"$py" "$script_dir/normalize_style_svg_paths.py" "$dump"
+
 mkdir -p "$(dirname "$output")"
 
 if [ -f "$output" ]; then

@@ -508,13 +508,13 @@ begin
 
 	if _is_global is true and _query is not null then
 		if nd1 is true then
-			execute _query INTO total, good, bad;
+			execute format(_query, _args) INTO total, good, bad;
 		else
 			-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
 			if _query_nd2 is not null then
-				execute _query_nd2 INTO total, good, bad;
+				execute format(_query_nd2, _args) INTO total, good, bad;
 			else 
-				execute _query INTO total, good, bad;
+				execute format(_query, _args) INTO total, good, bad;
 			end if;
 		end if;
 		raise notice 'Good? % % %', total, good, bad;
@@ -4489,7 +4489,7 @@ begin
 	)
 	select count(*) from bad_rows into count_bad;
 
-	return query select -1, -1, coalesce(count_bad, 0);
+	return query select coalesce(count_bad, 0), 0, coalesce(count_bad, 0);
 end;
 $$ language plpgsql;
 

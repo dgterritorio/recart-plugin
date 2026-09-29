@@ -93,6 +93,8 @@ Exemplo das áreas (a vermelho) onde não há pontos cotados e provavelmente dev
 
 Depois de calculadas essas áreas, é colocado um ponto cotado na superfície da área (`ST_PointOnSurface`), que serve para indicar a área onde constar um ponto cotado. É uma posição meramente indicativa. Estes ponto indicativas são gerados na tabela `errors.ponto_cotado_re3_3`.
 
+No sumário, Elementos e Erros são o número desses pontos.
+
 Exemplos dos pontos criados nas áreas anteriormente identificadas;
 
 ![](../images/pontos_re3_3.png)

@@ -696,15 +696,15 @@ $$select * from validation.re3_3_validation(1, '%s'::json)$$,
 $$select * from validation.re3_3_validation(2, '%s'::json)$$ );
 
 delete from validation.rules_area where code = 're3_3';
-insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2 ) 
+insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, is_global ) 
 values ('re3_3', 'Pontos cotados', 
 $$É recolhido pelo menos um "Ponto cotado" nas zonas planas onde a distância
 horizontal entre os objetos "Curva de nível" exceda os seguintes valores:
 NdD1: 100 m;
 NdD2: 500 m.$$, 
 $$"Ponto cotado".$$, 'ponto_cotado',
-$$select * from validation.re3_3_validation(1, '%s'::geometry, '%s'::json)$$,
-$$select * from validation.re3_3_validation(2, '%s'::geometry, '%s'::json)$$ );
+$$select * from validation.re3_3_validation(1, '%s'::json)$$,
+$$select * from validation.re3_3_validation(2, '%s'::json)$$, true );
 
 -- Regras do tema Hidrografia
 
