@@ -100,13 +100,11 @@ Exemplos dos pontos criados nas áreas anteriormente identificadas;
 
 ### Contagens do sumário e de errors.erros_3d
 
-O sumário do relatório (Elementos, Corretos, Erros) lê total, good e bad em `validation.rules`. Estas contagens são por objeto: uma curva de nível ou um eixo conta uma vez.
+`re3_1_1`, `re3_1_2` e `re4_5_2` gravam em `errors.erros_3d` um ponto por vértice em falha. O mesmo objeto pode originar várias linhas. A secção "Erros 3D" do relatório conta essas linhas, e o valor Erros do sumário coincide com essas linhas: `rule_code=re3_1_1`, `rule_code=re3_1_2` e `rule_code=re4_5_2`.
 
-`re3_1_1`, `re3_1_2` e `re4_5_2` gravam em `errors.erros_3d` um ponto por vértice em falha. O mesmo objeto pode originar várias linhas. A secção "Erros 3D" do relatório conta essas linhas, pelo que esse total pode ser superior ao valor Erros do sumário.
-
-- `re3_1_1`: o sumário conta curvas de nível não fechadas com pelo menos um extremo fora do limite da área de trabalho. A tabela guarda cada extremo em falha (indice 0 no início, indice -1 no fim), pelo que uma curva pode contribuir com 1 ou 2 pontos.
-- `re3_1_2`: o sumário conta curvas em que os vértices não partilham o mesmo Z. A tabela guarda cada vértice cuja cota difere da mediana.
-- `re4_5_2`: o sumário conta eixos cuja sequência de Z não é monótona. A tabela guarda cada ponto de inflexão, pelo que um eixo pode contribuir com vários pontos.
+- `re3_1_1`: o sumário conta extremos. Elementos é o dobro das curvas de nível. Uma curva fechada contribui com dois Corretos. Uma curva aberta contribui com um Erro por extremo fora do limite da área de trabalho (`indice` 0 no início, `indice` -1 no fim) e com Corretos nos extremos que estão sobre esse limite.
+- `re3_1_2`: o sumário conta vértices. Elementos é `ST_NPoints` sobre todas as curvas de nível. Corretos são os vértices cuja cota é a mediana da curva. Erros é o número de vértices cuja cota difere da mediana.
+- `re4_5_2`: o sumário conta vértices. Elementos é `ST_NPoints` sobre todos os `curso_de_agua_eixo`. Corretos são os vértices que não são pontos de inflexão. Erros é o número de vértices que são pontos de inflexão.
 
 
 ### Área de trabalho única para validação
