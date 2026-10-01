@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="1.3000002mm"
+   height="2.7562883mm"
+   viewBox="0 0 1.3000002 2.7562883"
+   version="1.1"
+   id="svg5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2" />
+  <g
+     id="layer1"
+     transform="translate(-82.41752,-76.511883)">
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#cc0000;stroke-width:0.118807px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 83.06692,76.511931 0.0012,1.499702"
+       id="path1615" />
+    <g
+       id="g1733">
+      <path
+         style="fill:none;stroke:#cc0000;stroke-width:0.110097;stroke-dasharray:none"
+         id="path234"
+         d="m 83.662472,78.618172 a 0.59495157,0.59495151 0 0 1 -0.593886,0.59495 0.59495157,0.59495151 0 0 1 -0.596014,-0.592818 0.59495157,0.59495151 0 0 1 0.591749,-0.597075 0.59495157,0.59495151 0 0 1 0.598135,0.590678" />
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#cc0000;stroke-width:0.0584869px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 83.716335,78.620081 -0.109204,2.56e-4"
+         id="path1615-3" />
+    </g>
+    <g
+       id="g1702"
+       transform="rotate(45,84.150333,74.762182)">
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#cc0000;stroke-width:0.119982px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 85.035409,76.528596 1.8e-5,1.299999"
+         id="path1671" />
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#cc0000;stroke-width:0.119982px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 85.685418,77.178587 -1.3,1.7e-5"
+         id="path1671-5" />
+    </g>
+  </g>
+</svg>
