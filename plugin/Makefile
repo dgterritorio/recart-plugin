@@ -145,6 +145,7 @@ deploy: compile
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V112)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V201)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V202)
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/svg
 	cp -vf $(PY_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(UI_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(UI_DIR)/
 	cp -vf $(CONV_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(CONV_DIR)/
@@ -159,6 +160,7 @@ deploy: compile
 	cp -vrf $(PROC_DIR_V202)/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/$(PROC_DIR_V202)/
 	cp -vf $(COMPILED_RESOURCE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(EXTRAS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
+	cp -vrf svg/* $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/svg/
 	# cp -vfr i18n $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	# cp -vfr $(HELP) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/help
 	# Copy extra directories if any

@@ -508,13 +508,13 @@ begin
 
 	if _is_global is true and _query is not null then
 		if nd1 is true then
-			execute _query INTO total, good, bad;
+			execute format(_query, _args) INTO total, good, bad;
 		else
 			-- só adianta escrever uma regra própria para o ND2 se for diferente da regra para o ND1
 			if _query_nd2 is not null then
-				execute _query_nd2 INTO total, good, bad;
+				execute format(_query_nd2, _args) INTO total, good, bad;
 			else 
-				execute _query INTO total, good, bad;
+				execute format(_query, _args) INTO total, good, bad;
 			end if;
 		end if;
 		raise notice 'Good? % % %', total, good, bad;
@@ -1098,141 +1098,44 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function validation.re3_1_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+create or replace function validation.re3_1_1_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
 	count_bad integer := 0;
-	count_bad_points integer := 0;
 begin
-	delete from errors.erros_3d where rule_code = 're3_1_1'
-		or (rule_code is null and entidade = 'curva_de_nivel' and motivo = 'Descontinuidade fora da linha da área de trabalho');
+	if sect is null then
+		delete from errors.erros_3d where rule_code = 're3_1_1';
+	end if;
 
-	with 
-		total as (select count(*) from {schema}.curva_de_nivel),
-		good as (select count(cdn.identificador)
-			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-			where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
-				and ( ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and
-					ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) ) 
-		),
-		bad as (select count(cdn.identificador) 
-			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-			where not ST_IsClosed(cdn.geometria)
-				and (not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) or
-					not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) )
-		)
-	select total.count as total, good.count as good, bad.count as bad 
-	from total, good, bad 
-	into count_all, count_good, count_bad;
+	select count(*) * 2 from {schema}.curva_de_nivel into count_all;
 
 	WITH bad_points AS (
 		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
 		select cdn.identificador, 'curva_de_nivel', 0, 'Descontinuidade fora da linha da área de trabalho', 're3_1_1', ST_StartPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria))
+			and (sect is null or ST_Intersects(cdn.geometria, sect))
 		union
 		select cdn.identificador, 'curva_de_nivel', -1, 'Descontinuidade fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
 		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
 		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria))
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
-			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
-			indice = EXCLUDED.indice
+			and (sect is null or ST_Intersects(cdn.geometria, sect))
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO NOTHING
 		RETURNING 1
 	)
-	SELECT count(*) FROM bad_points into count_bad_points;
-	raise notice 'Existem % pontos errados', count_bad_points;
+	SELECT count(*) FROM bad_points into count_bad;
+
+	count_good := count_all - count_bad;
+	raise notice 'Existem % pontos errados', count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
 
-create or replace function validation.re3_1_1_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
-declare
-	count_all integer := 0;
-	count_good integer := 0;
-	count_bad integer := 0;
-	count_bad_points integer := 0;
+create or replace function validation.re3_1_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 begin
-	with 
-		total as (select count(*) from {schema}.curva_de_nivel),
-		good as (select count(cdn.identificador)
-			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-			where ST_IsClosed(cdn.geometria) or (not ST_IsClosed(cdn.geometria)
-				and ( ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and
-					ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) ) and ST_Intersects(cdn.geometria, sect)
-		),
-		bad as (select count(cdn.identificador) 
-			from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-			where not ST_IsClosed(cdn.geometria)
-				and (not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) or
-					not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) ) and ST_Intersects(cdn.geometria, sect)
-		)
-	select total.count as total, good.count as good, bad.count as bad 
-	from total, good, bad 
-	into count_all, count_good, count_bad;
-
-	WITH bad_points AS (
-		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
-		select cdn.identificador, 'curva_de_nivel', 0, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_StartPoint(cdn.geometria) as geometria
-		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_StartPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
-		union
-		select cdn.identificador, 'curva_de_nivel', -1, 'Ponto fora da linha da área de trabalho', 're3_1_1', ST_EndPoint(cdn.geometria) as geometria
-		from {schema}.curva_de_nivel cdn, validation.area_trabalho_multi adt
-		where not ST_IsClosed(cdn.geometria) and not ST_Covers(ST_Boundary(adt.geometria), ST_EndPoint(cdn.geometria)) and ST_Intersects(cdn.geometria, sect)
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
-			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
-			indice = EXCLUDED.indice
-		RETURNING 1
-	)
-	SELECT count(*) FROM bad_points into count_bad_points;
-	raise notice 'Existem % pontos errados', count_bad_points;
-
-	return query select count_all as total, count_good as good, count_bad as bad;
-end;
-$$ language plpgsql;
-
-create or replace function validation.re3_1_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
-declare
-	count_all integer := 0;
-	count_good integer := 0;
-	count_bad integer := 0;
-	count_bad_points integer := 0;
-begin
-	delete from errors.erros_3d where rule_code = 're3_1_2'
-		or (rule_code is null and entidade = 'curva_de_nivel' and motivo like 'discrepância no valor de z:%');
-
-	with 
-		total as (select count(*) from {schema}.curva_de_nivel),
-		bad as (select count(*) from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria))
-	select total.count, total.count - bad.count as good, bad.count from total, bad
-	into count_all, count_good, count_bad;
-
-	with 
-	bad as (select * from {schema}.curva_de_nivel where ST_ZMax(geometria) != ST_ZMin(geometria)),
-	pontos as (select
-		identificador, ST_ZMax(geometria) as max, ST_ZMin(geometria) as min,
-		ST_DumpPoints(geometria) as dp
-		FROM bad as pc),
-	media as (select identificador, percentile_disc(0.5) WITHIN GROUP (
-		ORDER BY st_z((dp).geom)) as mediana
-		FROM pontos 
-		GROUP by identificador),
-	bad_points AS (
-		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)	
-		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, 're3_1_2', (dp).geom as geometria from pontos, media
-		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
-			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
-			indice = EXCLUDED.indice
-		RETURNING 1
-	)
-
-	SELECT count(*) FROM bad_points into count_bad_points;
-	raise notice 'Existem % pontos errados', count_bad_points;
-
-	return query select count_all as total, count_good as good, count_bad as bad;
+	return query select * from validation.re3_1_1_validation(ndd, null::geometry, _args);
 end;
 $$ language plpgsql;
 
@@ -1241,37 +1144,46 @@ declare
 	count_all integer := 0;
 	count_good integer := 0;
 	count_bad integer := 0;
-	count_bad_points integer := 0;
 begin
-	with 
-		total as (select count(*) from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect)),
-		bad as (select count(*) from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect) and ST_ZMax(geometria) != ST_ZMin(geometria))
-	select total.count, total.count - bad.count as good, bad.count from total, bad
-	into count_all, count_good, count_bad;
+	if sect is null then
+		delete from errors.erros_3d where rule_code = 're3_1_2';
+	end if;
 
-	with 
-	bad as (select * from {schema}.curva_de_nivel cdn where ST_Intersects(cdn.geometria, sect) and ST_ZMax(geometria) != ST_ZMin(geometria)),
+	select coalesce(sum(ST_NPoints(geometria)), 0) from {schema}.curva_de_nivel into count_all;
+
+	with
+	bad as (
+		select * from {schema}.curva_de_nivel
+		where ST_ZMax(geometria) != ST_ZMin(geometria)
+			and (sect is null or ST_Intersects(geometria, sect))
+	),
 	pontos as (select
 		identificador, ST_ZMax(geometria) as max, ST_ZMin(geometria) as min,
 		ST_DumpPoints(geometria) as dp
 		FROM bad as pc),
 	media as (select identificador, percentile_disc(0.5) WITHIN GROUP (
 		ORDER BY st_z((dp).geom)) as mediana
-		FROM pontos 
+		FROM pontos
 		GROUP by identificador),
 	bad_points AS (
-		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)	
+		insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
 		select pontos.identificador, 'curva_de_nivel', (dp).path[1] as indice, 'discrepância no valor de z: ' || st_z((dp).geom) || ' em vez de ' || media.mediana, 're3_1_2', (dp).geom as geometria from pontos, media
 		where pontos.identificador = media.identificador and st_z((dp).geom) != media.mediana
-		ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
-			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
-			indice = EXCLUDED.indice
+		ON CONFLICT (identificador, entidade, motivo, geometria) DO NOTHING
 		RETURNING 1
 	)
-	SELECT count(*) FROM bad_points into count_bad_points;
-	raise notice 'Existem % pontos errados', count_bad_points;
+	SELECT count(*) FROM bad_points into count_bad;
+
+	count_good := count_all - count_bad;
+	raise notice 'Existem % pontos errados', count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re3_1_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re3_1_2_validation(ndd, null::geometry, _args);
 end;
 $$ language plpgsql;
 
@@ -1279,59 +1191,32 @@ create or replace function validation.re4_5_2_insert (_id uuid, _arr  float[], _
 declare
 	var int;
 	count_all integer := 0;
+	inserted integer := 0;
 begin
 	if _arr[1] > _arr[array_upper(_arr, 1)] then
 		-- a altimetria está diminuir
 		for var in 1..array_upper(_arr, 1)-1 loop
 			if _arr[var] < _arr[var+1] then
-				count_all := count_all + 1;
 				insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
 				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', 're4_5_2', ST_PointN(_geo, var))
-				ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
-			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
-			indice = EXCLUDED.indice;
+				ON CONFLICT (identificador, entidade, motivo, geometria) DO NOTHING;
+				get diagnostics inserted = row_count;
+				count_all := count_all + inserted;
 			end if;
 		end loop;
 	else
 		-- a altimetria está aumentar
 		for var in 1..array_upper(_arr, 1)-1 loop
 			if _arr[var] > _arr[var+1] then
-				count_all := count_all + 1;
 				insert into errors.erros_3d (identificador, entidade, indice, motivo, rule_code, geometria)
 				values (_id, 'curso_de_agua_eixo', var, 'ponto de inflexão', 're4_5_2', ST_PointN(_geo, var))
-				ON CONFLICT (identificador, entidade, motivo, geometria) DO UPDATE SET
-			rule_code = COALESCE(errors.erros_3d.rule_code, EXCLUDED.rule_code),
-			indice = EXCLUDED.indice;
+				ON CONFLICT (identificador, entidade, motivo, geometria) DO NOTHING;
+				get diagnostics inserted = row_count;
+				count_all := count_all + inserted;
 			end if;
 		end loop;
 	end if;
 	return count_all;
-end;
-$$ language plpgsql;
-
-create or replace function validation.re4_5_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
-declare
-	count_all integer := 0;
-	count_good integer := 0;
-	count_bad integer := 0;
-	count_bad_points integer := 0;
-begin
-	delete from errors.erros_3d where rule_code = 're4_5_2'
-		or (rule_code is null and entidade = 'curso_de_agua_eixo' and motivo = 'ponto de inflexão');
-
-	with 
-		aux as (select identificador, geometria, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo group by identificador, geometria),
-		pontos as (select identificador, geometria, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador, geometria),
-		teste as (select identificador, geometria, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
-		total as (select count(*) from {schema}.curso_de_agua_eixo),
-		good as (select count(*) from teste where comparacao),
-		bad as (
-			select count( validation.re4_5_2_insert (identificador, pontos_arr, geometria) )
-			from teste where not comparacao)
-	select total.count as total, total.count - bad.count as good, bad.count as bad from total, bad
-	into count_all, count_good, count_bad;
-
-	return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
 
@@ -1340,23 +1225,36 @@ declare
 	count_all integer := 0;
 	count_good integer := 0;
 	count_bad integer := 0;
-	count_bad_points integer := 0;
 begin
-	with 
-		aux as (select identificador, geometria, (ST_DumpPoints(geometria)).* from {schema}.curso_de_agua_eixo 
-			where ST_Intersects(geometria, sect)
-			group by identificador, geometria),
+	if sect is null then
+		delete from errors.erros_3d where rule_code = 're4_5_2';
+	end if;
+
+	select coalesce(sum(ST_NPoints(geometria)), 0) from {schema}.curso_de_agua_eixo into count_all;
+
+	with
+		aux as (
+			select identificador, geometria, (ST_DumpPoints(geometria)).*
+			from {schema}.curso_de_agua_eixo
+			where sect is null or ST_Intersects(geometria, sect)
+			group by identificador, geometria
+		),
 		pontos as (select identificador, geometria, array_agg(ST_Z(geom)) as pontos_arr from aux group by identificador, geometria),
 		teste as (select identificador, geometria, pontos_arr, (pontos_arr = validation.sort_desc(pontos_arr) or pontos_arr = validation.sort_asc(pontos_arr)) as comparacao from pontos),
-		total as (select count(*) from {schema}.curso_de_agua_eixo),
-		good as (select count(*) from teste where comparacao),
 		bad as (
-			select count( validation.re4_5_2_insert (identificador, pontos_arr, geometria) )
+			select coalesce(sum(validation.re4_5_2_insert(identificador, pontos_arr, geometria)), 0) as n
 			from teste where not comparacao)
-	select total.count as total, total.count - bad.count as good, bad.count as bad from total, bad
-	into count_all, count_good, count_bad;
+	select bad.n into count_bad from bad;
+
+	count_good := count_all - count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re4_5_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re4_5_2_validation(ndd, null::geometry, _args);
 end;
 $$ language plpgsql;
 
@@ -1424,7 +1322,12 @@ begin
 		delete from errors.curso_de_agua_eixo_re4_4_2;
 	end if;
 
-	with candidates as (
+	with in_scope as (
+		select e.identificador
+		from {schema}.curso_de_agua_eixo e
+		where sect is null or ST_Intersects(e.geometria, sect)
+	),
+	candidates as (
 		select e.*
 		from {schema}.curso_de_agua_eixo e
 		where e.largura is not null
@@ -1451,11 +1354,12 @@ begin
 		returning 1
 	)
 	select
-		(select count(*) from classified)::int,
-		(select count(*) from classified where has_area)::int,
+		(select count(*) from in_scope)::int,
 		(select count(*) from classified where not has_area)::int
-	into count_all, count_good, count_bad
+	into count_all, count_bad
 	from (select count(*) from ins) as _force_ins;
+
+	count_good := count_all - count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
@@ -2187,7 +2091,10 @@ end;
 $$ language plpgsql;
 
 
-create or replace function validation.descontinuidades_quadrantes (entidade text) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
+drop function if exists validation.descontinuidades_quadrantes(text);
+drop function if exists validation.descontinuidades_quadrantes(text, geometry);
+
+create or replace function validation.descontinuidades_quadrantes (entidade text, limite double precision) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
 begin
 	return query execute format('WITH p AS (
 		SELECT  {schema}.%1$I.identificador AS id, {schema}.st_startpoint(%1$I.geometria) AS geom
@@ -2203,7 +2110,7 @@ begin
 	 st_setsrid((p1.geom)::geometry(PointZ), 3763) AS p1_endpoint_geom
 		FROM (q p1
 			JOIN q p2 ON p1.quad = p2.quad
-			 AND (((st_3ddistance(p1.geom, p2.geom) <> (0)::double precision) AND (st_3ddistance(p1.geom, p2.geom) < (0.2)::double precision)))
+			 AND (((st_3ddistance(p1.geom, p2.geom) <> (0)::double precision) AND (st_3ddistance(p1.geom, p2.geom) < (%2$s)::double precision)))
 			 AND (
 				p1.id < p2.id
 				OR (
@@ -2212,20 +2119,20 @@ begin
 						< (ST_X(p2.geom), ST_Y(p2.geom), COALESCE(ST_Z(p2.geom), 0))
 				)
 			 )
-		);', entidade);
+		);', entidade, limite);
 end;
 $$ language plpgsql;
 
-create or replace function validation.descontinuidades_quadrantes (entidade text, sect geometry) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
+create or replace function validation.descontinuidades_quadrantes (entidade text, sect geometry, limite double precision) returns table (p1_id uuid, p2_id uuid, dist_p1_p2 double precision, p1_endpoint_geom geometry) as $$
 begin
 	return query execute format('WITH p AS (
 		SELECT  {schema}.%1$I.identificador AS id, {schema}.st_startpoint(%1$I.geometria) AS geom
 			FROM {schema}.%1$I
-			where ST_Intersects(%1$I.geometria, %L)
+			where ST_Intersects(%1$I.geometria, %3$L)
 		UNION
 		SELECT  {schema}.%1$I.identificador, {schema}.st_endpoint(%1$I.geometria) AS geom
 			FROM {schema}.%1$I
-			where ST_Intersects(%1$I.geometria, %L)
+			where ST_Intersects(%1$I.geometria, %3$L)
 	), q AS (
 		SELECT  p.id, p.geom, trunc(ST_X(p.geom)/100)::text || '','' || trunc(ST_Y(p.geom)/100)::text AS quad
 			FROM p
@@ -2234,7 +2141,7 @@ begin
 	 st_setsrid((p1.geom)::geometry(PointZ), 3763) AS p1_endpoint_geom
 		FROM (q p1
 			JOIN q p2 ON p1.quad = p2.quad
-			 AND (((st_3ddistance(p1.geom, p2.geom) <> (0)::double precision) AND (st_3ddistance(p1.geom, p2.geom) < (0.2)::double precision)))
+			 AND (((st_3ddistance(p1.geom, p2.geom) <> (0)::double precision) AND (st_3ddistance(p1.geom, p2.geom) < (%2$s)::double precision)))
 			 AND (
 				p1.id < p2.id
 				OR (
@@ -2243,12 +2150,15 @@ begin
 						< (ST_X(p2.geom), ST_Y(p2.geom), COALESCE(ST_Z(p2.geom), 0))
 				)
 			 )
-		);', entidade, sect);
+		);', entidade, limite, sect);
 end;
 $$ language plpgsql;
 
 
-create or replace function validation.rg_3_validation () returns table (total int, good int, bad int) as $$
+drop function if exists validation.rg_3_validation();
+drop function if exists validation.rg_3_validation(geometry);
+
+create or replace function validation.rg_3_validation (limite double precision) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
@@ -2275,10 +2185,10 @@ begin
 				SELECT p1_id, p2_id, dist_p1_p2, p1_endpoint_geom, %L,
 					CASE WHEN p1_id = p2_id THEN ''linha quase fechada''
 					     ELSE ''extremos quase coincidentes'' END
-				FROM validation.descontinuidades_quadrantes(%L)
+				FROM validation.descontinuidades_quadrantes(%L, %s)
 				RETURNING 1
 			)
-			SELECT count(*) FROM bad_rows', tabela_erro, tabela, tabela) into bad_aux;
+			SELECT count(*) FROM bad_rows', tabela_erro, tabela, tabela, limite) into bad_aux;
 
 		count_all := count_all + all_aux;
 		count_bad := count_bad + bad_aux;
@@ -2290,7 +2200,7 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function validation.rg_3_validation (sect geometry) returns table (total int, good int, bad int) as $$
+create or replace function validation.rg_3_validation (sect geometry, limite double precision) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
@@ -2316,10 +2226,10 @@ begin
 				SELECT p1_id, p2_id, dist_p1_p2, p1_endpoint_geom, %L,
 					CASE WHEN p1_id = p2_id THEN ''linha quase fechada''
 					     ELSE ''extremos quase coincidentes'' END
-				FROM validation.descontinuidades_quadrantes(%L, %L)
+				FROM validation.descontinuidades_quadrantes(%L, %L, %s)
 				RETURNING 1
 			)
-			SELECT count(*) FROM bad_rows', tabela_erro, tabela, tabela, sect) into bad_aux;
+			SELECT count(*) FROM bad_rows', tabela_erro, tabela, tabela, sect, limite) into bad_aux;
 
 		count_all := count_all + all_aux;
 		count_bad := count_bad + bad_aux;
@@ -2481,7 +2391,7 @@ begin
 	 'sinal_geodesico'];
 
 	tabelas_3d = array['agua_lentica', 'curso_de_agua_area', 'curso_de_agua_eixo', 'no_hidrografico',
-	 'curva_de_nivel', 'fronteira_terra_agua', 'linha_de_quebra', 'nascente', 'no_trans_ferrov', 'obra_arte',
+	 'curva_de_nivel', 'fronteira_terra_agua', 'linha_de_quebra', 'nascente', 'obra_arte',
 	 'ponto_cotado', 'queda_de_agua', 'seg_via_ferrea', 'seg_via_rodov', 'via_rodov_limite', 'zona_humida'];
 
 	CREATE SCHEMA IF NOT EXISTS errors;
@@ -2545,6 +2455,32 @@ begin
 	count_all := count_all + all_aux;
 	count_bad := count_bad + bad_aux;
 
+	tabela := 'no_trans_ferrov';
+	execute format('select count(*) from {schema}.%I', tabela) into all_aux;
+	execute format('SELECT COUNT(*) FROM (select geom, ids, ft from
+		(SELECT ST_AsText(geometria) AS geom,
+			array_agg(identificador) AS ids,
+			array_agg(valor_tipo_no_trans_ferrov::text ORDER BY valor_tipo_no_trans_ferrov) AS valor,
+			''no_trans_ferrov'' as ft
+		FROM {schema}.no_trans_ferrov
+		GROUP BY geom HAVING COUNT(*) > 1) sub
+			where valor <> ARRAY[''4'', ''5'']) as foo') into bad_aux;
+
+	execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
+	SELECT ''%1$s'', %2$s, %3$s, geom, ids, geometria
+		FROM (SELECT ST_AsText(geometria) AS geom,
+				array_agg(identificador) AS ids,
+				array_agg(valor_tipo_no_trans_ferrov::text ORDER BY valor_tipo_no_trans_ferrov) AS valor,
+				''no_trans_ferrov'' as ft,
+				geometria
+			FROM {schema}.no_trans_ferrov
+			GROUP BY geom, geometria
+			HAVING COUNT(*) > 1) sub
+				where valor <> ARRAY[''4'', ''5'']', tabela, all_aux, bad_aux, tabela_erro);
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
 	select (count_all - count_bad) into count_good;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
@@ -2575,7 +2511,7 @@ begin
 	 'constru_na_margem', 'numero_policia', 'sinal_geodesico'];
 
 	tabelas_3d = array['agua_lentica', 'curso_de_agua_area', 'curso_de_agua_eixo', 'no_hidrografico',
-	 'curva_de_nivel', 'fronteira_terra_agua', 'linha_de_quebra', 'nascente', 'no_trans_ferrov', 'obra_arte',
+	 'curva_de_nivel', 'fronteira_terra_agua', 'linha_de_quebra', 'nascente', 'obra_arte',
 	 'ponto_cotado', 'queda_de_agua', 'seg_via_ferrea', 'seg_via_rodov', 'via_rodov_limite', 'zona_humida'];
 
 	CREATE SCHEMA IF NOT EXISTS errors;
@@ -2635,6 +2571,32 @@ begin
 			HAVING COUNT(*) > 1) sub
 				where not((array_position(valor, ''4'') = 1 and array_position(valor, ''5'') = 2) or 
 					(array_position(valor, ''5'') = 1 and array_position(valor, ''4'') = 2))', tabela, all_aux, bad_aux, tabela_erro);
+
+	count_all := count_all + all_aux;
+	count_bad := count_bad + bad_aux;
+
+	tabela := 'no_trans_ferrov';
+	execute format('select count(*) from {schema}.%I', tabela) into all_aux;
+	execute format('SELECT COUNT(*) FROM (select geom, ids, ft from
+		(SELECT ST_AsText(geometria) AS geom,
+			array_agg(identificador) AS ids,
+			array_agg(valor_tipo_no_trans_ferrov::text ORDER BY valor_tipo_no_trans_ferrov) AS valor,
+			''no_trans_ferrov'' as ft
+		FROM {schema}.no_trans_ferrov
+		GROUP BY geom HAVING COUNT(*) > 1) sub
+			where valor <> ARRAY[''4'', ''5'']) as foo') into bad_aux;
+
+	execute format('INSERT INTO %4$s (entidade, entidade_total, entidade_duplicados, geom, ids, geometria)
+	SELECT ''%1$s'', %2$s, %3$s, geom, ids, geometria
+		FROM (SELECT ST_AsText(geometria) AS geom,
+				array_agg(identificador) AS ids,
+				array_agg(valor_tipo_no_trans_ferrov::text ORDER BY valor_tipo_no_trans_ferrov) AS valor,
+				''no_trans_ferrov'' as ft,
+				geometria
+			FROM {schema}.no_trans_ferrov
+			GROUP BY geom, geometria
+			HAVING COUNT(*) > 1) sub
+				where valor <> ARRAY[''4'', ''5'']', tabela, all_aux, bad_aux, tabela_erro);
 
 	count_all := count_all + all_aux;
 	count_bad := count_bad + bad_aux;
@@ -3660,49 +3622,74 @@ end;
 $$ language plpgsql;
 
 
-create or replace function validation.re5_5_4_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+create or replace function validation.re5_2_4_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
 	count_bad integer := 0;
 begin
 	CREATE SCHEMA IF NOT EXISTS errors;
-	CREATE TABLE IF NOT exists errors.no_trans_rodov_re_5_5_4 (like {schema}.no_trans_rodov INCLUDING ALL);
+	DROP TABLE IF EXISTS errors.no_trans_ferrov_re5_2_4;
+	CREATE TABLE IF NOT EXISTS errors.infra_trans_ferrov_re5_2_4 (LIKE {schema}.infra_trans_ferrov INCLUDING ALL);
 
-	delete from errors.no_trans_rodov_re_5_5_4;
+	if sect is null then
+		delete from errors.infra_trans_ferrov_re5_2_4;
+	end if;
 
-	with inter as (
-		select distinct st_intersection(l1.geometria, l2.geometria) as geom from {schema}.seg_via_rodov l1
-			join {schema}.infra_trans_rodov l2
-				on st_intersects(ST_StartPoint(l1.geometria), l2.geometria)
-				or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
+	with endpoints as (
+		select ST_Force2D(ST_StartPoint(geometria)) as pt
+		from {schema}.seg_via_ferrea
+		where sect is null or ST_Intersects(geometria, sect)
+		union all
+		select ST_Force2D(ST_EndPoint(geometria))
+		from {schema}.seg_via_ferrea
+		where sect is null or ST_Intersects(geometria, sect)
 	),
-	inter_with_counts AS (
-		SELECT i.geom, COUNT(n.geometria) AS node_count
-		FROM inter i
-		LEFT JOIN {schema}.no_trans_rodov n ON n.geometria = i.geom
-		GROUP BY i.geom
+	infras as (
+		select i.identificador,
+			ST_X(ST_Force2D(i.geometria)) as x,
+			ST_Y(ST_Force2D(i.geometria)) as y
+		from {schema}.infra_trans_ferrov i
+		where exists (
+			select 1 from endpoints e
+			where ST_Intersects(e.pt, ST_Force2D(i.geometria))
+				and (sect is null or ST_Intersects(e.pt, sect))
+		)
 	),
-	estat AS (
-		SELECT
-			COUNT(*) FILTER (WHERE node_count <> 0) AS total,
-			COUNT(*) FILTER (WHERE node_count <> 0 and node_count = 2) AS good,
-			COUNT(*) FILTER (WHERE node_count <> 0 and node_count <> 2) AS bad
-		FROM inter_with_counts
+	counts as (
+		select f.identificador, count(n.identificador) as node_count
+		from infras f
+		left join {schema}.no_trans_ferrov n
+			on ST_X(ST_Force2D(n.geometria)) = f.x
+			and ST_Y(ST_Force2D(n.geometria)) = f.y
+		group by f.identificador
 	),
-	bad_rows AS (
-		INSERT INTO errors.no_trans_rodov_re_5_5_4
-			SELECT n.*
-			FROM {schema}.no_trans_rodov n
-			WHERE n.geometria IN (SELECT geom FROM inter_with_counts WHERE node_count <> 2)
-			ON CONFLICT DO NOTHING
-			RETURNING 1
+	ins as (
+		insert into errors.infra_trans_ferrov_re5_2_4
+		select i.*
+		from {schema}.infra_trans_ferrov i
+		join counts c on c.identificador = i.identificador
+		where c.node_count <> 2
+		on conflict do nothing
+		returning 1
 	)
-	select s.total, s.good, s.bad from estat s into count_all, count_good, count_bad;
+	select
+		(select count(*) from counts)::int,
+		(select count(*) from counts where node_count = 2)::int,
+		(select count(*) from counts where node_count <> 2)::int
+	into count_all, count_good, count_bad
+	from (select count(*) from ins) as _force_ins;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
+
+create or replace function validation.re5_2_4_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re5_2_4_validation(ndd, null::geometry, _args);
+end;
+$$ language plpgsql;
+
 
 create or replace function validation.re5_5_4_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
 declare
@@ -3711,39 +3698,64 @@ declare
 	count_bad integer := 0;
 begin
 	CREATE SCHEMA IF NOT EXISTS errors;
-	CREATE TABLE IF NOT exists errors.no_trans_rodov_re_5_5_4 (like {schema}.no_trans_rodov INCLUDING ALL);
+	DROP TABLE IF EXISTS errors.no_trans_rodov_re_5_5_4;
+	CREATE TABLE IF NOT EXISTS errors.infra_trans_rodov_re5_5_4 (LIKE {schema}.infra_trans_rodov INCLUDING ALL);
 
-	with inter as (
-		select distinct st_intersection(l1.geometria, l2.geometria) as geom from {schema}.seg_via_rodov l1
-			join {schema}.infra_trans_rodov l2
-				on st_intersects(ST_StartPoint(l1.geometria), l2.geometria)
-				or st_intersects(ST_EndPoint(l1.geometria), l2.geometria)
-			WHERE ST_Intersects(l2.geometria, sect)
+	if sect is null then
+		delete from errors.infra_trans_rodov_re5_5_4;
+	end if;
+
+	with endpoints as (
+		select ST_Force2D(ST_StartPoint(geometria)) as pt
+		from {schema}.seg_via_rodov
+		where sect is null or ST_Intersects(geometria, sect)
+		union all
+		select ST_Force2D(ST_EndPoint(geometria))
+		from {schema}.seg_via_rodov
+		where sect is null or ST_Intersects(geometria, sect)
 	),
-	inter_with_counts AS (
-		SELECT i.geom, COUNT(n.geometria) AS node_count
-		FROM inter i
-		LEFT JOIN {schema}.no_trans_rodov n ON n.geometria = i.geom
-		GROUP BY i.geom
+	infras as (
+		select i.identificador,
+			ST_X(ST_Force2D(i.geometria)) as x,
+			ST_Y(ST_Force2D(i.geometria)) as y
+		from {schema}.infra_trans_rodov i
+		where exists (
+			select 1 from endpoints e
+			where ST_Intersects(e.pt, ST_Force2D(i.geometria))
+				and (sect is null or ST_Intersects(e.pt, sect))
+		)
 	),
-	estat AS (
-		SELECT
-			COUNT(*) FILTER (WHERE node_count <> 0) AS total,
-			COUNT(*) FILTER (WHERE node_count <> 0 and node_count = 2) AS good,
-			COUNT(*) FILTER (WHERE node_count <> 0 and node_count <> 2) AS bad
-		FROM inter_with_counts
+	counts as (
+		select f.identificador, count(n.identificador) as node_count
+		from infras f
+		left join {schema}.no_trans_rodov n
+			on ST_X(ST_Force2D(n.geometria)) = f.x
+			and ST_Y(ST_Force2D(n.geometria)) = f.y
+		group by f.identificador
 	),
-	bad_rows AS (
-		INSERT INTO errors.no_trans_rodov_re_5_5_4
-			SELECT n.*
-			FROM {schema}.no_trans_rodov n
-			WHERE n.geometria IN (SELECT geom FROM inter_with_counts WHERE node_count <> 2)
-			ON CONFLICT DO NOTHING
-			RETURNING 1
+	ins as (
+		insert into errors.infra_trans_rodov_re5_5_4
+		select i.*
+		from {schema}.infra_trans_rodov i
+		join counts c on c.identificador = i.identificador
+		where c.node_count <> 2
+		on conflict do nothing
+		returning 1
 	)
-	select s.total, s.good, s.bad from estat s into count_all, count_good, count_bad;
+	select
+		(select count(*) from counts)::int,
+		(select count(*) from counts where node_count = 2)::int,
+		(select count(*) from counts where node_count <> 2)::int
+	into count_all, count_good, count_bad
+	from (select count(*) from ins) as _force_ins;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re5_5_4_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re5_5_4_validation(ndd, null::geometry, _args);
 end;
 $$ language plpgsql;
 
@@ -4477,7 +4489,7 @@ begin
 	)
 	select count(*) from bad_rows into count_bad;
 
-	return query select -1, -1, coalesce(count_bad, 0);
+	return query select coalesce(count_bad, 0), 0, coalesce(count_bad, 0);
 end;
 $$ language plpgsql;
 

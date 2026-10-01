@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Tag metadata file
-        run: sed -i -E "s/^version=v{0,1}[0-9]+\.[0-9]\.{0,1}[0-9]*/version=${{github.ref_name}}/g" ./plugin/metadata.txt
+        run: sed -i -E "s/^version=.*/version=${{github.ref_name}}/" ./plugin/metadata.txt
       - name: Create zip file
         run: |
           pip install PyQt5
@@ -36,4 +36,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "./plugin/recartDGT.zip"
+          generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -3458,7 +3458,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/backgrounds/background_square.svg?fill=%23a6cee3&amp;fill-opacity=1&amp;outline=%230000cc&amp;outline-opacity=1&amp;outline-width=2" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="backgrounds/background_square.svg?fill=%23a6cee3&amp;fill-opacity=1&amp;outline=%230000cc&amp;outline-opacity=1&amp;outline-width=2" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
@@ -3498,7 +3498,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/backgrounds/background_square.svg?fill=%230032fa&amp;fill-opacity=1&amp;outline=%230000cc&amp;outline-opacity=1&amp;outline-width=2" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="backgrounds/background_square.svg?fill=%230032fa&amp;fill-opacity=1&amp;outline=%230000cc&amp;outline-opacity=1&amp;outline-width=2" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
@@ -8511,7 +8511,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/backgrounds/background_square.svg?fill=%23ffffff&amp;fill-opacity=1&amp;outline=%23000000&amp;outline-opacity=1&amp;outline-width=1" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="backgrounds/background_square.svg?fill=%23ffffff&amp;fill-opacity=1&amp;outline=%23000000&amp;outline-opacity=1&amp;outline-width=1" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
@@ -8537,7 +8537,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/crosses/Cross4.svg?fill=%23000000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0.12" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="crosses/Cross4.svg?fill=%23000000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0.12" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
@@ -8577,7 +8577,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/backgrounds/background_square.svg?fill=%23fb9a99&amp;fill-opacity=1&amp;outline=%23cc0000&amp;outline-opacity=1&amp;outline-width=1" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="backgrounds/background_square.svg?fill=%23fb9a99&amp;fill-opacity=1&amp;outline=%23cc0000&amp;outline-opacity=1&amp;outline-width=1" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
@@ -8910,7 +8910,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/igreja.svg"/>
+        <Option name="name" type="QString" value="simbolos/igreja.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -8994,7 +8994,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/reservatorio_mae_agua.svg"/>
+        <Option name="name" type="QString" value="simbolos/reservatorio_mae_agua.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -9078,7 +9078,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg"/>
+        <Option name="name" type="QString" value="simbolos/mesquita_sinagoga.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -9191,7 +9191,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/moinho de vento.svg"/>
+        <Option name="name" type="QString" value="simbolos/moinho de vento.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -9306,7 +9306,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg"/>
+        <Option name="name" type="QString" value="simbolos/mesquita_sinagoga.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -9647,7 +9647,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg"/>
+        <Option name="name" type="QString" value="simbolos/mesquita_sinagoga.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -10039,7 +10039,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/azenha.svg"/>
+        <Option name="name" type="QString" value="simbolos/azenha.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -10309,7 +10309,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/capela.svg"/>
+        <Option name="name" type="QString" value="simbolos/capela.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -10393,7 +10393,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <Option name="color" type="QString" value="255,0,0,255,rgb:1,0,0,1"/>
         <Option name="fixedAspectRatio" type="QString" value="0"/>
         <Option name="horizontal_anchor_point" type="QString" value="1"/>
-        <Option name="name" type="QString" value="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/farol.svg"/>
+        <Option name="name" type="QString" value="simbolos/farol.svg"/>
         <Option name="offset" type="QString" value="0,0"/>
         <Option name="offset_map_unit_scale" type="QString" value="3x:0,0,0,0,0,0"/>
         <Option name="offset_unit" type="QString" value="MM"/>
@@ -10926,12 +10926,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/azenha.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/azenha.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/azenha.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/azenha.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -11045,12 +11045,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/capela.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/capela.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/capela.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/capela.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -11097,12 +11097,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/farol.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/farol.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/farol.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/farol.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -11206,12 +11206,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/igreja.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/igreja.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/igreja.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/igreja.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -11258,12 +11258,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/reservatorio_mae_agua.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/reservatorio_mae_agua.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/reservatorio_mae_agua.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/reservatorio_mae_agua.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -11310,12 +11310,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/mesquita_sinagoga.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/mesquita_sinagoga.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -11375,12 +11375,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/moinho de vento.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/moinho de vento.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/moinho de vento.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/moinho de vento.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -11449,12 +11449,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/mesquita_sinagoga.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/mesquita_sinagoga.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -11644,12 +11644,12 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/mesquita_sinagoga.svg?fill=%23ff0000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/extjs/GeoMasterBoard/server/scripts/database/client/dgt/DemonstradorWEB_CartTop/projetoQGIS_exemplo_Atlas_20231031/20231031/CartTop2_A0/simbolos/mesquita_sinagoga.svg" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="simbolos/mesquita_sinagoga.svg" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Well known marker fallback-->
@@ -12725,7 +12725,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/symbol/poi_tower_power.svg?fill=%23000000&amp;fill-opacity=1&amp;outline=%23000000&amp;outline-opacity=1&amp;outline-width=0.4" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="symbol/poi_tower_power.svg?fill=%23000000&amp;fill-opacity=1&amp;outline=%23000000&amp;outline-opacity=1&amp;outline-width=0.4" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
@@ -13491,7 +13491,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/symbol/poi_tower_communications.svg?fill=%23000000&amp;fill-opacity=1&amp;outline=%23000000&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="symbol/poi_tower_communications.svg?fill=%23000000&amp;fill-opacity=1&amp;outline=%23000000&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
@@ -15859,7 +15859,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <se:Graphic>
          <!--Parametric SVG-->
          <se:ExternalGraphic>
-          <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/shopping/shopping_pet2.svg?fill=%238c6400&amp;fill-opacity=1&amp;outline=%23ffffff&amp;outline-opacity=1&amp;outline-width=0.005" xlink:type="simple"/>
+          <se:OnlineResource xlink:href="shopping/shopping_pet2.svg?fill=%238c6400&amp;fill-opacity=1&amp;outline=%23ffffff&amp;outline-opacity=1&amp;outline-width=0.005" xlink:type="simple"/>
           <se:Format>image/svg+xml</se:Format>
          </se:ExternalGraphic>
          <!--Plain SVG fallback, no parameters-->
@@ -19749,7 +19749,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
       <se:Graphic>
        <!--Parametric SVG-->
        <se:ExternalGraphic>
-        <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/symbol/landuse_coniferous.svg?fill=%2354b04a&amp;fill-opacity=1&amp;outline=%233d8035&amp;outline-opacity=1&amp;outline-width=1.2" xlink:type="simple"/>
+        <se:OnlineResource xlink:href="symbol/landuse_coniferous.svg?fill=%2354b04a&amp;fill-opacity=1&amp;outline=%233d8035&amp;outline-opacity=1&amp;outline-width=1.2" xlink:type="simple"/>
         <se:Format>image/svg+xml</se:Format>
        </se:ExternalGraphic>
        <!--Plain SVG fallback, no parameters-->
@@ -21487,7 +21487,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <se:Graphic>
          <!--Parametric SVG-->
          <se:ExternalGraphic>
-          <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/backgrounds/background_tilted_square.svg?fill=%23000000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
+          <se:OnlineResource xlink:href="backgrounds/background_tilted_square.svg?fill=%23000000&amp;fill-opacity=1&amp;outline=%23232323&amp;outline-opacity=1&amp;outline-width=0" xlink:type="simple"/>
           <se:Format>image/svg+xml</se:Format>
          </se:ExternalGraphic>
          <!--Plain SVG fallback, no parameters-->
@@ -26723,7 +26723,7 @@ INSERT INTO public.layer_styles ( f_table_catalog, f_table_schema, f_table_name,
         <se:Graphic>
          <!--Parametric SVG-->
          <se:ExternalGraphic>
-          <se:OnlineResource xlink:href="/home/jgr/dev/cpp/build-qgis-qt6/output/data/svg/symbol/landuse_grass.svg?fill=%230000cc&amp;fill-opacity=1&amp;outline=%230000cc&amp;outline-opacity=1&amp;outline-width=0.12" xlink:type="simple"/>
+          <se:OnlineResource xlink:href="symbol/landuse_grass.svg?fill=%230000cc&amp;fill-opacity=1&amp;outline=%230000cc&amp;outline-opacity=1&amp;outline-width=0.12" xlink:type="simple"/>
           <se:Format>image/svg+xml</se:Format>
          </se:ExternalGraphic>
          <!--Plain SVG fallback, no parameters-->
