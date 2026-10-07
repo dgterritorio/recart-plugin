@@ -818,6 +818,10 @@ class ValidationDialog(QDialog, FORM_CLASS):
                         print('-----')
                         print(row)
 
+                    if slayer is not None and slayer not in displayList:
+                        self.writeText("[Aviso] Objeto '{}' ignorado no relatório".format(slayer))
+                        continue
+
                     if slayer is not None:
                         key = displayList[slayer]["name"]
                         if key not in themes:
@@ -1397,6 +1401,10 @@ class AddLayersProcess(QThread):
                     elif tb[0] == 'erros_3d':
                         slayer = tb[0]
                     else:
+                        continue
+
+                    if slayer is not None and slayer not in displayList:
+                        self.write("[Aviso] Camada '{}' ignorada ao adicionar erros".format(slayer))
                         continue
 
                     if slayer is not None:

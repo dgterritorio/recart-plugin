@@ -837,7 +837,7 @@ begin
 	end if;
 
 	if rg = 1 then
-		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' ';
+		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' and LEFT(f_table_name, 3) != ''ls_'' ';
 	else
 		if versao = 1 then
 			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
@@ -909,7 +909,7 @@ begin
 	end if;
 
 	if rg = 1 then
-		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria'' ';
+		tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''POLYGON'' or type = ''GEOMETRY'') and LEFT(f_table_name, 1) != ''_'' and LEFT(f_table_name, 3) != ''ls_'' and f_geometry_column = ''geometria'' ';
 	else
 		if versao = 1 then
 			tabelas := $q$WITH  dupla_geometria (f_table_name, f_geometry_column) AS (VALUES 
@@ -2255,7 +2255,7 @@ declare
 	tabelas text;
 	tabela_erro text;
 begin
-	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria''';
+	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_'' and LEFT(f_table_name, 3) != ''ls_'' and f_geometry_column = ''geometria''';
 	for tabela in execute tabelas
 	loop
 		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
@@ -2277,7 +2277,7 @@ begin
 		end if;
 	end loop;
 
-	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''POLYGON'' or type = ''MULTIPOLYGON'') and coord_dimension = 2 and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria''';
+	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''POLYGON'' or type = ''MULTIPOLYGON'') and coord_dimension = 2 and LEFT(f_table_name, 1) != ''_'' and LEFT(f_table_name, 3) != ''ls_'' and f_geometry_column = ''geometria''';
 	for tabela in execute tabelas
 	loop
 		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
@@ -2318,7 +2318,7 @@ declare
 	tabelas text;
 	tabela_erro text;
 begin
-	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria''';
+	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_'' and LEFT(f_table_name, 3) != ''ls_'' and f_geometry_column = ''geometria''';
 	for tabela in execute tabelas
 	loop
 		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
@@ -2339,7 +2339,7 @@ begin
 		end if;
 	end loop;
 
-	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''POLYGON'' or type = ''MULTIPOLYGON'') and coord_dimension = 2 and LEFT(f_table_name, 1) != ''_'' and f_geometry_column = ''geometria''';
+	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and (type = ''POLYGON'' or type = ''MULTIPOLYGON'') and coord_dimension = 2 and LEFT(f_table_name, 1) != ''_'' and LEFT(f_table_name, 3) != ''ls_'' and f_geometry_column = ''geometria''';
 	for tabela in execute tabelas
 	loop
 		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
@@ -2695,7 +2695,7 @@ begin
 	count_all := count_all + rec_aux.total;
 	count_bad := count_bad + rec_aux.bad;
 
-	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_''';
+	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_'' and LEFT(f_table_name, 3) != ''ls_''';
 
 	for tabela in execute tabelas
 	loop 
@@ -2750,7 +2750,7 @@ begin
 	count_all := count_all + rec_aux.total;
 	count_bad := count_bad + rec_aux.bad;
 
-	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_''';
+	tabelas := 'select f_table_name, f_geometry_column from geometry_columns where f_table_schema = ''{schema}'' and f_geometry_column=''geometria'' and (type = ''LINESTRING'') and LEFT(f_table_name, 1) != ''_'' and LEFT(f_table_name, 3) != ''ls_''';
 
 	for tabela in execute tabelas
 	loop 
