@@ -1699,6 +1699,7 @@ begin
 		ST_Force2D(e.geometria) as g2d
 	from {schema}.curso_de_agua_eixo e
 	where e.geometria is not null
+		and e.valor_posicao_vertical = '0'
 		and (sect is null or ST_Intersects(e.geometria, sect));
 
 	create index on _re4_7_eixos using gist (g2d);
