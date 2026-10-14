@@ -48,10 +48,10 @@ from . import qgis_configs
 from .postgis_helper import PostgisUtils
 from .aux_export import displayList, recartStructure, fieldNameMap, joins, form_nullable_fields
 from .gpkg_qgis_project import (
-    LABEL_VIEWS,
     build_and_embed_recart_project,
     copy_layer_as_attributes,
     create_gpkg_spatial_indexes,
+    label_views_for_export,
     write_gpkg_relationships,
 )
 
@@ -757,33 +757,38 @@ class ExportLayersProcess(QThread):
                                 outdata.CopyLayer(tabletogo, tb, copy_opts)
                                 exportedLayers[tb] = 1
 
-        # Materialize label views into the GPKG for project joins / labeling parity
-        self.ensure_aux_views()
+        # Label views exist only to join names onto edificio, areas
+        # artificializadas and via segments. Copying them for any other
+        # selection reads one row per feature in those tables.
+        views_needed = [
+            view for view in label_views_for_export(exportedLayers)
+            if view not in exportedLayers
+        ]
         pg_ds = None
         try:
-            gdal.UseExceptions()
-            pg_ds = gdal.OpenEx(
-                'PG:' + self.conn, gdal.OF_VECTOR,
-                open_options=['SCHEMAS=' + self.schema, 'LIST_ALL_TABLES=YES'])
-            for view in LABEL_VIEWS:
-                if view in exportedLayers:
-                    continue
-                self.write('A exportar a view de etiquetas {}'.format(view))
-                view_layer = None
-                if pg_ds is not None:
-                    view_layer = pg_ds.GetLayerByName(view)
-                if view_layer is None:
-                    view_layer = self.datasource.GetLayerByName(view)
-                if view_layer:
-                    if copy_layer_as_attributes(
-                            view_layer, outdata, view, self.write):
-                        exportedLayers[view] = 1
+            if views_needed:
+                self.ensure_aux_views()
+                gdal.UseExceptions()
+                pg_ds = gdal.OpenEx(
+                    'PG:' + self.conn, gdal.OF_VECTOR,
+                    open_options=['SCHEMAS=' + self.schema, 'LIST_ALL_TABLES=YES'])
+                for view in views_needed:
+                    self.write('A exportar a view de etiquetas {}'.format(view))
+                    view_layer = None
+                    if pg_ds is not None:
+                        view_layer = pg_ds.GetLayerByName(view)
+                    if view_layer is None:
+                        view_layer = self.datasource.GetLayerByName(view)
+                    if view_layer:
+                        if copy_layer_as_attributes(
+                                view_layer, outdata, view, self.write):
+                            exportedLayers[view] = 1
+                        else:
+                            self.write(
+                                "[Aviso] View de etiquetas '{}' não foi exportada".format(view))
                     else:
                         self.write(
-                            "[Aviso] View de etiquetas '{}' não copiada como tabela de atributos".format(view))
-                else:
-                    self.write(
-                        "[Aviso] View de etiquetas '{}' não disponível para exportação".format(view))
+                            "[Aviso] View de etiquetas '{}' não disponível para exportação".format(view))
         except Exception as e:
             self.write("[Aviso] Não foi possível exportar views de etiquetas: {}".format(e))
         finally:
