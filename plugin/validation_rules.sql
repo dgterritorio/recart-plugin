@@ -927,13 +927,13 @@ good as (select count(*)
 		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )),
+	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) )),
 bad as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
 		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and not exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) ))
+	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) ))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$with 
@@ -945,13 +945,13 @@ good as (select count(*)
 		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )),
+	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) )),
 bad as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
 		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and not exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) ))
+	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) ))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select b.*
@@ -959,7 +959,7 @@ $$select b.*
 	where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 	and not exists (select e.* 
 from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )$$ );
+where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) )$$ );
 
 delete from validation.rules_area where code = 're4_3_2';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
@@ -980,14 +980,14 @@ good as (select count(*)
 		and ST_Intersects(geometria, '%1$s')
 		and exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )),
+	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) )),
 bad as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
 		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and ST_Intersects(geometria, '%1$s')
 		and not exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) ))
+	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) ))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$with 
@@ -1001,14 +1001,14 @@ good as (select count(*)
 		and ST_Intersects(geometria, '%1$s')
 		and exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )),
+	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) )),
 bad as (select count(*)
 		from {schema}.barreira b, {schema}.valor_barreira vb
 		where b.valor_barreira = vb.identificador and (vb.descricao ilike '%%betão' or vb.descricao ilike '%%terra')
 		and ST_Intersects(geometria, '%1$s')
 		and not exists (select e.* 
 	from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) ))
+	where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) ))
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad $$,
 $$select b.*
@@ -1017,7 +1017,7 @@ $$select b.*
 	and ST_Intersects(geometria, '%1$s')
 	and not exists (select e.* 
 from {schema}.edificio e, {schema}.valor_forma_edificio vfe
-where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and st_within(b.geometria, e.geometria ) )$$ );
+where e.valor_forma_edificio = vfe.identificador and lower(vfe.descricao) = 'barragem' and ST_CoveredBy(b.geometria, e.geometria) )$$ );
 
 
 -- RE4.4: limiar de largura entre margens (NdD1: 1 m; NdD2: 5 m).

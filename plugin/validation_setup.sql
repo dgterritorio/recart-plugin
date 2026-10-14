@@ -3209,8 +3209,8 @@ begin
 	classificados as (
 		select *,
 			(
-				(valor_posicao_vertical = '1' and -delta_z > desvio_3D)
-				or (valor_posicao_vertical = '-1' and delta_z > desvio_3D)
+				(valor_posicao_vertical = '1' and -delta_z >= desvio_3D)
+				or (valor_posicao_vertical = '-1' and delta_z >= desvio_3D)
 			) as erro
 		from verificar
 	),
