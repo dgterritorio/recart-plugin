@@ -3152,6 +3152,97 @@ begin
 end;
 $$ language plpgsql;
 
+create or replace function validation.rg4_3_3_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all int := 0;
+	count_good int := 0;
+	count_bad int := 0;
+	desvio_3D numeric;
+begin
+	if ndd = 1 then
+		select coalesce(_args->>'desvio_3D', '0.028')::numeric into desvio_3D;
+	else
+		select coalesce(_args->>'desvio_3D', '0.141')::numeric into desvio_3D;
+	end if;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.intersecoes_3d_rg_4_3_3 (like validation.intersecoes_3d INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.intersecoes_3d_rg_4_3_3;
+	else
+		delete from errors.intersecoes_3d_rg_4_3_3 where ST_Intersects(geometria, sect);
+	end if;
+
+	WITH linhas1 as (
+		select identificador, geometria, 'curva_de_nivel' as tabela
+		from {schema}.curva_de_nivel
+		where sect is null or ST_Intersects(geometria, sect)
+	),
+	linhas2 as (
+		select identificador, geometria, valor_posicao_vertical, 'curso_de_agua_eixo' as tabela
+		from {schema}.curso_de_agua_eixo
+		where valor_posicao_vertical != '0' and delimitacao_conhecida and not ficticio
+			and (sect is null or ST_Intersects(geometria, sect))
+	),
+	allintersections as (
+		SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2,
+			linhas1.identificador as id_1, linhas1.geometria as geom_1,
+			linhas2.identificador as id_2, linhas2.geometria as geom_2,
+			linhas2.valor_posicao_vertical,
+			ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
+		FROM linhas1, linhas2
+		where ST_Intersects(linhas1.geometria, linhas2.geometria)
+	),
+	confirmacoes as (
+		select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, valor_posicao_vertical,
+			ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao,
+			ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao,
+			(dp).geom as geometria
+		from allintersections
+	),
+	verificar as (
+		select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, valor_posicao_vertical,
+			(st_z(p2_intersecao) - st_z(p1_intersecao)) as delta_z
+		from confirmacoes
+	),
+	classificados as (
+		select *,
+			(
+				(valor_posicao_vertical = '1' and -delta_z > desvio_3D)
+				or (valor_posicao_vertical = '-1' and delta_z > desvio_3D)
+			) as erro
+		from verificar
+	),
+	inserted as (
+		INSERT INTO errors.intersecoes_3d_rg_4_3_3 (
+			id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria,
+			p1_intersecao, p2_intersecao, delta_z, regra
+		)
+		SELECT id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria,
+			p1_intersecao, p2_intersecao, delta_z, 'rg_4_3_3'
+		FROM classificados
+		WHERE erro is true
+		ON CONFLICT DO NOTHING
+		RETURNING 1
+	)
+	SELECT count(*)::int,
+		count(*) FILTER (WHERE erro is not true)::int,
+		count(*) FILTER (WHERE erro is true)::int
+	FROM classificados
+	WHERE (SELECT count(*) FROM inserted) >= 0
+	INTO count_all, count_good, count_bad;
+
+	return query select coalesce(count_all, 0), coalesce(count_good, 0), coalesce(count_bad, 0);
+end;
+$$ language plpgsql;
+
+create or replace function validation.rg4_3_3_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.rg4_3_3_validation(ndd, NULL::geometry, _args);
+end;
+$$ language plpgsql;
+
 create or replace function validation.re4_8_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
