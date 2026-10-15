@@ -76,6 +76,7 @@ class MainDialog(QDialog, FORM_CLASS):
         # para se adivinhar o CRS da fonte de dados
         self.srs = ''
         self.postgisUtils = None
+        self.conString = None
 
     def showEvent(self, event):
         super(MainDialog, self).showEvent(event)
@@ -126,6 +127,7 @@ class MainDialog(QDialog, FORM_CLASS):
 
     def changeConn(self, newConnName):
         self.schemaName.clear()
+        self.conString = None
 
         if newConnName == 'Atualizar conexões...':
             self.fillDataSources()
@@ -153,6 +155,7 @@ class MainDialog(QDialog, FORM_CLASS):
 
                     self.schemaName.addItems(schemas)
                     self.schemaName.setCurrentIndex(schemas.index('public') if 'public' in schemas else 0)
+                    self.conString = conString
 
                 except ValueError as error:
                     self.plainTextEdit.appendPlainText(
@@ -197,16 +200,12 @@ class MainDialog(QDialog, FORM_CLASS):
             self.exportEncoding.setEnabled(True)
 
     def doLoadLayers(self):
-        conString = qgis_configs.getConnString(
-            self, self.connCombo.currentText())
-        schema = str(self.schemaName.currentText())
-
-        if conString is None:
-            self.plainTextEdit.appendPlainText(
-                        "[Aviso] {0}\n".format("Ligação inválida"))
+        if not self.conString:
+            self.plainTextEdit.appendPlainText("[Aviso] Ligação inválida")
             return
 
-        self.loadLayersProcess = LoadLayersProcess(conString, schema)
+        schema = str(self.schemaName.currentText())
+        self.loadLayersProcess = LoadLayersProcess(self.conString, schema)
 
         self.loadLayersProcess.signal.connect(self.writeText)
         self.loadLayersProcess.finished.connect(self.finishedLoadLayers)

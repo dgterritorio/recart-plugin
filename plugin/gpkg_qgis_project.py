@@ -21,9 +21,7 @@ from qgis.core import (
 from .aux_export import displayList, form_nullable_fields, joins, recartStructure
 
 PROJECT_NAME = 'Recart'
-# Each label view is a join target for one feature table. Exporting a view
-# without that table copies one row per feature (edificios, in particular)
-# and is what makes a single-layer GeoPackage export look stuck.
+# Each label view is a join target for one feature table.
 LABEL_VIEW_FOR_LAYER = {
     'edificio': 'ls_edificio_label_view',
     'areas_artificializadas': 'ls_areas_artificializadas_label_view',
@@ -69,8 +67,7 @@ def copy_layer_as_attributes(src_layer, dest_ds, dest_name, log_cb=None):
 
     dst_defn = dst_layer.GetLayerDefn()
     src_layer.ResetReading()
-    # One transaction: otherwise GPKG commits (and rewrites the -journal)
-    # on every feature, which stalls on views with one row per edificio.
+    # One transaction: otherwise GPKG commits on every feature
     in_transaction = dest_ds.StartTransaction() == 0
     try:
         for feat in src_layer:
