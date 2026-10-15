@@ -1699,6 +1699,7 @@ begin
 		ST_Force2D(e.geometria) as g2d
 	from {schema}.curso_de_agua_eixo e
 	where e.geometria is not null
+		and e.valor_posicao_vertical = '0'
 		and (sect is null or ST_Intersects(e.geometria, sect));
 
 	create index on _re4_7_eixos using gist (g2d);
@@ -3152,6 +3153,97 @@ begin
 end;
 $$ language plpgsql;
 
+create or replace function validation.rg4_3_3_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all int := 0;
+	count_good int := 0;
+	count_bad int := 0;
+	desvio_3D numeric;
+begin
+	if ndd = 1 then
+		select coalesce(_args->>'desvio_3D', '0.028')::numeric into desvio_3D;
+	else
+		select coalesce(_args->>'desvio_3D', '0.141')::numeric into desvio_3D;
+	end if;
+
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT exists errors.intersecoes_3d_rg_4_3_3 (like validation.intersecoes_3d INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.intersecoes_3d_rg_4_3_3;
+	else
+		delete from errors.intersecoes_3d_rg_4_3_3 where ST_Intersects(geometria, sect);
+	end if;
+
+	WITH linhas1 as (
+		select identificador, geometria, 'curva_de_nivel' as tabela
+		from {schema}.curva_de_nivel
+		where sect is null or ST_Intersects(geometria, sect)
+	),
+	linhas2 as (
+		select identificador, geometria, valor_posicao_vertical, 'curso_de_agua_eixo' as tabela
+		from {schema}.curso_de_agua_eixo
+		where valor_posicao_vertical != '0' and delimitacao_conhecida and not ficticio
+			and (sect is null or ST_Intersects(geometria, sect))
+	),
+	allintersections as (
+		SELECT linhas1.tabela as tabela_1, linhas2.tabela as tabela_2,
+			linhas1.identificador as id_1, linhas1.geometria as geom_1,
+			linhas2.identificador as id_2, linhas2.geometria as geom_2,
+			linhas2.valor_posicao_vertical,
+			ST_DumpPoints( ST_Intersection(linhas1.geometria, linhas2.geometria) ) as dp
+		FROM linhas1, linhas2
+		where ST_Intersects(linhas1.geometria, linhas2.geometria)
+	),
+	confirmacoes as (
+		select tabela_1, tabela_2, id_1, id_2, geom_1, geom_2, valor_posicao_vertical,
+			ST_LineInterpolatePoint( geom_1, ST_LineLocatePoint(geom_1, (dp).geom)) as p1_intersecao,
+			ST_LineInterpolatePoint( geom_2, ST_LineLocatePoint(geom_2, (dp).geom)) as p2_intersecao,
+			(dp).geom as geometria
+		from allintersections
+	),
+	verificar as (
+		select id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria, p1_intersecao, p2_intersecao, valor_posicao_vertical,
+			(st_z(p2_intersecao) - st_z(p1_intersecao)) as delta_z
+		from confirmacoes
+	),
+	classificados as (
+		select *,
+			(
+				(valor_posicao_vertical = '1' and -delta_z >= desvio_3D)
+				or (valor_posicao_vertical = '-1' and delta_z >= desvio_3D)
+			) as erro
+		from verificar
+	),
+	inserted as (
+		INSERT INTO errors.intersecoes_3d_rg_4_3_3 (
+			id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria,
+			p1_intersecao, p2_intersecao, delta_z, regra
+		)
+		SELECT id_1, id_2, tabela_1, tabela_2, geom_1, geom_2, geometria,
+			p1_intersecao, p2_intersecao, delta_z, 'rg_4_3_3'
+		FROM classificados
+		WHERE erro is true
+		ON CONFLICT DO NOTHING
+		RETURNING 1
+	)
+	SELECT count(*)::int,
+		count(*) FILTER (WHERE erro is not true)::int,
+		count(*) FILTER (WHERE erro is true)::int
+	FROM classificados
+	WHERE (SELECT count(*) FROM inserted) >= 0
+	INTO count_all, count_good, count_bad;
+
+	return query select coalesce(count_all, 0), coalesce(count_good, 0), coalesce(count_bad, 0);
+end;
+$$ language plpgsql;
+
+create or replace function validation.rg4_3_3_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.rg4_3_3_validation(ndd, NULL::geometry, _args);
+end;
+$$ language plpgsql;
+
 create or replace function validation.re4_8_1_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
@@ -3350,10 +3442,15 @@ begin
 
 	select
 		count(*)::int,
-		count(*) filter (where justified)::int,
-		count(*) filter (where not justified)::int
+		count(*) filter (where not is_bad)::int,
+		count(*) filter (where is_bad)::int
 	into count_all, count_good, count_bad
-	from _re4_8_2_classified;
+	from (
+		select u.identificador, bool_or(not c.justified) as is_bad
+		from _re4_8_2_classified c
+		cross join lateral unnest(c.ids) as u(identificador)
+		group by u.identificador
+	) eixos;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
@@ -3474,6 +3571,102 @@ begin
 	FROM nos_classified into count_all, count_good, count_bad;
 
 	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+
+create or replace function validation.re5_2_2_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
+declare
+	count_all integer := 0;
+	count_good integer := 0;
+	count_bad integer := 0;
+begin
+	CREATE SCHEMA IF NOT EXISTS errors;
+	CREATE TABLE IF NOT EXISTS errors.seg_via_ferrea_re5_2_2 (like {schema}.seg_via_ferrea INCLUDING ALL);
+
+	if sect is null then
+		delete from errors.seg_via_ferrea_re5_2_2;
+	end if;
+
+	drop table if exists _re5_2_2_pairs;
+	drop table if exists _re5_2_2_endpoints;
+	drop table if exists _re5_2_2_points;
+	drop table if exists _re5_2_2_bad_ids;
+	drop table if exists _re5_2_2_all_ids;
+
+	create temp table _re5_2_2_pairs on commit drop as
+	select cf1.identificador as id1,
+		cf2.identificador as id2,
+		ST_Intersection(cf1.geometria, cf2.geometria) as geom
+	from {schema}.seg_via_ferrea cf1
+	join {schema}.seg_via_ferrea cf2
+		on cf1.identificador < cf2.identificador
+		and cf1.valor_posicao_vertical_transportes = cf2.valor_posicao_vertical_transportes
+		and ST_Intersects(cf1.geometria, cf2.geometria)
+		and (
+			sect is null
+			or ST_Intersects(cf1.geometria, sect)
+			or ST_Intersects(cf2.geometria, sect)
+		);
+
+	create temp table _re5_2_2_endpoints on commit drop as
+	select ST_StartPoint(geometria) as geom
+	from {schema}.seg_via_ferrea
+	union
+	select ST_EndPoint(geometria)
+	from {schema}.seg_via_ferrea;
+
+	create temp table _re5_2_2_points on commit drop as
+	select d.geom as pt
+	from _re5_2_2_pairs p
+	cross join lateral ST_Dump(p.geom) as d
+	where GeometryType(p.geom) in ('POINT', 'MULTIPOINT')
+		and d.geom not in (select geom from _re5_2_2_endpoints);
+
+	create temp table _re5_2_2_bad_ids on commit drop as
+	select svf.identificador as id
+	from {schema}.seg_via_ferrea svf
+	join _re5_2_2_points bp on ST_Contains(svf.geometria, bp.pt)
+	union
+	select p.id1
+	from _re5_2_2_pairs p
+	where GeometryType(p.geom) not in ('POINT', 'MULTIPOINT')
+	union
+	select p.id2
+	from _re5_2_2_pairs p
+	where GeometryType(p.geom) not in ('POINT', 'MULTIPOINT');
+
+	create temp table _re5_2_2_all_ids on commit drop as
+	select id1 as id from _re5_2_2_pairs
+	union
+	select id2 from _re5_2_2_pairs;
+
+	insert into errors.seg_via_ferrea_re5_2_2
+	select e.*
+	from {schema}.seg_via_ferrea e
+	where e.identificador in (select id from _re5_2_2_bad_ids)
+	on conflict do nothing;
+
+	select
+		(select count(*) from (
+			select id from _re5_2_2_all_ids
+			union
+			select id from _re5_2_2_bad_ids
+		) t)::int,
+		(select count(*) from _re5_2_2_all_ids a
+			where not exists (
+				select 1 from _re5_2_2_bad_ids b where b.id = a.id
+			))::int,
+		(select count(*) from _re5_2_2_bad_ids)::int
+	into count_all, count_good, count_bad;
+
+	return query select count_all as total, count_good as good, count_bad as bad;
+end;
+$$ language plpgsql;
+
+create or replace function validation.re5_2_2_validation (ndd integer, _args json) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re5_2_2_validation(ndd, null::geometry, _args);
 end;
 $$ language plpgsql;
 
@@ -4500,8 +4693,10 @@ end;
 $$ language plpgsql;
 
 
--- select * from validation.re4_10_validation ();
-create or replace function validation.re4_10_validation () returns table (total int, good int, bad int) as $$
+drop function if exists validation.re4_10_validation();
+drop function if exists validation.re4_10_validation(geometry);
+
+create or replace function validation.re4_10_validation (spec int, sect geometry) returns table (total int, good int, bad int) as $$
 declare
 	count_all integer := 0;
 	count_good integer := 0;
@@ -4511,123 +4706,188 @@ declare
 	bad_aux integer;
 	tabela text;
 	tabela_erro text;
-	tabelas text[];
 	tipo_no text;
-	add_fltr text;
+	extra text;
+	scope_sql text;
+	fail_sql text;
 begin
-	tabelas = array['queda_de_agua', 'zona_humida', 'barreira'];
-
-	for tabela in select unnest(tabelas)
-	loop 
-		RAISE NOTICE '-------------------------- table % -------------------------------------------------', tabela;
-		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
-		RAISE NOTICE 'All is % for table %', all_aux, tabela;
-		count_all := count_all + all_aux;
-
-		if tabela='barreira' then
-			tipo_no := '6';
-			add_fltr := 'valor_barreira=''1'' and';
+	for tabela in select unnest(array['queda_de_agua', 'zona_humida', 'barreira'])
+	loop
+		if tabela = 'zona_humida' and spec = 2 then
+			scope_sql := $f$
+				($1::geometry is null or ST_Intersects(t.geometria, $1))
+				and exists (
+					select 1 from {schema}.curso_de_agua_eixo e
+					where ST_Crosses(e.geometria, t.geometria)
+				)
+			$f$;
+			fail_sql := $f$
+				exists (
+					select 1
+					from {schema}.curso_de_agua_eixo e
+					left join lateral (
+						select p.geom
+						from ST_Dump(ST_CollectionExtract(ST_Intersection(e.geometria, ST_Boundary(t.geometria)), 1)) p
+					) pts on true
+					where ST_Crosses(e.geometria, t.geometria)
+						and (
+							e.ficticio is not true
+							or pts.geom is null
+							or not exists (
+								select 1 from {schema}.no_hidrografico nh
+								where nh.valor_tipo_no_hidrografico = '5'
+									and ST_Intersects(nh.geometria, pts.geom)
+							)
+						)
+				)
+			$f$;
 		else
-			tipo_no := '5';
-			add_fltr := '';
+			if tabela = 'barreira' then
+				tipo_no := '6';
+				if spec = 2 then
+					extra := 't.valor_barreira = ''1''';
+				else
+					extra := 'true';
+				end if;
+			else
+				tipo_no := '5';
+				extra := 'true';
+			end if;
+
+			scope_sql := format($f$
+				($1::geometry is null or ST_Intersects(t.geometria, $1))
+				and (%s)
+				and exists (
+					select 1 from {schema}.curso_de_agua_eixo e
+					where ST_Intersects(t.geometria, e.geometria)
+				)
+			$f$, extra);
+			fail_sql := format($f$
+				not exists (
+					select 1
+					from {schema}.curso_de_agua_eixo e
+					join {schema}.no_hidrografico nh
+						on nh.valor_tipo_no_hidrografico = %L
+						and ST_Intersects(nh.geometria, t.geometria)
+						and ST_Intersects(nh.geometria, e.geometria)
+					where ST_Intersects(t.geometria, e.geometria)
+				)
+			$f$, tipo_no);
 		end if;
 
-		execute format('select count(t.*) from {schema}.%I t, {schema}.no_hidrografico nh
-			where St_intersects(t.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%s''', tabela, tipo_no) INTO good_aux;
+		execute format('select count(*)::int from {schema}.%I t where %s', tabela, scope_sql) using sect into all_aux;
+		execute format('select count(*)::int from {schema}.%I t where %s and (%s)', tabela, scope_sql, fail_sql) using sect into bad_aux;
+		good_aux := all_aux - bad_aux;
 
-		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
+		raise notice 're4_10_1 % spec % total % good % bad %', tabela, spec, all_aux, good_aux, bad_aux;
+		count_all := count_all + all_aux;
 		count_good := count_good + good_aux;
-
-		execute format('select count(t.*) from {schema}.%1$I t
-			where %3$s (not (select ST_intersects(t.geometria, f.geometria) from 
-					(select geom_col as geometria from validation.no_hidro) as f)
-				or t.identificador not in (select distinct ta.identificador from {schema}.%1$I ta, {schema}.no_hidrografico nh 
-					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no, add_fltr) INTO bad_aux;
-	
-		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
 		count_bad := count_bad + bad_aux;
 
-		if bad_aux > 0 then
-			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tabela_erro := 'errors.' || tabela || '_re4_10_1';
-			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
-
-			execute format('delete from %1$s', tabela_erro);
-			execute format('insert into %1$s select t.* from {schema}.%2$I t
-				where %4$s (not (select ST_intersects(t.geometria, f.geometria) from 
-						(select geom_col as geometria from validation.no_hidro) as f)
-					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, {schema}.no_hidrografico nh 
-						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no, add_fltr);
+		tabela_erro := 'errors.' || tabela || '_re4_10_1';
+		if bad_aux > 0 or to_regclass(tabela_erro) is not null then
+			create schema if not exists errors;
+			execute format('create table if not exists %s (like {schema}.%I including all)', tabela_erro, tabela);
+			execute format('delete from %s t where ($1::geometry is null or ST_Intersects(t.geometria, $1))', tabela_erro) using sect;
+			if bad_aux > 0 then
+				execute format('insert into %s select t.* from {schema}.%I t where %s and (%s)', tabela_erro, tabela, scope_sql, fail_sql) using sect;
+			end if;
 		end if;
 	end loop;
+
 	return query select count_all as total, count_good as good, count_bad as bad;
 end;
 $$ language plpgsql;
 
-create or replace function validation.re4_10_validation (sect geometry) returns table (total int, good int, bad int) as $$
+create or replace function validation.re4_10_validation (spec int) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re4_10_validation(spec, null::geometry);
+end;
+$$ language plpgsql;
+
+
+create or replace function validation.re4_10_2_validation (spec int, sect geometry) returns table (total int, good int, bad int) as $$
 declare
-	count_all integer := 0;
-	count_good integer := 0;
-	count_bad integer := 0;
 	all_aux integer;
 	good_aux integer;
 	bad_aux integer;
-	tabela text;
-	tabela_erro text;
-	tabelas text[];
-	tipo_no text;
-	add_fltr text;
+	tabela_erro text := 'errors.no_hidrografico_re4_10_2';
 begin
-	tabelas = array['queda_de_agua', 'zona_humida', 'barreira'];
+	drop table if exists pg_temp._re4_10_2_scope;
+	create temp table _re4_10_2_scope on commit drop as
+	select nh.identificador,
+		(
+			(
+				nh.valor_tipo_no_hidrografico = '5'
+				and (
+					exists (
+						select 1 from {schema}.queda_de_agua q
+						where ST_Intersects(nh.geometria, q.geometria)
+					)
+					or (
+						spec = 1
+						and exists (
+							select 1 from {schema}.zona_humida z
+							where ST_Intersects(nh.geometria, z.geometria)
+						)
+					)
+					or (
+						spec = 2
+						and exists (
+							select 1
+							from {schema}.zona_humida z
+							join {schema}.curso_de_agua_eixo e
+								on e.ficticio is true
+								and ST_Crosses(e.geometria, z.geometria)
+							where ST_Intersects(nh.geometria, ST_Boundary(z.geometria))
+								and ST_Intersects(nh.geometria, e.geometria)
+						)
+					)
+				)
+			)
+			or (
+				nh.valor_tipo_no_hidrografico = '6'
+				and exists (
+					select 1 from {schema}.barreira b
+					where ST_Intersects(nh.geometria, b.geometria)
+						and (spec = 1 or b.valor_barreira = '1')
+				)
+			)
+		) as is_good
+	from {schema}.no_hidrografico nh
+	where (sect is null or ST_Intersects(nh.geometria, sect))
+		and nh.valor_tipo_no_hidrografico in ('5', '6')
+		and exists (
+			select 1 from {schema}.curso_de_agua_eixo e
+			where ST_Intersects(nh.geometria, e.geometria)
+		);
 
-	for tabela in select unnest(tabelas)
-	loop 
-		RAISE NOTICE '-------------------------- table % -------------------------------------------------', tabela;
-		execute format('select count(*) from {schema}.%I where ST_Intersects(geometria, %L)', tabela, sect) INTO all_aux;
-		RAISE NOTICE 'All is % for table %', all_aux, tabela;
-		count_all := count_all + all_aux;
+	select count(*)::int, (count(*) filter (where is_good))::int
+	into all_aux, good_aux
+	from _re4_10_2_scope;
+	bad_aux := all_aux - good_aux;
 
-		if tabela='barreira' then
-			tipo_no := '6';
-			add_fltr := 'valor_barreira=''1'' and';
-		else
-			tipo_no := '5';
-			add_fltr := '';
-		end if;
+	raise notice 're4_10_2 spec % total % good % bad %', spec, all_aux, good_aux, bad_aux;
 
-		execute format('select count(t.*) from {schema}.%I t, {schema}.no_hidrografico nh
-			where ST_Intersects(t.geometria, %3$L) and St_intersects(t.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''', tabela, tipo_no, sect) INTO good_aux;
+	if bad_aux > 0 or to_regclass(tabela_erro) is not null then
+		create schema if not exists errors;
+		create table if not exists errors.no_hidrografico_re4_10_2 (like {schema}.no_hidrografico including all);
+		delete from errors.no_hidrografico_re4_10_2 t
+		where (sect is null or ST_Intersects(t.geometria, sect));
+		insert into errors.no_hidrografico_re4_10_2
+		select nh.*
+		from {schema}.no_hidrografico nh
+		join _re4_10_2_scope s on s.identificador = nh.identificador
+		where not s.is_good;
+	end if;
 
-		RAISE NOTICE 'Good is % for table %', good_aux, tabela;
-		count_good := count_good + good_aux;
+	return query select all_aux as total, good_aux as good, bad_aux as bad;
+end;
+$$ language plpgsql;
 
-		execute format('select count(t.*) from {schema}.%1$I t
-			where %4$s ST_Intersects(geometria, %3$L) and (not (select ST_intersects(t.geometria, f.geometria) from 
-					(select geom_col as geometria from validation.no_hidro) as f)
-				or t.identificador not in (select distinct ta.identificador from {schema}.%1$I ta, {schema}.no_hidrografico nh 
-					where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%2$s''))', tabela, tipo_no, sect, add_fltr) INTO bad_aux;
-	
-		RAISE NOTICE 'Bad is % for table %', bad_aux, tabela;
-		count_bad := count_bad + bad_aux;
-
-		if bad_aux > 0 then
-			CREATE SCHEMA IF NOT EXISTS errors;
-			-- table without indexes
-			tabela_erro := 'errors.' || tabela || '_re4_10_1';
-			-- raise notice '%', tbl;
-			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
-
-			execute format('delete from %1$s', tabela_erro);
-			execute format('insert into %1$s select t.* from {schema}.%2$I t
-				where %5$s ST_Intersects(geometria, %4$L) and (not (select ST_intersects(t.geometria, f.geometria) from 
-						(select geom_col as geometria from validation.no_hidro) as f)
-					or t.identificador not in (select distinct ta.identificador from {schema}.%2$I ta, {schema}.no_hidrografico nh 
-						where St_intersects(ta.geometria, nh.geometria) and nh.valor_tipo_no_hidrografico=''%3$s''))', tabela_erro, tabela, tipo_no, sect, add_fltr);
-		end if;
-	end loop;
-	return query select count_all as total, count_good as good, count_bad as bad;
+create or replace function validation.re4_10_2_validation (spec int) returns table (total int, good int, bad int) as $$
+begin
+	return query select * from validation.re4_10_2_validation(spec, null::geometry);
 end;
 $$ language plpgsql;
 
