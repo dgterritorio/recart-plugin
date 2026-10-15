@@ -21,12 +21,23 @@ from qgis.core import (
 from .aux_export import displayList, form_nullable_fields, joins, recartStructure
 
 PROJECT_NAME = 'Recart'
-LABEL_VIEWS = (
-    'ls_edificio_label_view',
-    'ls_areas_artificializadas_label_view',
-    'ls_seg_via_rodov_label_view',
-    'ls_seg_via_ferrea_label_view',
-)
+# Each label view is a join target for one feature table.
+LABEL_VIEW_FOR_LAYER = {
+    'edificio': 'ls_edificio_label_view',
+    'areas_artificializadas': 'ls_areas_artificializadas_label_view',
+    'seg_via_rodov': 'ls_seg_via_rodov_label_view',
+    'seg_via_ferrea': 'ls_seg_via_ferrea_label_view',
+}
+LABEL_VIEWS = tuple(LABEL_VIEW_FOR_LAYER.values())
+
+
+def label_views_for_export(exported_layers):
+    """Label views whose feature table is part of this export."""
+    exported = set(exported_layers)
+    return [
+        view for layer, view in LABEL_VIEW_FOR_LAYER.items()
+        if layer in exported
+    ]
 
 
 def copy_layer_as_attributes(src_layer, dest_ds, dest_name, log_cb=None):
@@ -56,6 +67,8 @@ def copy_layer_as_attributes(src_layer, dest_ds, dest_name, log_cb=None):
 
     dst_defn = dst_layer.GetLayerDefn()
     src_layer.ResetReading()
+    # One transaction: otherwise GPKG commits on every feature
+    in_transaction = dest_ds.StartTransaction() == 0
     try:
         for feat in src_layer:
             if feat is None:
@@ -67,11 +80,20 @@ def copy_layer_as_attributes(src_layer, dest_ds, dest_name, log_cb=None):
             err = dst_layer.CreateFeature(new_feat)
             new_feat = None
             if err != 0:
+                if in_transaction:
+                    dest_ds.RollbackTransaction()
                 log("[Aviso] Falha a copiar feature para '{}'".format(dest_name))
                 return False
+        if in_transaction and dest_ds.CommitTransaction() != 0:
+            log("[Aviso] Falha a gravar a transação de '{}'".format(dest_name))
+            return False
     except Exception as e:
-        log("[Aviso] Falha a copiar '{}' como tabela de atributos: {}".format(
-            dest_name, e))
+        if in_transaction:
+            try:
+                dest_ds.RollbackTransaction()
+            except Exception:
+                pass
+        log("[Aviso] Falha a copiar '{}': {}".format(dest_name, e))
         return False
 
     return True
@@ -783,7 +805,12 @@ def build_and_embed_recart_project(gpkg_path, layer_list, vrs, srsid, log_cb=Non
             _add_layer(project, dgt_group, 'Tabelas Auxiliares', aux_group_index, layer)
             added_tables.add(table)
 
-        for view in LABEL_VIEWS:
+        needed_label_views = {
+            conf['join_table']
+            for name, conf in joins.items()
+            if conf['join_table'] in LABEL_VIEWS and project.mapLayersByName(name)
+        }
+        for view in needed_label_views:
             if view in added_tables:
                 continue
             if not _gpkg_has_layer(gpkg_path, view):
