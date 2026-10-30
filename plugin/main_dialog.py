@@ -77,6 +77,11 @@ class MainDialog(QDialog, FORM_CLASS):
         self.srs = ''
         self.postgisUtils = None
         self.conString = None
+        self.dataSource = None
+        self.vrs = 'Desconhecida'
+        self.loadLayersProcess = None
+        self._abandonedLoads = []
+        self.schemaName.currentTextChanged.connect(self.changeSchema)
 
     def showEvent(self, event):
         super(MainDialog, self).showEvent(event)
@@ -125,41 +130,90 @@ class MainDialog(QDialog, FORM_CLASS):
         secondRow = 'Atualizar conexões...'
         self.connCombo.addItems([firstRow, secondRow] + dblist)
 
+    def clearLoadedState(self):
+        process = self.loadLayersProcess
+        self.loadLayersProcess = None
+        if process is not None:
+            try:
+                process.finished.disconnect(self.finishedLoadLayers)
+            except TypeError:
+                pass
+            try:
+                process.signal.disconnect(self.writeText)
+            except TypeError:
+                pass
+            if process.isRunning():
+                self._abandonedLoads.append(process)
+                process.finished.connect(self._releaseAbandonedLoad)
+                if not process.isRunning():
+                    self._releaseAbandonedLoad(process)
+
+        self.treeView.setModel(None)
+        self.selectACheckBox.blockSignals(True)
+        self.selectACheckBox.setChecked(False)
+        self.selectACheckBox.blockSignals(False)
+        self.dataSource = None
+        self.vrs = 'Desconhecida'
+        self.vrsCombo.setCurrentText('Desconhecida')
+        self.srs = ''
+
+    def _releaseAbandonedLoad(self, process=None):
+        if process is None:
+            process = self.sender()
+        try:
+            self._abandonedLoads.remove(process)
+        except ValueError:
+            pass
+
+    def changeSchema(self, newSchema):
+        self.clearLoadedState()
+
     def changeConn(self, newConnName):
-        self.schemaName.clear()
+        self.clearLoadedState()
+        if self.postgisUtils is not None:
+            self.postgisUtils._invalidate_connection()
+            self.postgisUtils = None
         self.conString = None
 
-        if newConnName == 'Atualizar conexões...':
-            self.fillDataSources()
-            self.plainTextEdit.appendPlainText("Conexões Postgis atualizadas")
-            self.connCombo.setCurrentIndex(0)
-        else:
-            if newConnName != 'Escolher conexão...' and newConnName != 'Sem conexões disponíveis' and newConnName != "":
-                conString = qgis_configs.getConnString(self, newConnName)
-                # self.plainTextEdit.appendPlainText(
-                #     "New connection to: {0}\n".format(conString))
-                if conString is None:
-                    self.plainTextEdit.appendPlainText(
-                        "[Aviso] {0}\n".format("Conexão inválida"))
-                    self.fillDataSources()
-                    return
-
-                self.postgisUtils = PostgisUtils(self, conString)
-                try:
-                    schemas = self.postgisUtils.read_db_schemas_keep_conn()
-                    if not len(schemas) > 0:
+        schemaBlocked = self.schemaName.blockSignals(True)
+        self.schemaName.clear()
+        try:
+            if newConnName == 'Atualizar conexões...':
+                self.fillDataSources()
+                self.plainTextEdit.appendPlainText("Conexões Postgis atualizadas")
+                self.connCombo.setCurrentIndex(0)
+            else:
+                if newConnName != 'Escolher conexão...' and newConnName != 'Sem conexões disponíveis' and newConnName != "":
+                    conString = qgis_configs.getConnString(self, newConnName)
+                    # self.plainTextEdit.appendPlainText(
+                    #     "New connection to: {0}\n".format(conString))
+                    if conString is None:
                         self.plainTextEdit.appendPlainText(
                             "[Aviso] {0}\n".format("Conexão inválida"))
                         self.fillDataSources()
                         return
 
-                    self.schemaName.addItems(schemas)
-                    self.schemaName.setCurrentIndex(schemas.index('public') if 'public' in schemas else 0)
-                    self.conString = conString
+                    postgisUtils = PostgisUtils(self, conString)
+                    try:
+                        schemas = postgisUtils.read_db_schemas_keep_conn()
+                        if not len(schemas) > 0:
+                            postgisUtils._invalidate_connection()
+                            self.plainTextEdit.appendPlainText(
+                                "[Aviso] {0}\n".format("Conexão inválida"))
+                            self.fillDataSources()
+                            return
 
-                except ValueError as error:
-                    self.plainTextEdit.appendPlainText(
-                        "[Erro]: {0}\n".format(error))
+                        self.schemaName.addItems(schemas)
+                        self.schemaName.setCurrentIndex(schemas.index('public') if 'public' in schemas else 0)
+                        self.conString = conString
+                        self.postgisUtils = postgisUtils
+
+                    except ValueError as error:
+                        postgisUtils._invalidate_connection()
+                        self.plainTextEdit.appendPlainText(
+                            "[Erro]: {0}\n".format(error))
+        finally:
+            self.schemaName.blockSignals(schemaBlocked)
 
     def selectAll(self, state):
         if Qt.CheckState(state) == Qt.CheckState.Checked:
@@ -190,12 +244,22 @@ class MainDialog(QDialog, FORM_CLASS):
         self.selectACheckBox.blockSignals(False)
 
     def onChangeFormat(self, fmt):
-        if fmt == 'Projeto QGIS':
+        if fmt == 'Shapefile':
+            self.aliasCheckBox.setEnabled(True)
+        else:
             self.aliasCheckBox.setEnabled(False)
+
+        if fmt == 'GeoPackage':
+            self.fileLbl.setHidden(False)
+            self.fileName.setHidden(False)
+        else:
+            self.fileLbl.setHidden(True)
+            self.fileName.setHidden(True)
+
+        if fmt == 'Projeto QGIS':
             self.mQgsFileWidget.setEnabled(False)
             self.exportEncoding.setEnabled(False)
         else:
-            self.aliasCheckBox.setEnabled(True)
             self.mQgsFileWidget.setEnabled(True)
             self.exportEncoding.setEnabled(True)
 
@@ -214,14 +278,16 @@ class MainDialog(QDialog, FORM_CLASS):
         self.loadLayersProcess.start()
 
     def finishedLoadLayers(self):
+        if self.sender() is not self.loadLayersProcess:
+            return
+
         try:
             self.dataSource = self.loadLayersProcess.dataSource
             self.vrs = self.loadLayersProcess.vrs
             self.vrsCombo.setCurrentText(self.vrs)
             self.fillLayerList(self.dataSource)
 
-            crs = QgsCoordinateReferenceSystem("EPSG:" + self.srs)
-            self.mQgsProjectionSelectionWidget.setCrs( crs )
+            self.crs = QgsCoordinateReferenceSystem("EPSG:" + self.srs)
 
         except AttributeError as e:
             print(e)
@@ -247,7 +313,7 @@ class MainDialog(QDialog, FORM_CLASS):
                     authid = layer.GetSpatialRef().GetAuthorityCode( 'PROJCS' )
                     if self.srs != authid:
                         self.srs = authid
-                        self.writeText("Detetada camada {} com o sistema de coordenadas {}".format( layer.GetName(), authid ) )
+                        self.writeText("Detetado o sistema de coordenadas {}".format( authid ) )
 
                 if self.displayLayerList[layer.GetName()]['name'] in roots:
                     roots[self.displayLayerList[layer.GetName()]['name']
@@ -279,7 +345,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.writeText("A exportar camadas ...")
         self.progressBar.setVisible(True)
 
-        srsid = self.mQgsProjectionSelectionWidget.crs()
+        srsid = self.crs
         # self.writeText( 'Exportar no SRS {}'.format( srsid.authid() ) )
         self.writeText( 'Exportar no SRS {}'.format( srsid.postgisSrid() ) )
 
@@ -305,7 +371,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.exportLayersProcess = ExportLayersProcess(
             self.loadLayersProcess.conString, self.loadLayersProcess.schema,
             self.dataSource, layerList, outFormat, outEncoding, self.mQgsFileWidget.filePath(), self.aliasCheckBox.isChecked(), 
-            srsid.postgisSrid(), self.vrs, self.postgisUtils)
+            srsid.postgisSrid(), self.vrs, self.postgisUtils, False, self.fileName.text())
 
         self.exportLayersProcess.signal.connect(self.writeText)
         self.exportLayersProcess.addLayer.connect(self.addLayer)
@@ -318,7 +384,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.writeText("A carregar camadas ...")
         self.progressBar.setVisible(True)
 
-        srsid = self.mQgsProjectionSelectionWidget.crs()
+        srsid = self.crs
         # self.writeText( 'Exportar no SRS {}'.format( srsid.authid() ) )
         self.writeText( 'Carregar no SRS {}'.format( srsid.postgisSrid() ) )
 
@@ -514,7 +580,7 @@ class ExportLayersProcess(QThread):
     addLayer = pyqtSignal('PyQt_PyObject', 'PyQt_PyObject', 'PyQt_PyObject',
                           'PyQt_PyObject', 'PyQt_PyObject')
 
-    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid, vrs, postgisUtils, loadQGIS=False):
+    def __init__(self, connection, schema, datasource, layerList, outFormat, outEncoding, outDir, exportAlias, srsid, vrs, postgisUtils, loadQGIS=False, fileName=None):
         QThread.__init__(self)
 
         self.conn = connection
@@ -529,6 +595,7 @@ class ExportLayersProcess(QThread):
         self.vrs = vrs
         self.postgisUtils = postgisUtils
         self.loadQGIS = loadQGIS
+        self.fileName = fileName
 
         if not self.outDir:
             self.outDir = str(Path.home())
@@ -730,7 +797,8 @@ class ExportLayersProcess(QThread):
 
     def exportGeoPackage(self):
         exportedLayers = {}
-        self.gpkg_path = os.path.join(self.outDir, 'export.gpkg')
+        filename = f'{self.fileName}.gpkg' if self.fileName else 'export.gpkg'
+        self.gpkg_path = os.path.join(self.outDir, filename)
         driver = gdal.GetDriverByName('GPKG')
         if os.path.isfile(self.gpkg_path):
             driver.Delete(self.gpkg_path)
