@@ -5418,7 +5418,7 @@ BEGIN
         EXECUTE format(
             'INSERT INTO validation.geometrias_invalidas_report (tabela, identificador, motivo, geometria)
 			SELECT %L, identificador, ST_IsValidReason(geometria), geometria
-			FROM %I
+			FROM {schema}.%I
 			WHERE geometria IS NOT NULL AND NOT ST_IsValid(geometria)',
 			tbl, tbl
         );
