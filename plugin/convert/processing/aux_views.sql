@@ -3,12 +3,12 @@ CREATE MATERIALIZED VIEW {schema}.ls_areas_artificializadas_label_view
 TABLESPACE pg_default
 AS SELECT aa.identificador as areas_artificializadas_id,
     COALESCE(string_agg(DISTINCT ip.nome::text, ' | '::text), string_agg(DISTINCT iga.nome::text, ' | '::text), string_agg(DISTINCT euc.nome, ' | '::text)) AS nome,
-    geometria
+    aa.geometria
    FROM {schema}.areas_artificializadas aa
      LEFT JOIN {schema}.inst_producao ip ON aa.inst_producao_id = ip.identificador
      LEFT JOIN {schema}.inst_gestao_ambiental iga ON aa.inst_gestao_ambiental_id = iga.identificador
      LEFT JOIN {schema}.equip_util_coletiva euc ON aa.equip_util_coletiva_id = euc.identificador
-  GROUP BY aa.identificador
+  GROUP BY aa.identificador, aa.geometria
 WITH DATA;
 
 
