@@ -20,4 +20,4 @@ jobs:
         uses: EndBug/add-and-commit@v7
         with:
           branch: ${{github.head_ref}}
-          add: './plugin/convert/mapping.py'
+          add: './plugin/convert/mapping_*.py'
