@@ -57,10 +57,10 @@ for layer in layers.values():
 
 ## 4. Exportar para o plugin
 
-Utilizar o seguinte script para criar o novo `layer_styles`:
+É preciso o cliente PostgreSQL (`psql`) instalado. O nome do serviço vem do ficheiro de serviços: `~/.pg_service.conf` no Linux e no macOS, `%APPDATA%\postgresql\pg_service.conf` no Windows.
 
 ```bash
-./plugin/export_layer_styles.sh -p 5434 \
+python plugin/export_layer_styles.py -p 5434 \
   -o plugin/convert/processing/<versão>/layer_styles.sql \
   <pg_service>
 ```
