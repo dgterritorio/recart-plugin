@@ -1466,33 +1466,6 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE validation.create_agua_lentica_anel(max_vertices integer DEFAULT 16)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	CALL validation.create_agua_lentica_2d();
-
-	IF (SELECT count(*) FROM information_schema.tables
-		WHERE table_schema = 'validation' AND table_name = 'agua_lentica_anel') > 0 THEN
-		RAISE NOTICE 'A tabela validation.agua_lentica_anel já existe. Nada a fazer.';
-		RETURN;
-	END IF;
-
-	CREATE UNLOGGED TABLE validation.agua_lentica_anel AS
-	SELECT l.identificador AS lake_id, ST_Boundary(l.g2d) AS geom
-	FROM validation.agua_lentica_2d l
-	WHERE l.npts < 500
-	UNION ALL
-	SELECT l.identificador, g AS geom
-	FROM validation.agua_lentica_2d l
-	CROSS JOIN LATERAL ST_Subdivide(ST_Boundary(l.g2d), max_vertices) AS g
-	WHERE l.npts >= 500;
-
-	CREATE INDEX idx_agua_lentica_anel_geom ON validation.agua_lentica_anel USING GIST (geom);
-	CREATE INDEX idx_agua_lentica_anel_lake ON validation.agua_lentica_anel (lake_id);
-	ANALYZE validation.agua_lentica_anel;
-END;
-$$;
 
 CREATE OR REPLACE PROCEDURE validation.create_agua_water_idx(max_vertices integer DEFAULT 256)
 LANGUAGE plpgsql
@@ -1575,66 +1548,46 @@ begin
 		delete from errors.agua_lentica_re4_6;
 	end if;
 
+	CALL validation.cap_temp_io_concurrency();
 	CALL validation.create_agua_lentica_2d();
-	CALL validation.create_curso_de_agua_eixo_extremos();
-	CALL validation.create_agua_lentica_anel(16);
+	CALL validation.create_agua_water_idx(256);
 
-	drop table if exists _re4_6_hits;
-	drop table if exists _re4_6_hit_class;
-	drop table if exists _re4_6_crossed;
+	drop table if exists _re4_6_scope;
 
-	create temp table _re4_6_hits on commit drop as
-	select distinct r.lake_id, p.identificador as eixo_id
-	from validation.agua_lentica_anel r
-	join validation.curso_de_agua_eixo_extremos p on ST_DWithin(p.geom, r.geom, 0.01)
-	join validation.agua_lentica_2d l on l.identificador = r.lake_id
-	where sect is null or ST_Intersects(l.g2d, sect);
+	create temp table _re4_6_scope on commit drop as
+	select i.water_id as identificador
+	from validation.agua_water_idx i
+	join validation.agua_lentica_2d l on l.identificador = i.water_id
+	join {schema}.curso_de_agua_eixo e
+		on e.geometria is not null
+		and e.geometria && i.geom
+	where i.kind = 'lentica'
+		and (sect is null or ST_Intersects(l.g2d, sect))
+		and ST_Length(ST_Intersection(ST_Force2D(e.geometria), i.geom)) > 0.01
+	group by i.water_id;
 
-	create index on _re4_6_hits (lake_id);
-
-	-- Midpoint-in-polygon agrees with ST_Within on hit pairs and avoids
-	-- line-in-polygon against 50k–110k vertex reservoirs.
-	create temp table _re4_6_hit_class on commit drop as
-	select h.lake_id,
-		h.eixo_id,
-		case
-			when l.npts >= 500 then ST_Contains(l.g2d, ST_LineInterpolatePoint(ST_Force2D(e.geometria), 0.5))
-			else ST_Within(ST_Force2D(e.geometria), l.g2d)
-		end as is_within
-	from _re4_6_hits h
-	join validation.agua_lentica_2d l on l.identificador = h.lake_id
-	join {schema}.curso_de_agua_eixo e on e.identificador = h.eixo_id;
-
-	create temp table _re4_6_crossed on commit drop as
-	select lake_id as identificador,
-		bool_or(is_within) as has_through_hit
-	from _re4_6_hit_class
-	group by lake_id
-	having count(*) filter (where not is_within) >= 2;
-
-	create index on _re4_6_crossed (identificador);
+	create index on _re4_6_scope (identificador);
 
 	with through as (
-		select c.identificador
-		from _re4_6_crossed c
-		where c.has_through_hit
-			or exists (
-				select 1
-				from validation.agua_lentica_2d l
-				join {schema}.curso_de_agua_eixo e
-					on e.geometria && l.g2d
-					and case
-						when l.npts >= 500 then ST_Contains(l.g2d, ST_LineInterpolatePoint(ST_Force2D(e.geometria), 0.5))
-						else ST_Within(ST_Force2D(e.geometria), l.g2d)
-					end
-				where l.identificador = c.identificador
-			)
+		select s.identificador
+		from _re4_6_scope s
+		where exists (
+			select 1
+			from validation.agua_lentica_2d l
+			join {schema}.curso_de_agua_eixo e
+				on e.geometria && l.g2d
+				and case
+					when l.npts >= 500 then ST_Contains(l.g2d, ST_LineInterpolatePoint(ST_Force2D(e.geometria), 0.5))
+					else ST_Within(ST_Force2D(e.geometria), l.g2d)
+				end
+			where l.identificador = s.identificador
+		)
 	),
 	classified as (
-		select c.identificador,
+		select s.identificador,
 			(t.identificador is not null) as has_through
-		from _re4_6_crossed c
-		left join through t on t.identificador = c.identificador
+		from _re4_6_scope s
+		left join through t on t.identificador = s.identificador
 	),
 	ins as (
 		insert into errors.agua_lentica_re4_6
@@ -1668,7 +1621,14 @@ declare
 	count_all integer := 0;
 	count_good integer := 0;
 	count_bad integer := 0;
+	desvio_3D numeric;
 begin
+	if ndd = 1 then
+		select coalesce(_args->>'desvio_3D', '0.028')::numeric into desvio_3D;
+	else
+		select coalesce(_args->>'desvio_3D', '0.141')::numeric into desvio_3D;
+	end if;
+
 	CALL validation.cap_temp_io_concurrency();
 
 	CREATE SCHEMA IF NOT EXISTS errors;
@@ -1691,6 +1651,7 @@ begin
 	drop table if exists _re4_7_hits;
 	drop table if exists _re4_7_agg;
 	drop table if exists _re4_7_in_scope;
+	drop table if exists _re4_7_geom_3d;
 
 	create temp table _re4_7_eixos on commit drop as
 	select e.identificador,
@@ -1749,17 +1710,52 @@ begin
 	from _re4_7_agg a
 	where a.interior_hit or a.within_some;
 
+	create temp table _re4_7_geom_3d on commit drop as
+	select h.eixo_id,
+		h.kind,
+		h.water_id,
+		coalesce(ST_3DDistance(x.geometria, w.geometria) <= desvio_3D, false) as hits_3d
+	from _re4_7_in_scope s
+	join _re4_7_hits h on h.eixo_id = s.eixo_id and h.interior
+	join {schema}.curso_de_agua_eixo x on x.identificador = h.eixo_id
+	left join lateral (
+		select a.geometria
+		from {schema}.curso_de_agua_area a
+		where h.kind = 'area' and a.identificador = h.water_id
+		union all
+		select a.geometria
+		from {schema}.agua_lentica a
+		where h.kind = 'lentica' and a.identificador = h.water_id
+	) w on true
+	where s.geom_bad;
+
+	update _re4_7_in_scope s
+	set geom_bad = false
+	where s.geom_bad
+		and not exists (
+			select 1 from _re4_7_geom_3d d
+			where d.eixo_id = s.eixo_id and d.hits_3d
+		);
+
+	delete from _re4_7_in_scope s
+	where exists (
+			select 1 from _re4_7_geom_3d d where d.eixo_id = s.eixo_id
+		)
+		and not exists (
+			select 1 from _re4_7_geom_3d d
+			where d.eixo_id = s.eixo_id and d.hits_3d
+		);
+
 	with failures as (
 		select s.eixo_id,
-			case h.kind when 'lentica' then 'agua_lentica' else 'curso_de_agua_area' end as entidade,
+			case d.kind when 'lentica' then 'agua_lentica' else 'curso_de_agua_area' end as entidade,
 			'não incluído'::text as motivo
 		from _re4_7_in_scope s
 		join (
-			select eixo_id, kind
-			from _re4_7_hits
-			where interior
-			group by eixo_id, kind
-		) h on h.eixo_id = s.eixo_id
+			select distinct eixo_id, kind
+			from _re4_7_geom_3d
+			where hits_3d
+		) d on d.eixo_id = s.eixo_id
 		where s.geom_bad
 		union all
 		select s.eixo_id, 'agua_lentica', 'uuid'
@@ -2703,14 +2699,21 @@ begin
 		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
 		count_all := count_all + all_aux;
 
-		execute format('select count(*) from {schema}.%I where st_3dlength(geometria) < %s', tabela, cvalue) INTO bad_aux;
+		execute format(
+			'select count(*) from {schema}.%1$I t, validation.area_trabalho_multi adt
+			where st_3dlength(t.geometria) < %2$s
+			and not ST_Intersects(t.geometria, ST_Boundary(adt.geometria))', tabela, cvalue) INTO bad_aux;
 		count_bad := count_bad + bad_aux;
 
 		if bad_aux > 0 then
 			tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS motivo TEXT NULL', tabela_erro);
-			execute format('insert into %s select *, ''min length'' from {schema}.%I where st_3dlength(geometria) < %s on conflict (identificador) do nothing', tabela_erro, tabela, cvalue);
+			execute format(
+				'insert into %1$s select t.*, ''min length'' from {schema}.%2$I t, validation.area_trabalho_multi adt
+				where st_3dlength(t.geometria) < %3$s
+				and not ST_Intersects(t.geometria, ST_Boundary(adt.geometria))
+				on conflict (identificador) do nothing', tabela_erro, tabela, cvalue);
 		end if;
 	end loop;
 
@@ -2758,14 +2761,23 @@ begin
 		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
 		count_all := count_all + all_aux;
 
-		execute format('select count(*) from {schema}.%I where st_3dlength(geometria) < %s and ST_Intersects(geometria, %L)', tabela, cvalue, sect) INTO bad_aux;
+		execute format(
+			'select count(*) from {schema}.%1$I t, validation.area_trabalho_multi adt
+			where st_3dlength(t.geometria) < %2$s
+			and ST_Intersects(t.geometria, %3$L)
+			and not ST_Intersects(t.geometria, ST_Boundary(adt.geometria))', tabela, cvalue, sect) INTO bad_aux;
 		count_bad := count_bad + bad_aux;
 
 		if bad_aux > 0 then
 			tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS motivo TEXT NULL', tabela_erro);
-			execute format('insert into %s select *, ''min length'' from {schema}.%I where st_3dlength(geometria) < %s and ST_Intersects(geometria, %L) on conflict (identificador) do nothing', tabela_erro, tabela, cvalue, sect);
+			execute format(
+				'insert into %1$s select t.*, ''min length'' from {schema}.%2$I t, validation.area_trabalho_multi adt
+				where st_3dlength(t.geometria) < %3$s
+				and ST_Intersects(t.geometria, %4$L)
+				and not ST_Intersects(t.geometria, ST_Boundary(adt.geometria))
+				on conflict (identificador) do nothing', tabela_erro, tabela, cvalue, sect);
 		end if;
 	end loop;
 
@@ -4287,6 +4299,7 @@ begin
         CROSS JOIN LATERAL (
             SELECT geometria FROM {schema}.curva_de_nivel AS ports
             WHERE all_cdn.identificador != ports.identificador
+			  AND ports.valor_tipo_curva IN ('1', '2')
             ORDER BY all_cdn.first_point <-> ports.geometria
             LIMIT 1
         ) AS closest_cdn
