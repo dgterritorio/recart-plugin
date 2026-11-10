@@ -1466,33 +1466,6 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE validation.create_agua_lentica_anel(max_vertices integer DEFAULT 16)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	CALL validation.create_agua_lentica_2d();
-
-	IF (SELECT count(*) FROM information_schema.tables
-		WHERE table_schema = 'validation' AND table_name = 'agua_lentica_anel') > 0 THEN
-		RAISE NOTICE 'A tabela validation.agua_lentica_anel já existe. Nada a fazer.';
-		RETURN;
-	END IF;
-
-	CREATE UNLOGGED TABLE validation.agua_lentica_anel AS
-	SELECT l.identificador AS lake_id, ST_Boundary(l.g2d) AS geom
-	FROM validation.agua_lentica_2d l
-	WHERE l.npts < 500
-	UNION ALL
-	SELECT l.identificador, g AS geom
-	FROM validation.agua_lentica_2d l
-	CROSS JOIN LATERAL ST_Subdivide(ST_Boundary(l.g2d), max_vertices) AS g
-	WHERE l.npts >= 500;
-
-	CREATE INDEX idx_agua_lentica_anel_geom ON validation.agua_lentica_anel USING GIST (geom);
-	CREATE INDEX idx_agua_lentica_anel_lake ON validation.agua_lentica_anel (lake_id);
-	ANALYZE validation.agua_lentica_anel;
-END;
-$$;
 
 CREATE OR REPLACE PROCEDURE validation.create_agua_water_idx(max_vertices integer DEFAULT 256)
 LANGUAGE plpgsql
@@ -1575,66 +1548,46 @@ begin
 		delete from errors.agua_lentica_re4_6;
 	end if;
 
+	CALL validation.cap_temp_io_concurrency();
 	CALL validation.create_agua_lentica_2d();
-	CALL validation.create_curso_de_agua_eixo_extremos();
-	CALL validation.create_agua_lentica_anel(16);
+	CALL validation.create_agua_water_idx(256);
 
-	drop table if exists _re4_6_hits;
-	drop table if exists _re4_6_hit_class;
-	drop table if exists _re4_6_crossed;
+	drop table if exists _re4_6_scope;
 
-	create temp table _re4_6_hits on commit drop as
-	select distinct r.lake_id, p.identificador as eixo_id
-	from validation.agua_lentica_anel r
-	join validation.curso_de_agua_eixo_extremos p on ST_DWithin(p.geom, r.geom, 0.01)
-	join validation.agua_lentica_2d l on l.identificador = r.lake_id
-	where sect is null or ST_Intersects(l.g2d, sect);
+	create temp table _re4_6_scope on commit drop as
+	select i.water_id as identificador
+	from validation.agua_water_idx i
+	join validation.agua_lentica_2d l on l.identificador = i.water_id
+	join {schema}.curso_de_agua_eixo e
+		on e.geometria is not null
+		and e.geometria && i.geom
+	where i.kind = 'lentica'
+		and (sect is null or ST_Intersects(l.g2d, sect))
+		and ST_Length(ST_Intersection(ST_Force2D(e.geometria), i.geom)) > 0.01
+	group by i.water_id;
 
-	create index on _re4_6_hits (lake_id);
-
-	-- Midpoint-in-polygon agrees with ST_Within on hit pairs and avoids
-	-- line-in-polygon against 50k–110k vertex reservoirs.
-	create temp table _re4_6_hit_class on commit drop as
-	select h.lake_id,
-		h.eixo_id,
-		case
-			when l.npts >= 500 then ST_Contains(l.g2d, ST_LineInterpolatePoint(ST_Force2D(e.geometria), 0.5))
-			else ST_Within(ST_Force2D(e.geometria), l.g2d)
-		end as is_within
-	from _re4_6_hits h
-	join validation.agua_lentica_2d l on l.identificador = h.lake_id
-	join {schema}.curso_de_agua_eixo e on e.identificador = h.eixo_id;
-
-	create temp table _re4_6_crossed on commit drop as
-	select lake_id as identificador,
-		bool_or(is_within) as has_through_hit
-	from _re4_6_hit_class
-	group by lake_id
-	having count(*) filter (where not is_within) >= 2;
-
-	create index on _re4_6_crossed (identificador);
+	create index on _re4_6_scope (identificador);
 
 	with through as (
-		select c.identificador
-		from _re4_6_crossed c
-		where c.has_through_hit
-			or exists (
-				select 1
-				from validation.agua_lentica_2d l
-				join {schema}.curso_de_agua_eixo e
-					on e.geometria && l.g2d
-					and case
-						when l.npts >= 500 then ST_Contains(l.g2d, ST_LineInterpolatePoint(ST_Force2D(e.geometria), 0.5))
-						else ST_Within(ST_Force2D(e.geometria), l.g2d)
-					end
-				where l.identificador = c.identificador
-			)
+		select s.identificador
+		from _re4_6_scope s
+		where exists (
+			select 1
+			from validation.agua_lentica_2d l
+			join {schema}.curso_de_agua_eixo e
+				on e.geometria && l.g2d
+				and case
+					when l.npts >= 500 then ST_Contains(l.g2d, ST_LineInterpolatePoint(ST_Force2D(e.geometria), 0.5))
+					else ST_Within(ST_Force2D(e.geometria), l.g2d)
+				end
+			where l.identificador = s.identificador
+		)
 	),
 	classified as (
-		select c.identificador,
+		select s.identificador,
 			(t.identificador is not null) as has_through
-		from _re4_6_crossed c
-		left join through t on t.identificador = c.identificador
+		from _re4_6_scope s
+		left join through t on t.identificador = s.identificador
 	),
 	ins as (
 		insert into errors.agua_lentica_re4_6
