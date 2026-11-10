@@ -4330,6 +4330,7 @@ begin
         CROSS JOIN LATERAL (
             SELECT geometria FROM {schema}.curva_de_nivel AS ports
             WHERE all_cdn.identificador != ports.identificador
+			  AND ports.valor_tipo_curva IN ('1', '2')
             ORDER BY all_cdn.first_point <-> ports.geometria
             LIMIT 1
         ) AS closest_cdn
