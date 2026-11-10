@@ -2699,14 +2699,21 @@ begin
 		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
 		count_all := count_all + all_aux;
 
-		execute format('select count(*) from {schema}.%I where st_3dlength(geometria) < %s', tabela, cvalue) INTO bad_aux;
+		execute format(
+			'select count(*) from {schema}.%1$I t, validation.area_trabalho_multi adt
+			where st_3dlength(t.geometria) < %2$s
+			and not ST_Intersects(t.geometria, ST_Boundary(adt.geometria))', tabela, cvalue) INTO bad_aux;
 		count_bad := count_bad + bad_aux;
 
 		if bad_aux > 0 then
 			tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS motivo TEXT NULL', tabela_erro);
-			execute format('insert into %s select *, ''min length'' from {schema}.%I where st_3dlength(geometria) < %s on conflict (identificador) do nothing', tabela_erro, tabela, cvalue);
+			execute format(
+				'insert into %1$s select t.*, ''min length'' from {schema}.%2$I t, validation.area_trabalho_multi adt
+				where st_3dlength(t.geometria) < %3$s
+				and not ST_Intersects(t.geometria, ST_Boundary(adt.geometria))
+				on conflict (identificador) do nothing', tabela_erro, tabela, cvalue);
 		end if;
 	end loop;
 
@@ -2754,14 +2761,23 @@ begin
 		execute format('select count(*) from {schema}.%I', tabela) INTO all_aux;
 		count_all := count_all + all_aux;
 
-		execute format('select count(*) from {schema}.%I where st_3dlength(geometria) < %s and ST_Intersects(geometria, %L)', tabela, cvalue, sect) INTO bad_aux;
+		execute format(
+			'select count(*) from {schema}.%1$I t, validation.area_trabalho_multi adt
+			where st_3dlength(t.geometria) < %2$s
+			and ST_Intersects(t.geometria, %3$L)
+			and not ST_Intersects(t.geometria, ST_Boundary(adt.geometria))', tabela, cvalue, sect) INTO bad_aux;
 		count_bad := count_bad + bad_aux;
 
 		if bad_aux > 0 then
 			tabela_erro := 'errors.' || tabela || '_pq2_4_1';
 			execute format('CREATE TABLE IF NOT exists %s (like {schema}.%I INCLUDING ALL)', tabela_erro, tabela);
 			execute format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS motivo TEXT NULL', tabela_erro);
-			execute format('insert into %s select *, ''min length'' from {schema}.%I where st_3dlength(geometria) < %s and ST_Intersects(geometria, %L) on conflict (identificador) do nothing', tabela_erro, tabela, cvalue, sect);
+			execute format(
+				'insert into %1$s select t.*, ''min length'' from {schema}.%2$I t, validation.area_trabalho_multi adt
+				where st_3dlength(t.geometria) < %3$s
+				and ST_Intersects(t.geometria, %4$L)
+				and not ST_Intersects(t.geometria, ST_Boundary(adt.geometria))
+				on conflict (identificador) do nothing', tabela_erro, tabela, cvalue, sect);
 		end if;
 	end loop;
 
