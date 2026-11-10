@@ -1668,7 +1668,14 @@ declare
 	count_all integer := 0;
 	count_good integer := 0;
 	count_bad integer := 0;
+	desvio_3D numeric;
 begin
+	if ndd = 1 then
+		select coalesce(_args->>'desvio_3D', '0.028')::numeric into desvio_3D;
+	else
+		select coalesce(_args->>'desvio_3D', '0.141')::numeric into desvio_3D;
+	end if;
+
 	CALL validation.cap_temp_io_concurrency();
 
 	CREATE SCHEMA IF NOT EXISTS errors;
@@ -1691,6 +1698,7 @@ begin
 	drop table if exists _re4_7_hits;
 	drop table if exists _re4_7_agg;
 	drop table if exists _re4_7_in_scope;
+	drop table if exists _re4_7_geom_3d;
 
 	create temp table _re4_7_eixos on commit drop as
 	select e.identificador,
@@ -1749,17 +1757,52 @@ begin
 	from _re4_7_agg a
 	where a.interior_hit or a.within_some;
 
+	create temp table _re4_7_geom_3d on commit drop as
+	select h.eixo_id,
+		h.kind,
+		h.water_id,
+		coalesce(ST_3DDistance(x.geometria, w.geometria) <= desvio_3D, false) as hits_3d
+	from _re4_7_in_scope s
+	join _re4_7_hits h on h.eixo_id = s.eixo_id and h.interior
+	join {schema}.curso_de_agua_eixo x on x.identificador = h.eixo_id
+	left join lateral (
+		select a.geometria
+		from {schema}.curso_de_agua_area a
+		where h.kind = 'area' and a.identificador = h.water_id
+		union all
+		select a.geometria
+		from {schema}.agua_lentica a
+		where h.kind = 'lentica' and a.identificador = h.water_id
+	) w on true
+	where s.geom_bad;
+
+	update _re4_7_in_scope s
+	set geom_bad = false
+	where s.geom_bad
+		and not exists (
+			select 1 from _re4_7_geom_3d d
+			where d.eixo_id = s.eixo_id and d.hits_3d
+		);
+
+	delete from _re4_7_in_scope s
+	where exists (
+			select 1 from _re4_7_geom_3d d where d.eixo_id = s.eixo_id
+		)
+		and not exists (
+			select 1 from _re4_7_geom_3d d
+			where d.eixo_id = s.eixo_id and d.hits_3d
+		);
+
 	with failures as (
 		select s.eixo_id,
-			case h.kind when 'lentica' then 'agua_lentica' else 'curso_de_agua_area' end as entidade,
+			case d.kind when 'lentica' then 'agua_lentica' else 'curso_de_agua_area' end as entidade,
 			'não incluído'::text as motivo
 		from _re4_7_in_scope s
 		join (
-			select eixo_id, kind
-			from _re4_7_hits
-			where interior
-			group by eixo_id, kind
-		) h on h.eixo_id = s.eixo_id
+			select distinct eixo_id, kind
+			from _re4_7_geom_3d
+			where hits_3d
+		) d on d.eixo_id = s.eixo_id
 		where s.geom_bad
 		union all
 		select s.eixo_id, 'agua_lentica', 'uuid'
