@@ -1990,12 +1990,12 @@ total as (select count(*) from {schema}.seg_via_ferrea),
 good as (select count(svf.*)
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov) and ST_EndPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov))
-		or st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
+		or st_intersects(svf.geometria, ST_Boundary(adt.geometria))
 ),
 bad as (select count(svf.*)
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
-		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
+		and st_intersects(svf.geometria, ST_Boundary(adt.geometria)) is not true
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
@@ -2004,19 +2004,19 @@ total as (select count(*) from {schema}.seg_via_ferrea),
 good as (select count(svf.*)
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov) and ST_EndPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov))
-		or st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
+		or st_intersects(svf.geometria, ST_Boundary(adt.geometria))
 ),
 bad as (select count(svf.*)
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
-		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
+		and st_intersects(svf.geometria, ST_Boundary(adt.geometria)) is not true
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select svf.*
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
-		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))$$ );
+		and st_intersects(svf.geometria, ST_Boundary(adt.geometria)) is not true$$ );
 
 delete from validation.rules_area where code = 're5_2_3_1';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
@@ -2029,12 +2029,12 @@ total as (select count(*) from {schema}.seg_via_ferrea),
 good as (select count(svf.*)
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where ST_Intersects(svf.geometria, '%1$s'::geometry) and ((ST_StartPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov) and ST_EndPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov))
-		or st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria)))
+		or st_intersects(svf.geometria, ST_Boundary(adt.geometria)))
 ),
 bad as (select count(svf.*)
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where ST_Intersects(svf.geometria, '%1$s'::geometry) and (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
-		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
+		and st_intersects(svf.geometria, ST_Boundary(adt.geometria)) is not true
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
@@ -2043,19 +2043,19 @@ total as (select count(*) from {schema}.seg_via_ferrea),
 good as (select count(svf.*)
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where ST_Intersects(svf.geometria, '%1$s'::geometry) and ((ST_StartPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov) and ST_EndPoint(svf.geometria) in (select geometria from {schema}.no_trans_ferrov))
-		or st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria)))
+		or st_intersects(svf.geometria, ST_Boundary(adt.geometria)))
 ),
 bad as (select count(svf.*)
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where ST_Intersects(svf.geometria, '%1$s'::geometry) and (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
-		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))
+		and st_intersects(svf.geometria, ST_Boundary(adt.geometria)) is not true
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select svf.*
 	from {schema}.seg_via_ferrea svf, validation.area_trabalho_multi adt
 	where ST_Intersects(svf.geometria, '%1$s'::geometry) and (ST_StartPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov) or ST_EndPoint(svf.geometria) not in (select geometria from {schema}.no_trans_ferrov))
-		and not st_intersects(svf.geometria, ST_ExteriorRing(adt.geometria))$$ );
+		and st_intersects(svf.geometria, ST_Boundary(adt.geometria)) is not true$$ );
 
 
 delete from validation.rules where code = 're5_2_3_2';
@@ -2361,12 +2361,12 @@ total as (select count(*) from {schema}.seg_via_rodov),
 good as (select count(svr.*)
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov) and ST_EndPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov))
-		or st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))
+		or st_intersects(svr.geometria, ST_Boundary(adt.geometria))
 ),
 bad as (select count(svr.*)
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
-		and st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)) is not true
+		and st_intersects(svr.geometria, ST_Boundary(adt.geometria)) is not true
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
@@ -2375,19 +2375,19 @@ total as (select count(*) from {schema}.seg_via_rodov),
 good as (select count(svr.*)
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov) and ST_EndPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov))
-		or st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria))
+		or st_intersects(svr.geometria, ST_Boundary(adt.geometria))
 ),
 bad as (select count(svr.*)
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
-		and st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)) is not true
+		and st_intersects(svr.geometria, ST_Boundary(adt.geometria)) is not true
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select svr.*
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where (ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
-		and st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)) is not true$$ );
+		and st_intersects(svr.geometria, ST_Boundary(adt.geometria)) is not true$$ );
 
 delete from validation.rules_area where code = 're5_5_3_1';
 insert into validation.rules_area ( code, name, rule, scope, entity,  query, query_nd2, report ) 
@@ -2400,12 +2400,12 @@ total as (select count(*) from {schema}.seg_via_rodov),
 good as (select count(svr.*)
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where ST_Intersects(svr.geometria, '%1$s'::geometry) and ((ST_StartPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov) and ST_EndPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov))
-		or st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)))
+		or st_intersects(svr.geometria, ST_Boundary(adt.geometria)))
 ),
 bad as (select count(svr.*)
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where ST_Intersects(svr.geometria, '%1$s'::geometry) and ((ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
-		and st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)) is not true)
+		and st_intersects(svr.geometria, ST_Boundary(adt.geometria)) is not true)
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
@@ -2414,19 +2414,19 @@ total as (select count(*) from {schema}.seg_via_rodov),
 good as (select count(svr.*)
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where ST_Intersects(svr.geometria, '%1$s'::geometry) and ((ST_StartPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov) and ST_EndPoint(svr.geometria) in (select geometria from {schema}.no_trans_rodov))
-		or st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)))
+		or st_intersects(svr.geometria, ST_Boundary(adt.geometria)))
 ),
 bad as (select count(svr.*)
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where ST_Intersects(svr.geometria, '%1$s'::geometry) and ((ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
-		and st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)) is not true)
+		and st_intersects(svr.geometria, ST_Boundary(adt.geometria)) is not true)
 )
 select total.count as total, good.count as good, bad.count as bad
 from total, good, bad$$,
 $$select svr.*
 	from {schema}.seg_via_rodov svr, validation.area_trabalho_multi adt
 	where ST_Intersects(svr.geometria, '%1$s'::geometry) and ((ST_StartPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov) or ST_EndPoint(svr.geometria) not in (select geometria from {schema}.no_trans_rodov))
-		and st_intersects(svr.geometria, ST_ExteriorRing(adt.geometria)) is not true)$$ );
+		and st_intersects(svr.geometria, ST_Boundary(adt.geometria)) is not true)$$ );
 
 
 delete from validation.rules where code = 're5_5_3_2';
